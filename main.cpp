@@ -5,6 +5,10 @@
 #include <stdarg.h>
 #include <string.h>
 
+#include <algorithm>
+#include <functional>
+#include <iterator>
+
 #include <stdexcept>
 #include <string>
 #include <vector>
@@ -232,7 +236,7 @@ public:
         m_textSection = os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
     }
     ~x86JITEngine() { os_freeExecutable(m_textSection); }
-    char* getFunction(const string &name) { return *_getFunctionEntry(name); }
+    unsigned char* getFunction(const string &name) { return (unsigned char*)*_getFunctionEntry(name); }
 
     void beginBuild();
     char** _getFunctionEntry(const string &name) { return &m_funcEntries[name]; }
@@ -278,6 +282,8 @@ public:
     int getCodeSize() const{ return m_codeSize;}
 
     void beginBuild(){
+    	emit(3, 0x48, 0x31, 0xc0);
+        emit(1, 0xc3); // ret,wxf
         emit(1, 0x52); // push edx
         emit(1, 0x55); // push ebp
         emit(2, 0x8b, 0xec); // mov ebp, esp
@@ -753,24 +759,19 @@ static int loadFile(const char *fileName) {
         return 1;
     }
 }
-int main(int argc, char *argv[]) {
-    x86JITEngine _engine;
 
-    g_jitEngine = &_engine;
-    *g_jitEngine->_getFunctionEntry("loadFile") = (char*)loadFile;
-
-    if (argc >= 2) {
-        int erro = loadFile(argv[1]);
-        return erro ? erro : ((int(*)())g_jitEngine->getFunction("main"))();
-    }
-
+int handleInput(){
     int lineNum = 0;
     for (string line; ; ++lineNum) {
         printf(">>> ");
         if (!getline(cin, line)) break;
+		line.erase(line.begin(), std::find_if(line.begin(), line.end(), std::not1(std::ptr_fun(::isspace))));
+        if (line.size() == 0)continue;
+        if (line == "q")break;
 
         try {
             Scanner scanner(line.c_str());
+
             bool isFuncDefine = false;
             switch (scanner.LA(1).tid) {
                 case TID_TYPE_INT: case TID_TYPE_STRING: case TID_TYPE_VOID: 
@@ -778,6 +779,7 @@ int main(int argc, char *argv[]) {
                     break;
                 default: break;
             }
+
             if (!isFuncDefine) {
                 line = format("int temp_%d(){ return %s; }", lineNum, line.c_str());
                 scanner = Scanner(line.c_str());
@@ -788,11 +790,46 @@ int main(int argc, char *argv[]) {
             g_jitEngine->endBuild();
 
             if (!isFuncDefine) {
-                printf("%d\n", ((int(*)())g_jitEngine->getFunction(format("temp_%d", lineNum)))());
+            	unsigned char*p = g_jitEngine->getFunction(format("temp_%d", lineNum));
+            	int(*f)() = (int(*)())p;
+	            printf("f=%p, %02x %02x\n", f, p[0], p[1]);
+            	
+                printf("ret=%d\n", f());
+            printf("%d\n",__LINE__);
             }
 
         } catch(const exception &e) {
             puts(e.what());
         } 
     }
+    return 0;	
+}
+
+int handleFile(char *file){
+    int ret = loadFile(file);
+    if(ret == 0){
+    	int(*mainFunc)() = (int(*)())g_jitEngine->getFunction("main");
+    	ret = mainFunc();
+    }
+	return ret;
+}
+
+x86JITEngine* createX86JitEngine(){
+    x86JITEngine *engine = new x86JITEngine();
+    *engine->_getFunctionEntry("loadFile") = (char*)loadFile;
+	return engine;
+}
+
+int main(int argc, char *argv[]) {
+	int ret = 0;
+	g_jitEngine = createX86JitEngine();
+
+    if (argc >= 2) {
+        ret = handleFile(argv[1]);
+    }
+    else{
+    	ret = handleInput();    	
+    }    
+
+    return ret;
 }
