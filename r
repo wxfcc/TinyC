@@ -1,2 +1,2 @@
-g++ main.cpp -o tc
+g++ src/main.cpp -o tc
 ./tc

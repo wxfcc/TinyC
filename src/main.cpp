@@ -1,4 +1,4 @@
-#include "pch.h"
+//#include "pch.h"
 //============================== 
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,6 +14,7 @@
 #include <vector>
 #include <set>
 #include <map>
+#include <iostream>
 using namespace std;
 //============================== 
 #define _TO_STRING(e) #e
@@ -21,6 +22,7 @@ using namespace std;
 #define FILE_LINE __FILE__ "(" TO_STRING(__LINE__) ")"
 #define ASSERT(b) do { if(!(b)) throw logic_error(FILE_LINE " : assert failed ! " #b); } while(0)
 #define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
+
 static string unescape(const string &s) {
     string r;
     for (int i = 0; i < (int)s.size(); ++i) {
@@ -673,19 +675,38 @@ private:
 private:
     static int getOperatorLBP(TokenID tid) {
         switch (tid) {
-            case TID_RP: case TID_COMMA: case TID_SEMICELON: return 0;
-            case TID_OP_AND: case TID_OP_OR: return 10;
-            case TID_OP_LESS: case TID_OP_LESSEQ: case TID_OP_GREATER: case TID_OP_GREATEREQ: case TID_OP_EQUAL: case TID_OP_NEQUAL:
+            case TID_RP: 
+            case TID_COMMA: 
+            case TID_SEMICELON: 
+            	return 0;
+            case TID_OP_AND: 
+            case TID_OP_OR: 
+            	return 10;
+            case TID_OP_LESS: 
+            case TID_OP_LESSEQ: 
+            case TID_OP_GREATER: 
+        	case TID_OP_GREATEREQ: 
+    		case TID_OP_EQUAL: 
+        	case TID_OP_NEQUAL:
                 return 20;
-            case TID_OP_ADD: case TID_OP_SUB: return 30;
-            case TID_OP_MUL: case TID_OP_DIV: case TID_OP_MOD: return 40;
-            default: ASSERT(0); return 0;
+            case TID_OP_ADD: 
+            case TID_OP_SUB: 
+            	return 30;
+            case TID_OP_MUL: 
+        	case TID_OP_DIV: 
+        	case TID_OP_MOD: 
+        		return 40;
+            default: 
+            	ASSERT(0); 
+            	return 0;
         }
     }
     static int getOperatorRBP(TokenID tid) {
         switch (tid) {
-            case TID_OP_NOT: return 100;
-            default: return getOperatorLBP(tid);
+            case TID_OP_NOT: 
+            	return 100;
+            default: 
+            	return getOperatorLBP(tid);
         }
     }
 private:
@@ -774,10 +795,13 @@ int handleInput(){
 
             bool isFuncDefine = false;
             switch (scanner.LA(1).tid) {
-                case TID_TYPE_INT: case TID_TYPE_STRING: case TID_TYPE_VOID: 
+                case TID_TYPE_INT: 
+                case TID_TYPE_STRING: 
+                case TID_TYPE_VOID: 
                     if (scanner.LA(2).tid == TID_ID && scanner.LA(3).tid == TID_LP) isFuncDefine = true;
                     break;
-                default: break;
+                default: 
+                	break;
             }
 
             if (!isFuncDefine) {
@@ -790,12 +814,13 @@ int handleInput(){
             g_jitEngine->endBuild();
 
             if (!isFuncDefine) {
-            	unsigned char*p = g_jitEngine->getFunction(format("temp_%d", lineNum));
+            	string tf = format("temp_%d", lineNum);
+            	unsigned char*p = g_jitEngine->getFunction(tf);
+
+	            printf("func %s: %p, code: %02x %02x %02x %02x\n", tf.c_str(), p, p[0], p[1], p[2], p[3]);
             	int(*f)() = (int(*)())p;
-	            printf("f=%p, %02x %02x\n", f, p[0], p[1]);
             	
                 printf("ret=%d\n", f());
-            printf("%d\n",__LINE__);
             }
 
         } catch(const exception &e) {
