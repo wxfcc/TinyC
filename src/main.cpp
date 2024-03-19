@@ -1,5 +1,3 @@
-//#include "pch.h"
-//============================== 
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
@@ -15,13 +13,9 @@
 #include <set>
 #include <map>
 #include <iostream>
+#include "x86jit.h"
 using namespace std;
 //============================== 
-#define _TO_STRING(e) #e
-#define TO_STRING(e) _TO_STRING(e)
-#define FILE_LINE __FILE__ "(" TO_STRING(__LINE__) ")"
-#define ASSERT(b) do { if(!(b)) throw logic_error(FILE_LINE " : assert failed ! " #b); } while(0)
-#define ARRAY_SIZE(a) (sizeof(a) / sizeof(a[0]))
 
 static string unescape(const string &s) {
     string r;
@@ -61,19 +55,16 @@ static string readFile(const string &fileName) {
     return r;
 }
 //============================== lexical analysis
-enum TokenID {
-    TID_LP, TID_RP, TID_LBRACE, TID_RBRACE, TID_LBRACKET, TID_RBRACKET, TID_COMMA, TID_SEMICELON,
-    TID_IF, TID_ELSE, TID_FOR, TID_WHILE, TID_CONTINUE, TID_BREAK, TID_RETURN,
-    TID_OP_NOT, TID_OP_INC, TID_OP_DEC,
-    TID_OP_ASSIGN,
-    TID_OP_AND, TID_OP_OR,
-    TID_OP_ADD, TID_OP_SUB, TID_OP_MUL, TID_OP_DIV, TID_OP_MOD,   
-    TID_OP_LESS, TID_OP_LESSEQ, TID_OP_GREATER, TID_OP_GREATEREQ, TID_OP_EQUAL, TID_OP_NEQUAL, 
-    TID_TYPE_INT, TID_TYPE_STRING, TID_TYPE_VOID,
-    TID_TRUE, TID_FALSE,
-    // special 
-    TID_INT, TID_ID, TID_STRING,
-    TID_EOF,
+const char *lexemes[] = {
+    "(", ")", "{", "}", "[", "]", ",", ";",
+    "if", "else", "for", "while", "continue", "break", "return",
+    "!", "++", "--",
+    "=",
+    "&&", "||",
+    "+", "-", "*", "/", "%", 
+    "<", "<=", ">", ">=", "==", "!=",
+    "int", "string", "void",
+    "true", "false",
 };
 struct Token {
     TokenID tid;
@@ -84,17 +75,6 @@ struct Token {
 };
 static map<string, Token> setupBuildinTokens() {
     map<string, Token> tokens;
-    const char *lexemes[] = {
-        "(", ")", "{", "}", "[", "]", ",", ";",
-        "if", "else", "for", "while", "continue", "break", "return",
-        "!", "++", "--",
-        "=",
-        "&&", "||",
-        "+", "-", "*", "/", "%", 
-        "<", "<=", ">", ">=", "==", "!=",
-        "int", "string", "void",
-        "true", "false",
-    };
     for (int i = 0; i < ARRAY_SIZE(lexemes); ++i) tokens[lexemes[i]] = Token((TokenID)i);
     return tokens; 
 }
@@ -171,31 +151,33 @@ private:
 #pragma comment(lib, "Psapi.lib")
 #pragma warning(default : 4311)
 #pragma warning(default : 4312)
-static char* os_mallocExecutable(int size) {
+char* os_mallocExecutable(int size) {
     char *p = (char*)::VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
     ASSERT(p != NULL);
     return p;
 }
-static void os_freeExecutable(char *p) {
+void os_freeExecutable(char *p) {
     ASSERT(p != NULL);
 	::VirtualFree(p, 0, MEM_RELEASE);
 }
-static char* os_findSymbol(const char *funcName) {
+char* os_findSymbol(const char *funcName) {
     HANDLE process = ::OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId());
     ASSERT(process != NULL);
 
     vector<HMODULE> modules;
-    {
-        DWORD bytes;
-        ::EnumProcessModules(process, NULL, 0, &bytes);
-        modules.resize(bytes / sizeof(modules[0]));
-        ::EnumProcessModules(process, &modules[0], bytes, &bytes);
-    }
+    DWORD bytes;
+    EnumProcessModules(process, NULL, 0, &bytes);
+    modules.resize(bytes / sizeof(modules[0]));
+    EnumProcessModules(process, &modules[0], bytes, &bytes);
+
     ASSERT(modules.size() > 0);
 
     char *func = NULL;
     for (int i = 0; i < (int)modules.size(); ++i) {
         if (func = (char*)::GetProcAddress(modules[i], funcName)) {
+            char moduleName[256] = { 0 };
+            GetModuleBaseName(process, modules[i], moduleName, sizeof(moduleName));
+            printf("%s %s\n", moduleName, funcName);
             break;
         }
     }
@@ -209,7 +191,7 @@ static char* os_findSymbol(const char *funcName) {
 #include <dlfcn.h>
 #include <unistd.h>
 #include <sys/mman.h>
-static char* os_mallocExecutable(int size) {
+char* os_mallocExecutable(int size) {
     char *p = NULL;
     int erro = ::posix_memalign((void**)&p, ::getpagesize(), size);
     ASSERT(erro == 0 && p != NULL);
@@ -217,252 +199,18 @@ static char* os_mallocExecutable(int size) {
     ASSERT(erro == 0);
     return p;
 }
-static void os_freeExecutable(char *p) {
+void os_freeExecutable(char *p) {
     ASSERT(p != NULL);
     ::free(p);
 }
-static char* os_findSymbol(const char *funcName) {
+char* os_findSymbol(const char *funcName) {
     void *m = ::dlopen(NULL, RTLD_NOW);
     char *r = (char*)::dlsym(m, funcName);
     ::dlclose(m);
     return r;
 }
 #endif
-//============================== code generator
-#define MAX_TEXT_SECTION_SIZE (4096 * 8)
-#define MAX_LOCAL_COUNT 64
-class x86FunctionBuilder;
-class x86JITEngine {
-public:
-    x86JITEngine(): m_textSectionSize(0) {
-        m_textSection = os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
-    }
-    ~x86JITEngine() { os_freeExecutable(m_textSection); }
-    unsigned char* getFunction(const string &name) { return (unsigned char*)*_getFunctionEntry(name); }
 
-    void beginBuild();
-    char** _getFunctionEntry(const string &name) { return &m_funcEntries[name]; }
-    const char* _getLiteralStringLoc(const string &literalStr) { return m_literalStrs.insert(literalStr).first->c_str();}
-    x86FunctionBuilder* beginBuildFunction();
-    void endBuildFunction(x86FunctionBuilder *builder);
-    void endBuild();
-private:
-    char *m_textSection;
-    int m_textSectionSize;
-    map<string, char*> m_funcEntries;
-    set<string> m_literalStrs;
-};
-class x86Label { 
-public:
-    x86Label(): m_address(NULL){}
-    ~x86Label() { ASSERT(m_address != NULL); }
-    void mark(char *address) {
-        ASSERT(m_address == NULL);
-        m_address = address;
-        bindRefs();
-    }
-    void addRef(char *ref) {
-        m_refs.push_back(ref);
-        bindRefs();
-    }
-private:
-    void bindRefs() {
-        if (m_address == NULL) return;
-        for (int i = 0; i < (int)m_refs.size(); ++i) {
-            *(int*)m_refs[i] = int(m_address - (m_refs[i] + 4));
-        }
-        m_refs.clear();
-    }
-private:
-    char *m_address;
-    vector<char*> m_refs;
-};
-class x86FunctionBuilder {
-public:
-    x86FunctionBuilder(x86JITEngine *parent, char *codeBuf): m_parent(parent), m_codeBuf(codeBuf), m_codeSize(0){}
-    string& getFuncName() { return m_funcName;}
-    int getCodeSize() const{ return m_codeSize;}
-
-    void beginBuild(){
-    	emit(3, 0x48, 0x31, 0xc0);
-        emit(1, 0xc3); // ret,wxf
-        emit(1, 0x52); // push edx
-        emit(1, 0x55); // push ebp
-        emit(2, 0x8b, 0xec); // mov ebp, esp
-        emit(2, 0x81, 0xec); emitValue(MAX_LOCAL_COUNT * 4); // sub esp, MAX_LOCAL_COUNT * 4
-    }
-    void endBuild(){
-        markLabel(&m_retLabel);
-        emit(2, 0x8b, 0xe5);  // mov esp,ebp 
-        emit(1, 0x5d); // pop ebp  
-        emit(1, 0x5a); // pop edx  
-        emit(1, 0xc3); // ret
-    }
-
-    void loadImm(int imm){
-        emit(1, 0x68); emitValue(imm); // push imm
-    }
-    void loadLiteralStr(const string &literalStr){
-        const char *loc = m_parent->_getLiteralStringLoc(literalStr);
-        emit(1, 0x68); emitValue(loc); // push loc
-    }
-    void loadLocal(int idx){
-        emit(2, 0xff, 0xb5); emitValue(localIdx2EbpOff(idx)); // push dword ptr [ebp + idxOff]
-    }
-    void storeLocal(int idx) {
-        emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-        emit(2, 0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov dword ptr [ebp + idxOff], eax
-        emit(2, 0x83, 0xc4); emitValue((char)4); // add esp, 4
-    }
-    void incLocal(int idx) {
-        emit(2, 0xff, 0x85); emitValue(localIdx2EbpOff(idx)); // inc dword ptr [ebp + idxOff]
-    }
-    void decLocal(int idx) {
-        emit(2, 0xff, 0x8d); emitValue(localIdx2EbpOff(idx)); // dec dword ptr [ebp + idxOff]
-    }
-    void pop(int n){
-        emit(2, 0x81, 0xc4); emitValue(n * 4); // add esp, n * 4
-    }
-    void dup(){
-        emit(3, 0xff, 0x34, 0x24); // push dword ptr [esp]
-    }
-
-    void doArithmeticOp(TokenID opType) {
-        emit(4, 0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4]
-        switch (opType) {
-            case TID_OP_ADD: 
-                emit(3, 0x03, 0x04, 0x24); // add eax, dword ptr [esp]
-                break;
-            case TID_OP_SUB: 
-                emit(3, 0x2b, 0x04, 0x24); // sub eax, dword ptr [esp]
-                break;
-            case TID_OP_MUL: 
-                emit(4, 0x0f, 0xaf, 0x04, 0x24); // imul eax, dword ptr [esp]
-                break;
-            case TID_OP_DIV: 
-            case TID_OP_MOD: 
-                emit(2, 0x33, 0xd2); // xor edx, edx
-                emit(3, 0xf7, 0x3c, 0x24); // idiv dword ptr [esp]
-                if (opType == TID_OP_MOD) {
-                    emit(2, 0x8b, 0xc2); // mov eax, edx
-                }
-                break;  
-            default: ASSERT(0); break;
-        }
-        emit(4, 0x89, 0x44, 0x24, 0x04); // mov dword ptr [esp+4], eax
-        emit(3, 0x83, 0xc4, 0x04); // add esp, 4
-    }
-    void cmp(TokenID cmpType) {
-        x86Label label_1, label_0, label_end;
-        emit(4, 0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4] 
-        emit(3, 0x8b, 0x14, 0x24); // mov edx, dword ptr[esp]
-        emit(2, 0x83, 0xc4); emitValue((char)8);// add esp, 8
-        emit(2, 0x3b, 0xc2); // cmp eax, edx
-        condJmp(cmpType, &label_1);
-        jmp(&label_0);
-        markLabel(&label_1);
-        emit(2, 0x6a, 0x01); // push 1
-        jmp(&label_end);
-        markLabel(&label_0);
-        emit(2, 0x6a, 0x00); // push 0
-        markLabel(&label_end);
-    }
-
-    void markLabel(x86Label *label){ label->mark(m_codeBuf + m_codeSize); }
-    void jmp(x86Label *label) { 
-        emit(1, 0xe9);
-        char *ref = m_codeBuf + m_codeSize;
-        emitValue(NULL);
-        label->addRef(ref); 
-    }
-    void trueJmp(x86Label *label) {
-        emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-        emit(3, 0x83, 0xc4, 0x04); // add esp, 4
-        emit(2, 0x85, 0xc0); // test eax, eax
-        condJmp(TID_OP_NEQUAL, label); 
-    }
-    void falseJmp(x86Label *label) {
-        emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-        emit(3, 0x83, 0xc4, 0x04); // add esp, 4
-        emit(2, 0x85, 0xc0); // test eax, eax
-        condJmp(TID_OP_EQUAL, label); 
-    }
-    void ret() { jmp(&m_retLabel); }
-    void retExpr() {
-        emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-        emit(3, 0x83, 0xc4, 0x04); // add esp, 4
-        jmp(&m_retLabel);
-    }
-
-    int beginCall(){
-        return 0;
-    }
-    void endCall(const string &funcName, int callID, int paramCount){
-        char ** entry = m_parent->_getFunctionEntry(funcName);
-        for (int i = 0; i < paramCount - 1; ++i) {
-            emit(3, 0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 4); // push dword ptr [esp+4*i]
-        }
-        emit(2, 0xff, 0x15); emitValue(entry); // call [entry]
-        pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
-        emit(1, 0x50); // push eax
-    }
-private:
-    void emit(int n, ...) {
-        va_list args;
-        va_start(args, n);
-        for (int i = 0; i < n; ++i) m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
-        va_end(args);
-    }
-    template<typename T>
-    void emitValue(T val) {
-        memcpy(m_codeBuf + m_codeSize, &val, sizeof(val));
-        m_codeSize += sizeof(val);
-    }
-private:
-    void condJmp(TokenID tid, x86Label *label) {
-        switch (tid) {
-            case TID_OP_LESS: emit(2, 0x0f, 0x8c); break;
-            case TID_OP_LESSEQ: emit(2, 0x0f, 0x8e); break;
-            case TID_OP_GREATER: emit(2, 0x0f, 0x8f); break;
-            case TID_OP_GREATEREQ: emit(2, 0x0f, 0x8d); break;
-            case TID_OP_EQUAL: emit(2, 0x0f, 0x84); break;
-            case TID_OP_NEQUAL: emit(2, 0x0f, 0x85); break;
-        }
-        char *ref = m_codeBuf + m_codeSize;
-        emitValue(NULL);
-        label->addRef(ref);
-    }
-private:
-    int localIdx2EbpOff(int idx) { return idx < 0 ? 8 - idx * 4 : -(1 + idx) * 4; }
-private:
-    x86JITEngine *m_parent;
-    char *m_codeBuf;
-    int m_codeSize;
-    string m_funcName;
-    x86Label m_retLabel;
-};
-void x86JITEngine::beginBuild() { }
-x86FunctionBuilder* x86JITEngine::beginBuildFunction() {
-    x86FunctionBuilder *r = new x86FunctionBuilder(this, m_textSection + m_textSectionSize);
-    r->beginBuild();
-    return r;
-}
-void x86JITEngine::endBuildFunction(x86FunctionBuilder *builder) {
-    builder->endBuild();
-    *_getFunctionEntry(builder->getFuncName()) = m_textSection + m_textSectionSize;
-    m_textSectionSize += builder->getCodeSize();
-    ASSERT(m_textSectionSize <= MAX_TEXT_SECTION_SIZE);
-    delete builder;
-}
-void x86JITEngine::endBuild() {
-    for (map<string, char*>::iterator iter = m_funcEntries.begin(); iter != m_funcEntries.end(); ++iter) {
-        if (iter->second == NULL) {
-            char *f = os_findSymbol(iter->first.c_str());
-            ASSERT(f != NULL);
-            iter->second = f;
-        }
-    }
-}
 //============================== syntax analysis
 class FunctionParser {
 public:
@@ -634,7 +382,8 @@ private:
                     else m_builder->decLocal(localIdx);
                     m_builder->loadLocal(localIdx);
                 } break;
-            default: ASSERT(0); break;
+            default: 
+                ASSERT(0); break;
         }
     }
     void _expr_led() {
@@ -769,6 +518,7 @@ private:
 static x86JITEngine* g_jitEngine;
 static int loadFile(const char *fileName) {
     try {
+        printf("loadFile: %s\n", fileName);
         g_jitEngine->beginBuild();
         string source = readFile(fileName);
         Scanner scanner(source.c_str());
@@ -842,6 +592,8 @@ int handleFile(char *file){
 x86JITEngine* createX86JitEngine(){
     x86JITEngine *engine = new x86JITEngine();
     *engine->_getFunctionEntry("loadFile") = (char*)loadFile;
+    *engine->_getFunctionEntry("runFile") = (char*)handleFile;
+    *engine->_getFunctionEntry("printf") = (char*)printf;
 	return engine;
 }
 
