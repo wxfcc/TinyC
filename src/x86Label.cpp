@@ -1,4 +1,5 @@
 
+#include "common.h"
 #include "x86Label.h"
 
 x86Label::x86Label(): m_address(NULL){

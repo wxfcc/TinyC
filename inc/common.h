@@ -1,5 +1,6 @@
 #ifndef __COMMON__H__
 #define __COMMON__H__
+#include <stdexcept>
 
 #define _TO_STRING(e) #e
 #define TO_STRING(e) _TO_STRING(e)

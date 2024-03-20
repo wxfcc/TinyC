@@ -10,6 +10,6 @@ int main()  {
 	printf("h=%d\n", h);
 	WriteConsoleA(h, "hello console\n", 14, 0, 0);
 	puts("=================");
-	runFile("test\\hello_mod.c");
+	runFile("..\\test\\hello_mod.c");
     return 0;
 }
