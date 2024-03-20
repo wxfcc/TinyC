@@ -196,8 +196,10 @@ int handleFile(char *file){
         }
         else {
             mainFunc = (int(*)())g_jitEngine->getFunction("main");
-            if (mainFunc)
+            if (mainFunc) {
                 ret = mainFunc();
+                printf("%s return: %d\n", file, ret);
+            }
             else
                 printf("not found main()\n");
         }
@@ -222,8 +224,9 @@ JITEngine* createJitEngine(int arch){
 
 int main(int argc, char *argv[]) {
 	int ret = 0;
-	//g_jitEngine = createJitEngine(JIT_X86);
-	g_jitEngine = createJitEngine(JIT_X64); argc = 1;
+    int arch = JIT_X86;
+    arch = JIT_X64;
+	g_jitEngine = createJitEngine(arch);
 
     if (argc >= 2) {
         ret = handleFile(argv[1]);

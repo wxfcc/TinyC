@@ -29,6 +29,9 @@
     <ClCompile Include="..\src\x64FunctionBuilder.cpp" />
     <ClCompile Include="..\src\x86FunctionBuilder.cpp" />
     <Text Include="..\test\hello.c">
+      <FileType>CppCode</FileType>
+    </Text>
+    <Text Include="..\test\hello0.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>CppCode</FileType>
     </Text>

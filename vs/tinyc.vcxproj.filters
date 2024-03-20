@@ -59,6 +59,9 @@
     <Text Include="..\test\test.c">
       <Filter>test</Filter>
     </Text>
+    <Text Include="..\test\hello0.c">
+      <Filter>test</Filter>
+    </Text>
     <Text Include="..\test\hello.c">
       <Filter>test</Filter>
     </Text>
