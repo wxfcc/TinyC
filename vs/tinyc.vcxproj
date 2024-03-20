@@ -22,13 +22,12 @@
     <ClCompile Include="..\src\FileParser.cpp" />
     <ClCompile Include="..\src\FunctionBuilder.cpp" />
     <ClCompile Include="..\src\FunctionParser.cpp" />
+    <ClCompile Include="..\src\JITEngine.cpp" />
+    <ClCompile Include="..\src\Label.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Scaner.cpp" />
     <ClCompile Include="..\src\x64FunctionBuilder.cpp" />
-    <ClCompile Include="..\src\x64jit.cpp" />
     <ClCompile Include="..\src\x86FunctionBuilder.cpp" />
-    <ClCompile Include="..\src\x86jit.cpp" />
-    <ClCompile Include="..\src\x86Label.cpp" />
     <Text Include="..\test\hello.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
       <FileType>CppCode</FileType>
@@ -51,10 +50,11 @@
     <ClInclude Include="..\inc\FileParser.h" />
     <ClInclude Include="..\inc\FunctionBuilder.h" />
     <ClInclude Include="..\inc\FunctionParser.h" />
+    <ClInclude Include="..\inc\JITEngine.h" />
+    <ClInclude Include="..\inc\Label.h" />
     <ClInclude Include="..\inc\Scanner.h" />
-    <ClInclude Include="..\inc\x64jit.h" />
-    <ClInclude Include="..\inc\x86jit.h" />
-    <ClInclude Include="..\inc\x86Label.h" />
+    <ClInclude Include="..\inc\x64FunctionBuilder.h" />
+    <ClInclude Include="..\inc\x86FunctionBuilder.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -110,6 +110,7 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <IncludePath>$(VC_IncludePath);$(WindowsSDK_IncludePath);$(ProjectDir)\..\inc</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>

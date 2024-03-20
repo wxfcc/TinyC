@@ -3,12 +3,11 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include <algorithm>
+//#include <algorithm>
 #include <functional>
 
 #include <iostream>
-#include "x86jit.h"
-#include "x64jit.h"
+#include "JITEngine.h"
 #include "Scanner.h"
 #include "FileParser.h"
 
@@ -123,7 +122,7 @@ char* os_findSymbol(const char *funcName) {
 
 //============================== syntax analysis
 //============================== 
-static x86JITEngine* g_jitEngine;
+static JITEngine* g_jitEngine;
 static int loadFile(const char *fileName) {
     try {
         printf("loadFile: %s\n", fileName);
@@ -205,9 +204,16 @@ int handleFile(char *file){
     }
 	return ret;
 }
-
-x86JITEngine* createX86JitEngine(){
-    x86JITEngine *engine = new x86JITEngine();
+#define JIT_X86     0
+#define JIT_X64     1
+#define JIT_ARM     2
+#define JIT_ARM64   3
+JITEngine* createJitEngine(int arch){
+    JITEngine* engine = NULL;
+    if(arch == JIT_X86)
+        engine = new JITEngine(x86FunctionBuilder::newBuilder);
+    else if(arch == JIT_X64)
+        engine = new JITEngine(x64FunctionBuilder::newBuilder);
     *engine->_getFunctionEntry("loadFile") = (char*)loadFile;
     *engine->_getFunctionEntry("runFile") = (char*)handleFile;
     *engine->_getFunctionEntry("printf") = (char*)printf;
@@ -216,7 +222,8 @@ x86JITEngine* createX86JitEngine(){
 
 int main(int argc, char *argv[]) {
 	int ret = 0;
-	g_jitEngine = createX86JitEngine();
+	//g_jitEngine = createJitEngine(JIT_X86);
+	g_jitEngine = createJitEngine(JIT_X64); argc = 1;
 
     if (argc >= 2) {
         ret = handleFile(argv[1]);

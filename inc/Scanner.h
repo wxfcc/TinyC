@@ -1,17 +1,7 @@
 #ifndef __SCANNER__H__
 #define __SCANNER__H__
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
-#include <string.h>
-
-#include <algorithm>
-#include <functional>
-
-#include <iostream>
-#include "x86jit.h"
-#include "x64jit.h"
+#include "JITEngine.h"
 using namespace std;
 
 struct Token {

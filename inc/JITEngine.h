@@ -1,32 +1,37 @@
-#ifndef __X86_JITENGINE__
-#define __X86_JITENGINE__
+#ifndef __JITENGINE_H__
+#define __JITENGINE_H__
 #include <string>
 #include <set>
 #include <map>
-#include "x86Label.h"
+#include "Label.h"
 #include "common.h"
+#include "FunctionBuilder.h"
+#include "x86FunctionBuilder.h"
+#include "x64FunctionBuilder.h"
 
 //============================== code generator
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
 #define MAX_LOCAL_COUNT 64
-class x86FunctionBuilder;
-class x86JITEngine {
+
+class JITEngine {
 public:
-    x86JITEngine();
-    ~x86JITEngine();
+    JITEngine(FunctionBuilder_FP builder_fp);
+    ~JITEngine();
     unsigned char* getFunction(const string &name);
 
     void beginBuild();
     char** _getFunctionEntry(const string &name);
     const char* _getLiteralStringLoc(const string &literalStr);
-    x86FunctionBuilder* beginBuildFunction();
-    void endBuildFunction(x86FunctionBuilder *builder);
+    FunctionBuilder* beginBuildFunction();
+    void endBuildFunction(FunctionBuilder *builder);
     void endBuild();
 protected:
     char *m_textSection;
     int m_textSectionSize;
     map<string, char*> m_funcEntries;
     set<string> m_literalStrs;
+    //(FunctionBuilder*) (m_funcBuilder);
+    FunctionBuilder_FP m_funcBuilderFP = NULL;
 };
 
 

@@ -1,22 +1,14 @@
 #ifndef __FUNCTION_PARSER__H__
 #define __FUNCTION_PARSER__H__
-#include <stdio.h>
-#include <stdlib.h>
 #include <stdarg.h>
-#include <string.h>
 
-#include <algorithm>
-#include <functional>
-
-#include <iostream>
-#include "x86jit.h"
-#include "x64jit.h"
+#include "JITEngine.h"
 #include "Scanner.h"
 using namespace std;
 
 class FunctionParser {
 public:
-    FunctionParser(x86FunctionBuilder* builder, Scanner* scanner);
+    FunctionParser(FunctionBuilder* builder, Scanner* scanner);
     void parse();
 private:
     void _function_define();
@@ -40,18 +32,18 @@ private:
     int declareArg(const string &name, const string &type);
     int declareLocal(const string &name, const string &type);
     int getLocal(const string &name);
-    x86Label* pushContinueLabel();
+    Label* pushContinueLabel();
     void popContinueLabel();
-    x86Label* getLastContinueLabel();
-    x86Label* pushBreakLabel();
+    Label* getLastContinueLabel();
+    Label* pushBreakLabel();
     void popBreakLabel();
-    x86Label* getLastBreakLabel();
+    Label* getLastBreakLabel();
 
 private:
-    x86FunctionBuilder *m_builder;
+    FunctionBuilder*m_builder;
     Scanner *m_scanner;
     vector<map<string, int> > m_nestedLocals;
     map<string, int> m_args;
-    vector<x86Label*> m_continueLabels, m_breakLabels;
+    vector<Label*> m_continueLabels, m_breakLabels;
 };
 #endif

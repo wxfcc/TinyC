@@ -24,15 +24,6 @@
     <ClCompile Include="..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\x64jit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\x86jit.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\src\x86Label.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\src\FunctionBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,6 +40,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Scaner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\JITEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Label.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -70,15 +67,6 @@
     <ClInclude Include="..\inc\common.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\x64jit.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\x86jit.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\x86Label.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
     <ClInclude Include="..\inc\FunctionBuilder.h">
       <Filter>Inc</Filter>
     </ClInclude>
@@ -89,6 +77,18 @@
       <Filter>Inc</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\Scanner.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\JITEngine.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Label.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\x64FunctionBuilder.h">
+      <Filter>Inc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\x86FunctionBuilder.h">
       <Filter>Inc</Filter>
     </ClInclude>
   </ItemGroup>

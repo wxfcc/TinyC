@@ -2,30 +2,23 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "x64jit.h"
-#include "FunctionBuilder.h"
+#include "JITEngine.h"
 
-x86FunctionBuilder::x86FunctionBuilder(x86JITEngine* parent, char* codeBuf) : FunctionBuilder(parent, codeBuf) {
-}
-x86FunctionBuilder* x86JITEngine::beginBuildFunction() {
-    x86FunctionBuilder* r = new x86FunctionBuilder(this, m_textSection + m_textSectionSize);
-    r->beginBuild();
-    return r;
-}
-void x86JITEngine::endBuildFunction(x86FunctionBuilder* builder) {
-    builder->endBuild();
-    *_getFunctionEntry(builder->getFuncName()) = m_textSection + m_textSectionSize;
-    m_textSectionSize += builder->getCodeSize();
-    ASSERT(m_textSectionSize <= MAX_TEXT_SECTION_SIZE);
-    delete builder;
+x86FunctionBuilder::x86FunctionBuilder(JITEngine* parent, char* codeBuf) : FunctionBuilder(parent, codeBuf) {
 }
 
-string& x86FunctionBuilder::getFuncName() {
-    return m_funcName;
+FunctionBuilder* x86FunctionBuilder::newBuilder(JITEngine* parent, char* codeBuf) {
+    FunctionBuilder* builder = new x86FunctionBuilder(parent, codeBuf);
+    return builder;
 }
-int x86FunctionBuilder::getCodeSize() const {
-    return m_codeSize;
-}
+
+
+//string& x86FunctionBuilder::getFuncName() {
+//    return m_funcName;
+//}
+//int x86FunctionBuilder::getCodeSize() const {
+//    return m_codeSize;
+//}
 
 void x86FunctionBuilder::beginBuild() {
     emit(1, 0x52); // push edx
@@ -95,7 +88,7 @@ void x86FunctionBuilder::doArithmeticOp(TokenID opType) {
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
 }
 void x86FunctionBuilder::cmp(TokenID cmpType) {
-    x86Label label_1, label_0, label_end;
+    Label label_1, label_0, label_end;
     emit(4, 0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4] 
     emit(3, 0x8b, 0x14, 0x24); // mov edx, dword ptr[esp]
     emit(2, 0x83, 0xc4); emitValue((char)8);// add esp, 8
@@ -110,20 +103,20 @@ void x86FunctionBuilder::cmp(TokenID cmpType) {
     markLabel(&label_end);
 }
 
-void x86FunctionBuilder::markLabel(x86Label* label) { label->mark(m_codeBuf + m_codeSize); }
-void x86FunctionBuilder::jmp(x86Label* label) {
+void x86FunctionBuilder::markLabel(Label* label) { label->mark(m_codeBuf + m_codeSize); }
+void x86FunctionBuilder::jmp(Label* label) {
     emit(1, 0xe9);
     char* ref = m_codeBuf + m_codeSize;
     emitValue(NULL);
     label->addRef(ref);
 }
-void x86FunctionBuilder::trueJmp(x86Label* label) {
+void x86FunctionBuilder::trueJmp(Label* label) {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
     emit(2, 0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_NEQUAL, label);
 }
-void x86FunctionBuilder::falseJmp(x86Label* label) {
+void x86FunctionBuilder::falseJmp(Label* label) {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
     emit(2, 0x85, 0xc0); // test eax, eax
@@ -162,7 +155,7 @@ void x86FunctionBuilder::emitValue(T val) {
     m_codeSize += sizeof(val);
 }
 
-void x86FunctionBuilder::condJmp(TokenID tid, x86Label* label) {
+void x86FunctionBuilder::condJmp(TokenID tid, Label* label) {
     switch ((int)tid) {
     case TID_OP_LESS: emit(2, 0x0f, 0x8c); break;
     case TID_OP_LESSEQ: emit(2, 0x0f, 0x8e); break;

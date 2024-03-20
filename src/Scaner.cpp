@@ -7,8 +7,7 @@
 #include <functional>
 
 #include <iostream>
-#include "x86jit.h"
-#include "x64jit.h"
+#include "JITEngine.h"
 #include "Scanner.h"
 using namespace std;
 

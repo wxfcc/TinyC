@@ -44,12 +44,17 @@ static string readFile(const string &fileName) {
 //============================== lexical analysis
 //============================== platform details for jit
 //============================== syntax analysis
-FunctionParser::FunctionParser(x86FunctionBuilder *builder, Scanner *scanner): m_builder(builder), m_scanner(scanner) {}
-void FunctionParser::parse() { _function_define(); }
+FunctionParser::FunctionParser(FunctionBuilder *builder, Scanner *scanner): m_builder(builder), m_scanner(scanner) {
+}
+
+void FunctionParser::parse() { 
+    _function_define(); 
+}
 
 void FunctionParser::_function_define() {
     m_scanner->next(1); // type
-    m_builder->getFuncName() = m_scanner->next(1).lexeme;
+    string lexeme = m_scanner->next(1).lexeme;
+    m_builder->getFuncName() = lexeme;
     ASSERT(m_scanner->next(1).tid == TID_LP);
     while (m_scanner->LA(1).tid != TID_RP) {
         string type = m_scanner->next(1).lexeme;
@@ -89,7 +94,7 @@ void FunctionParser::_statement() {
     }
 }
 void FunctionParser::_if() {
-    x86Label label_true, label_false, label_end;
+    Label label_true, label_false, label_end;
 
     m_scanner->next(2);
     _expr(0);
@@ -110,7 +115,7 @@ void FunctionParser::_if() {
     m_builder->markLabel(&label_end);
 }
 void FunctionParser::_while() {
-    x86Label *label_break = pushBreakLabel(), *label_continue = pushContinueLabel();
+    Label *label_break = pushBreakLabel(), *label_continue = pushContinueLabel();
 
     m_builder->markLabel(label_continue);
     m_scanner->next(2);
@@ -126,8 +131,8 @@ void FunctionParser::_while() {
 }
 void FunctionParser::_for() {
     pushScope();
-    x86Label *label_continue = pushContinueLabel(), *label_break = pushBreakLabel();
-    x86Label label_loop, label_body;
+    Label *label_continue = pushContinueLabel(), *label_break = pushBreakLabel();
+    Label label_loop, label_body;
 
     m_scanner->next(2);
     switch (m_scanner->LA(1).tid) {
@@ -220,7 +225,7 @@ void FunctionParser::_expr_led() {
     Token opToken = m_scanner->next(1);
     switch (opToken.tid) {
         case TID_OP_AND: case TID_OP_OR: {
-                x86Label label_end;
+                Label label_end;
                 m_builder->dup();
                 if (opToken.tid == TID_OP_AND) m_builder->falseJmp(&label_end);
                 else m_builder->trueJmp(&label_end);
@@ -313,11 +318,11 @@ int FunctionParser::getLocal(const string &name) {
     ASSERT(iter != m_args.end());
     return iter->second;
 }
-x86Label* FunctionParser::pushContinueLabel() { m_continueLabels.push_back(new x86Label()); return m_continueLabels.back(); }
+Label* FunctionParser::pushContinueLabel() { m_continueLabels.push_back(new Label()); return m_continueLabels.back(); }
 void FunctionParser::popContinueLabel() { delete m_continueLabels.back(); m_continueLabels.pop_back();}
-x86Label* FunctionParser::getLastContinueLabel() { return m_continueLabels.back(); }
-x86Label* FunctionParser::pushBreakLabel(){ m_breakLabels.push_back(new x86Label()); return m_breakLabels.back(); }
+Label* FunctionParser::getLastContinueLabel() { return m_continueLabels.back(); }
+Label* FunctionParser::pushBreakLabel(){ m_breakLabels.push_back(new Label()); return m_breakLabels.back(); }
 void FunctionParser::popBreakLabel(){ delete m_breakLabels.back(); m_breakLabels.pop_back();}
-x86Label* FunctionParser::getLastBreakLabel() { return m_breakLabels.back(); }
+Label* FunctionParser::getLastBreakLabel() { return m_breakLabels.back(); }
 
     
