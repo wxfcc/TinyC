@@ -1,0 +1,210 @@
+x64:
+00007FF65EB0268A E8 25 EA FF FF       call        t1 (07FF65EB010B4h)  		07FF65EB010B4-00007FF65EB0268A-5=0xffffea25
+
+00007FF65EB010B4 E9 C7 13 00 00       jmp         t1 (07FF65EB02480h)		07FF65EB02480-00007FF65EB010B4-5=0x13c7
+
+000000014000105A FF 25 A8 0F 00 00    jmp         qword ptr [140002008 h]  
+0000000140001060 FF 25 9A 0F 00 00    jmp         qword ptr [140002000 h]  
+
+0000000140002000 C0 56 3B 9A FE 7F 00 00
+0000000140002008 A0 D7 3A 9A FE 7F 00 00 
+=====================================================================
+    kk = ret;
+00007FF769461CD9 48 89 05 B8 84 00 00 mov         qword ptr [kk (07FF76946A198h)],rax  
+    kk2 = ret;
+00007FF769461CE0 48 8B 45 00          mov         rax,qword ptr [rbp]  
+00007FF769461CE4 48 89 05 B5 84 00 00 mov         qword ptr [kk2 (07FF76946A1A0h)],rax  
+
+
+07FF76946A198-00007FF769461CD9 - 7=84B8
+07FF76946A1A0-00007FF769461CE4 - 7=84B5
+
+=====================================================================
+x64:                                                                                 x64:                                                                           
+0140001000 48 83 EC 48                  sub         rsp,48h                          0140001000 48 83 EC 48                 sub         rsp,48h                      
+0140001004 B9 F5 FF FF FF               mov         ecx,0FFFFFFF5h                   0140001004 B9 F5 FF FF FF              mov         ecx,0FFFFFFF5h               
+0140001009 FF 15 F9 0F 00 00            call        qword ptr [140002008 h]          0140001009 E8 30 00 00 00              call        014000103E             
+014000100F 48 89 44 24 30               mov         qword ptr [rsp+30 h],rax         014000100E 89 44 24 30                 mov         dword ptr [rsp+30 h],eax      
+0140001014 48 C7 44 24 20 00 00 00 00   mov         qword ptr [rsp+20 h],0           0140001012 48 C7 44 24 20 00 00 00 00  mov         qword ptr [rsp+20 h],0  
+014000101D 45 33 C9                     xor         r9d,r9d                          014000101B 45 33 C9                    xor         r9d,r9d                      
+0140001020 41 B8 06 00 00 00            mov         r8d,6                            014000101E 41 B8 06 00 00 00           mov         r8d,6                        
+0140001026 48 8B 15 D3 1F 00 00         mov         rdx,qword ptr [140003000 h]      0140001024 48 8B 15 D5 1F 00 00        mov         rdx,qword ptr [140003000 h]   
+014000102D 48 8B 4C 24 30               mov         rcx,qword ptr [rsp+30 h]         014000102B 8B 4C 24 30                 mov         ecx,dword ptr [rsp+30 h]      
+0140001032 FF 15 C8 0F 00 00            call        qword ptr [140002000 h]          014000102F E8 10 00 00 00              call        0000000140001044             
+0140001038 B8 02 00 00 00               mov         eax,2                            0140001034 B8 02 00 00 00              mov         eax,2                        
+014000103D 48 83 C4 48                  add         rsp,48h                          0140001039 48 83 C4 48                 add         rsp,48h                      
+0140001041 C3                           ret                                          014000103D C3                          ret                                      
+
+0140002000 c0 56 3B 9A FE 7F 00 00   address of WriteConsoleA                        014000103E FF 25 C4 0F 00 00           jmp         qword ptr [140002008 h]       
+0140002008 A0 D7 3A 9A FE 7F 00 00   address of GetStdHandle                         0140001044 FF 25 B6 0F 00 00           jmp         qword ptr [140002000 h]       
+
+=====================================================================
+a.exe x86                                                                                    minexe.exe:                                                                        
+.text:00700044          public start                                                        .text:00401000                 public start                                    
+.text:00700044 start    proc near                                                           .text:00401000 start           proc near                                       
+                                                                                            .text:00401000                                                                 
+                                                                                            .text:00401000 hConsoleOutput  = dword ptr -4                                  
+                                                                                            .text:00401000                                                                 
+.text:00700044          push    ebp                                                         .text:00401000                 push    ebp                                     
+.text:00700045          mov     ebp, esp                                                    .text:00401001                 mov     ebp, esp                                
+.text:00700047          sub     esp, 68h                                                    .text:00401003                 push    ecx                                     
+.text:0070004A          push    0FFFFFFF6h      ; nStdHandle                                .text:00401004                 push    0FFFFFFF5h      ; nStdHandle            
+.text:0070004C          call    ds:GetStdHandle                                             .text:00401006                 call    ds:GetStdHandle                         
+.text:00700052          mov     dword_600800, eax                                           .text:0040100C                 mov     [ebp+hConsoleOutput], eax               
+.text:00700057          push    0FFFFFFF5h      ; nStdHandle                                .text:0040100F                 push    0               ; lpReserved            
+.text:00700059          call    ds:GetStdHandle                                             .text:00401011                 push    0               ; lpNumberOfCharsWritten
+.text:0070005F          mov     hConsoleOutput, eax                                         .text:00401013                 push    6               ; nNumberOfCharsToWrite 
+.text:00700064          push    0               ; lpReserved                                .text:00401015                 mov     eax, lpBuffer                           
+.text:00700066          push    offset NumberOfCharsWritten ; lpNumberOfCharsWritten        .text:0040101A                 push    eax             ; lpBuffer              
+.text:0070006B          push    0Eh             ; nNumberOfCharsToWrite                     .text:0040101B                 mov     ecx, [ebp+hConsoleOutput]               
+.text:00700070          push    offset aHelloWorldN ; "Hello world!\\n"                     .text:0040101E                 push    ecx             ; hConsoleOutput        
+.text:00700075          push    hConsoleOutput  ; hConsoleOutput                            .text:0040101F                 call    ds:WriteConsoleA                        
+.text:0070007B          call    ds:WriteConsoleA                                            .text:00401025                 mov     eax, 2                                  
+.text:00700081          push    0               ; lpReserved                                .text:0040102A                 mov     esp, ebp                                
+.text:00700083          push    offset NumberOfCharsWritten ; lpNumberOfCharsWritten        .text:0040102C                 pop     ebp                                     
+.text:00700088          push    1               ; nNumberOfCharsToWrite                     .text:0040102D                 retn                                            
+.text:0070008D          push    offset unk_800000 ; lpBuffer                                .text:0040102D start           endp                                            
+.text:00700092          push    hConsoleOutput  ; hConsoleOutput                      
+.text:00700098          call    ds:WriteConsoleA                                      
+.text:0070009E          mov     eax, offset sub_700000                                
+.text:007000A3          call    eax ; sub_700000                                      
+.text:007000A5          mov     esp, ebp                                              
+.text:007000A7          pop     ebp                                                   
+.text:007000A8          retn                                                          
+.text:007000A8 start    endp                                                          
+=====================================================================
+x64:
+0000000140001000 40 56                push        rsi  
+0000000140001002 57                   push        rdi  
+0000000140001003 48 83 EC 48          sub         rsp,48h  
+0000000140001007 48 8D 44 24 34       lea         rax,[rsp+34 h]  
+000000014000100C 48 8D 0D 05 10 00 00 lea         rcx,[140002018 h]  
+0000000140001013 48 8B F8             mov         rdi,rax  
+0000000140001016 48 8B F1             mov         rsi,rcx  
+0000000140001019 B9 07 00 00 00       mov         ecx,7  
+000000014000101E F3 A4                rep movs    byte ptr [rdi],byte ptr [rsi]  
+0000000140001020 B9 F5 FF FF FF       mov         ecx,0FFFFFFF5h  
+0000000140001025 E8 30 00 00 00       call        000000014000105A  
+000000014000102A 89 44 24 30          mov         dword ptr [rsp+30 h],eax  
+000000014000102E 48 C7 44 24 20 00 00 00 00 mov         qword ptr [rsp+20 h],0  
+0000000140001037 45 33 C9             xor         r9d,r9d  
+000000014000103A 41 B8 07 00 00 00    mov         r8d,7  
+0000000140001040 48 8D 54 24 34       lea         rdx,[rsp+34 h]  
+0000000140001045 8B 4C 24 30          mov         ecx,dword ptr [rsp+30 h]  
+0000000140001049 E8 12 00 00 00       call        0000000140001060  
+000000014000104E B8 02 00 00 00       mov         eax,2  
+0000000140001053 48 83 C4 48          add         rsp,48h  
+0000000140001057 5F                   pop         rdi  
+0000000140001058 5E                   pop         rsi  
+0000000140001059 C3                   ret  
+000000014000105A FF 25 A8 0F 00 00    jmp         qword ptr [140002008 h]  
+0000000140001060 FF 25 9A 0F 00 00    jmp         qword ptr [140002000 h]  
+
+0000000140002000 C0 56 3B 9A FE 7F 00 00
+0000000140002008 A0 D7 3A 9A FE 7F 00 00 
+
+
+=====================================================================
+x64:
+00000001`40001100 55                    push    rbp
+00000001`40001101 4889e5                mov     rbp,rsp
+00000001`40001104 4883ec68              sub     rsp,68h
+00000001`40001108 b9f6ffffff            mov     ecx,0FFFFFFF6h
+00000001`4000110d ff15521f0000          call    qword ptr [a+0x3065 (00000001`40003065)]
+00000001`40001113 488905e6160000        mov     qword ptr [a+0x2800 (00000001`40002800)],rax
+00000001`4000111a b9f5ffffff            mov     ecx,0FFFFFFF5h
+00000001`4000111f ff15401f0000          call    qword ptr [a+0x3065 (00000001`40003065)]
+00000001`40001125 488905dc160000        mov     qword ptr [a+0x2808 (00000001`40002808)],rax
+00000001`4000112c 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`40001135 4533c9                xor     r9d,r9d
+00000001`40001138 41b80c000000          mov     r8d,0Ch
+00000001`4000113e 48ba0240004001000000  mov     rdx,offset a+0x4002 (00000001`40004002)
+00000001`40001148 488b0db9160000        mov     rcx,qword ptr [a+0x2808 (00000001`40002808)]
+00000001`4000114f ff15001f0000          call    qword ptr [a+0x3055 (00000001`40003055)]
+00000001`40001155 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`4000115e 4533c9                xor     r9d,r9d
+00000001`40001161 41b80b000000          mov     r8d,0Bh
+00000001`40001167 48ba0f40004001000000  mov     rdx,offset a+0x400f (00000001`4000400f)
+00000001`40001171 488b0d90160000        mov     rcx,qword ptr [a+0x2808 (00000001`40002808)]
+00000001`40001178 ff15d71e0000          call    qword ptr [a+0x3055 (00000001`40003055)]
+00000001`4000117e c6050029004000        mov     byte ptr [00000001`80003a85],0
+00000001`40001185 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`4000118e 4533c9                xor     r9d,r9d
+00000001`40001191 41b810000000          mov     r8d,10h
+00000001`40001197 48ba0029004000000000  mov     rdx,40002900h
+00000001`400011a1 488b0d58160000        mov     rcx,qword ptr [a+0x2800 (00000001`40002800)]
+00000001`400011a8 ff15af1e0000          call    qword ptr [a+0x305d (00000001`4000305d)]
+00000001`400011ae bb00290040            mov     ebx,40002900h
+00000001`400011b3 b980100040            mov     ecx,40001080h
+00000001`400011b8 ffd1                  call    rcx
+00000001`400011ba 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`400011c3 4533c9                xor     r9d,r9d
+00000001`400011c6 41b801000000          mov     r8d,1
+00000001`400011cc 48ba0040004001000000  mov     rdx,offset a+0x4000 (00000001`40004000)
+00000001`400011d6 488b0d2b160000        mov     rcx,qword ptr [a+0x2808 (00000001`40002808)]
+00000001`400011dd ff15721e0000          call    qword ptr [a+0x3055 (00000001`40003055)]
+00000001`400011e3 4889ec                mov     rsp,rbp
+00000001`400011e6 5d                    pop     rbp
+00000001`400011e7 c3                    ret
+===============================================================================
+0000000140001005 E9 46 01 00 00       jmp         print5 (0140001150h)  
+000000014000100A E9 21 00 00 00       jmp         crt_main (0140001030h)  
+000000014000100F E9 6C 01 00 00       jmp         print6 (0140001180h)  
+
+0000000140001030 48 83 EC 38          sub         rsp,38h  
+0000000140001034 48 8D 05 F5 30 00 00 lea         rax,[buf (0140004130h)]  
+000000014000103B 48 89 44 24 20       mov         qword ptr [rsp+20h],rax  
+0000000140001040 49 B9 44 44 44 44 44 44 44 44 mov         r9,4444444444444444h  
+000000014000104A 49 B8 33 33 33 33 33 33 33 33 mov         r8,3333333333333333h  
+0000000140001054 48 BA 22 22 22 22 22 22 22 22 mov         rdx,2222222222222222h  
+000000014000105E 48 B9 11 11 11 11 11 11 11 11 mov         rcx,1111111111111111h  
+0000000140001068 E8 98 FF FF FF       call        print5 (0140001005h)  
+000000014000106D 48 8D 05 BC 30 00 00 lea         rax,[buf (0140004130h)]  
+0000000140001074 48 89 44 24 28       mov         qword ptr [rsp+28h],rax  
+0000000140001079 48 B8 55 55 55 55 55 55 55 55 mov         rax,5555555555555555h  
+0000000140001083 48 89 44 24 20       mov         qword ptr [rsp+20h],rax  
+0000000140001088 49 B9 44 44 44 44 44 44 44 44 mov         r9,4444444444444444h  
+0000000140001092 49 B8 33 33 33 33 33 33 33 33 mov         r8,3333333333333333h  
+000000014000109C 48 BA 22 22 22 22 22 22 22 22 mov         rdx,2222222222222222h  
+00000001400010A6 48 B9 11 11 11 11 11 11 11 11 mov         rcx,1111111111111111h  
+00000001400010B0 E8 5A FF FF FF       call        print6 (014000100Fh)  
+00000001400010B5 B9 F6 FF FF FF       mov         ecx,0FFFFFFF6h  
+00000001400010BA FF 15 48 4F 00 00    call        qword ptr [__imp_GetStdHandle (0140006008h)]  
+00000001400010C0 48 89 05 59 30 00 00 mov         qword ptr [hIn (0140004120h)],rax  
+00000001400010C7 B9 F5 FF FF FF       mov         ecx,0FFFFFFF5h  
+00000001400010CC FF 15 36 4F 00 00    call        qword ptr [__imp_GetStdHandle (0140006008h)]  
+00000001400010D2 48 89 05 4F 30 00 00 mov         qword ptr [hOut (0140004128h)],rax  
+00000001400010D9 48 C7 44 24 20 00 00 00 00 mov         qword ptr [rsp+20h],0  
+00000001400010E2 4C 8D 0D C7 30 00 00 lea         r9,[dwRead (01400041B0h)]  
+00000001400010E9 41 B8 64 00 00 00    mov         r8d,64h  
+00000001400010EF 48 8D 15 3A 30 00 00 lea         rdx,[buf (0140004130h)]  
+00000001400010F6 48 8B 0D 23 30 00 00 mov         rcx,qword ptr [hIn (0140004120h)]  
+00000001400010FD FF 15 FD 4E 00 00    call        qword ptr [__imp_ReadConsoleA (0140006000h)]  
+0000000140001103 B8 02 00 00 00       mov         eax,2  
+0000000140001108 48 83 C4 38          add         rsp,38h  
+000000014000110C C3                   ret  
+
+void* print6(char* a, char* b, char* c, char* d, char* e,char*f) {
+0000000140001180 4C 89 4C 24 20       mov         qword ptr [d],r9  
+0000000140001185 4C 89 44 24 18       mov         qword ptr [c],r8  
+000000014000118A 48 89 54 24 10       mov         qword ptr [b],rdx  
+000000014000118F 48 89 4C 24 08       mov         qword ptr [a],rcx  
+0000000140001194 48 8B 44 24 30       mov         rax,qword ptr [f]  
+0000000140001199 C6 00 61             mov         byte ptr [rax],61h  
+000000014000119C 48 B8 66 66 66 66 66 66 66 66 mov         rax,6666666666666666h  
+00000001400010A6 48 B9 11 11 11 11 11 11 11 11 mov         rcx,1111111111111111h  
+000000014000109C 48 BA 22 22 22 22 22 22 22 22 mov         rdx,2222222222222222h  
+000000014000109C 48 BB 22 22 22 22 22 22 22 22 mov         rbx,2222222222222222h  
+000000014000109C 48 BC 22 22 22 22 22 22 22 22 mov         rsp,2222222222222222h  
+000000014000109C 48 BD 22 22 22 22 22 22 22 22 mov         rbp,2222222222222222h  
+000000014000109C 48 BE 22 22 22 22 22 22 22 22 mov         rsi,2222222222222222h  
+000000014000109C 48 BF 22 22 22 22 22 22 22 22 mov         rdi,2222222222222222h  
+0000000140001092 49 B8 33 33 33 33 33 33 33 33 mov         r8,3333333333333333h  
+0000000140001088 49 B9 44 44 44 44 44 44 44 44 mov         r9,4444444444444444h  
+0000000140001088 49 BA 44 44 44 44 44 44 44 44 mov         r10,4444444444444444h  
+0000000140001088 49 BB 44 44 44 44 44 44 44 44 mov         r11,4444444444444444h  
+0000000140001088 49 BC 44 44 44 44 44 44 44 44 mov         r12,4444444444444444h  
+0000000140001088 49 BD 44 44 44 44 44 44 44 44 mov         r13,4444444444444444h  
+0000000140001088 49 BE 44 44 44 44 44 44 44 44 mov         r14,4444444444444444h  
+0000000140001088 49 BF 44 44 44 44 44 44 44 44 mov         r15,4444444444444444h  
+}

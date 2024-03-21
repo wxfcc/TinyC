@@ -196,15 +196,22 @@ void FunctionParser::_expr(int rbp) {
 void FunctionParser::_expr_nud() {
     Token token = m_scanner->next(1);
     switch (token.tid) {
-        case TID_TRUE: m_builder->loadImm(1); break;
-        case TID_FALSE: m_builder->loadImm(0); break;
-        case TID_INT: m_builder->loadImm(atoi(token.lexeme.c_str())); break;
-        case TID_STRING: m_builder->loadLiteralStr(unescape(token.lexeme.substr(1, token.lexeme.size() - 2))); break;
+        case TID_TRUE: 
+            m_builder->loadImm(1); break;
+        case TID_FALSE: 
+            m_builder->loadImm(0); break;
+        case TID_INT: 
+            m_builder->loadImm(atoi(token.lexeme.c_str())); break;
+        case TID_STRING: 
+            m_builder->loadLiteralStr(unescape(token.lexeme.substr(1, token.lexeme.size() - 2))); break;
         case TID_ID: 
-            if (m_scanner->LA(1).tid == TID_LP) _expr_call(token);
-            else m_builder->loadLocal(getLocal(token.lexeme)); 
+            if (m_scanner->LA(1).tid == TID_LP) 
+                _expr_call(token);
+            else 
+                m_builder->loadLocal(getLocal(token.lexeme)); 
             break;
-        case TID_LP: _expr(0); ASSERT(m_scanner->next(1).tid == TID_RP); break;
+        case TID_LP: _expr(0); 
+            ASSERT(m_scanner->next(1).tid == TID_RP); break;
         case TID_OP_NOT: 
                 _expr(getOperatorRBP(token.tid)); 
                 m_builder->loadImm(0);
@@ -213,7 +220,8 @@ void FunctionParser::_expr_nud() {
         case TID_OP_INC: 
         case TID_OP_DEC: {
                 int localIdx = getLocal(m_scanner->next(1).lexeme);
-                if (token.tid == TID_OP_INC) m_builder->incLocal(localIdx);
+                if (token.tid == TID_OP_INC)
+                    m_builder->incLocal(localIdx);
                 else m_builder->decLocal(localIdx);
                 m_builder->loadLocal(localIdx);
             } break;
@@ -251,7 +259,8 @@ void FunctionParser::_expr_call(const Token &funcToken) {
     while (m_scanner->LA(1).tid != TID_RP) {
         ++paramCount;
         _expr(0);
-        if (m_scanner->LA(1).tid == TID_COMMA) m_scanner->next(1);
+        if (m_scanner->LA(1).tid == TID_COMMA) 
+            m_scanner->next(1);
     }
     ASSERT(m_scanner->next(1).tid == TID_RP);
     m_builder->endCall(funcToken.lexeme, callID, paramCount);

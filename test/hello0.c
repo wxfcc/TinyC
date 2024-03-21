@@ -1,7 +1,4 @@
 int main()  {
-    //printf("hello world");
-    int a = 1;
-    int b = 2;
-
-    return a+b;
+    printf("hello world, %d\n", 123);
+    return 12;
 }

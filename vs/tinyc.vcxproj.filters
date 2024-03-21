@@ -65,6 +65,9 @@
     <Text Include="..\test\hello.c">
       <Filter>test</Filter>
     </Text>
+    <Text Include="..\test\asm_x64.txt">
+      <Filter>test</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\common.h">

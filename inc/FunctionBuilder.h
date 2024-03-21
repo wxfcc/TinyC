@@ -17,35 +17,39 @@ public:
     string& getFuncName();
     int getCodeSize() const;
 
-    virtual void beginBuild() = NULL;
-    virtual void endBuild() = NULL;
+    virtual void beginBuild() = 0;
+    virtual void endBuild() = 0;
 
-    virtual void loadImm(int imm) = NULL;
+    virtual void loadImm(int imm) = 0;
     
-    virtual void loadLiteralStr(const string &literalStr) = NULL;
-    virtual void loadLocal(int idx) = NULL;
-    virtual void storeLocal(int idx) = NULL;
-    virtual void incLocal(int idx) = NULL;
-    virtual void decLocal(int idx) = NULL;
-    virtual void pop(int n) = NULL;
-    virtual void dup() = NULL;
-    virtual void doArithmeticOp(TokenID opType) = NULL;
-    virtual void cmp(TokenID cmpType) = NULL;
+    virtual void loadLiteralStr(const string &literalStr) = 0;
+    virtual void loadLocal(int idx) = 0;
+    virtual void storeLocal(int idx) = 0;
+    virtual void incLocal(int idx) = 0;
+    virtual void decLocal(int idx) = 0;
+    virtual void pop(int n) = 0;
+    virtual void dup() = 0;
+    virtual void doArithmeticOp(TokenID opType) = 0;
+    virtual void cmp(TokenID cmpType) = 0;
     virtual void markLabel(Label *label);
-    virtual void jmp(Label *label) = NULL;
-    virtual void trueJmp(Label *label) = NULL;
-    virtual void falseJmp(Label *label) = NULL;
-    virtual void ret() = NULL;
-    virtual void retExpr() = NULL;
-    virtual int beginCall() = NULL;
-    virtual void endCall(const string &funcName, int callID, int paramCount) = NULL;
-    virtual void condJmp(TokenID tid, Label *label) = NULL;
-    virtual int localIdx2EbpOff(int idx) = NULL;
+    virtual void jmp(Label *label) = 0;
+    virtual void trueJmp(Label *label) = 0;
+    virtual void falseJmp(Label *label) = 0;
+    virtual void ret() = 0;
+    virtual void retExpr() = 0;
+    virtual int beginCall() = 0;
+    virtual void endCall(const string &funcName, int callID, int paramCount) = 0;
+    virtual void condJmp(TokenID tid, Label *label) = 0;
+    virtual int localIdx2EbpOff(int idx) = 0;
     
     //static FunctionBuilder* newBuilder(JITEngine* parent, char* codeBuf);
 protected:
     void emit(int n, ...);
     template<typename T> void emitValue(T val);
+    //void emit8(char val);
+    //void emit16(short val);
+    //void emit32(int val);
+    //void emit64(long long val);
 
 	//
     JITEngine*m_parent;
@@ -53,6 +57,7 @@ protected:
     int m_codeSize;
     string m_funcName;
     Label m_retLabel;
+    int m_paramCount;
 };
 
 

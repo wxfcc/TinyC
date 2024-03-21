@@ -1,4 +1,4 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -206,6 +206,9 @@ int handleFile(char *file){
     }
 	return ret;
 }
+void myprintf(const char* s,...) {
+    printf(s);
+}
 #define JIT_X86     0
 #define JIT_X64     1
 #define JIT_ARM     2
@@ -216,16 +219,21 @@ JITEngine* createJitEngine(int arch){
         engine = new JITEngine(x86FunctionBuilder::newBuilder);
     else if(arch == JIT_X64)
         engine = new JITEngine(x64FunctionBuilder::newBuilder);
-    *engine->_getFunctionEntry("loadFile") = (char*)loadFile;
-    *engine->_getFunctionEntry("runFile") = (char*)handleFile;
-    *engine->_getFunctionEntry("printf") = (char*)printf;
+    engine->addFunctionEntry("loadFile", (char*)loadFile);
+    engine->addFunctionEntry("runFile", (char*)handleFile);
+    engine->addFunctionEntry("printf", (char*)printf);
+    engine->addFunctionEntry("myprintf", (char*)myprintf);
 	return engine;
 }
 
+
 int main(int argc, char *argv[]) {
+    //myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
 	int ret = 0;
     int arch = JIT_X86;
+#ifdef _WIN64
     arch = JIT_X64;
+#endif
 	g_jitEngine = createJitEngine(arch);
 
     if (argc >= 2) {
@@ -237,3 +245,4 @@ int main(int argc, char *argv[]) {
 
     return ret;
 }
+

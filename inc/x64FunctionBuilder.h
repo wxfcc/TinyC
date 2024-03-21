@@ -6,14 +6,11 @@
 class x64FunctionBuilder :public FunctionBuilder {
 public:
     x64FunctionBuilder(JITEngine* parent, char* codeBuf);
-    //string& getFuncName();
-    //int getCodeSize() const;
 
     void beginBuild();
     void endBuild();
 
     void loadImm(int imm);
-
     void loadLiteralStr(const string& literalStr);
     void loadLocal(int idx);
     void storeLocal(int idx);
@@ -37,6 +34,7 @@ public:
 protected:
     void emit(int n, ...);
     template<typename T> void emitValue(T val);
+    void emitRelativeAddr32(char* absPos, int prefixLen);
 
     void condJmp(TokenID tid, Label* label);
 

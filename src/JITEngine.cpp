@@ -30,10 +30,16 @@ unsigned char* JITEngine::getFunction(const string &name) {
 	return (unsigned char*)*_getFunctionEntry(name); 
 }
 
+void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
+    m_funcEntries[funcName] = entry;
+}
+
 char** JITEngine::_getFunctionEntry(const string &name) {
 	return &m_funcEntries[name]; 
 }
-const char* JITEngine::_getLiteralStringLoc(const string &literalStr) { return m_literalStrs.insert(literalStr).first->c_str();}
+const char* JITEngine::_getLiteralStringLoc(const string &literalStr) {
+    return m_literalStrs.insert(literalStr).first->c_str();
+}
 
 void JITEngine::beginBuild() { 
 }

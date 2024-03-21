@@ -25,6 +25,8 @@ public:
     FunctionBuilder* beginBuildFunction();
     void endBuildFunction(FunctionBuilder *builder);
     void endBuild();
+    void addFunctionEntry(const char* funcName, char* entry);
+
 protected:
     char *m_textSection;
     int m_textSectionSize;
