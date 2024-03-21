@@ -231,7 +231,7 @@ int main(int argc, char *argv[]) {
     //myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
 	int ret = 0;
     int arch = JIT_X86;
-#ifdef _WIN64
+#if defined _WIN64 || defined __x86_64__
     arch = JIT_X64;
 #endif
 	g_jitEngine = createJitEngine(arch);

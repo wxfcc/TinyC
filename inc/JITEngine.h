@@ -33,7 +33,7 @@ protected:
     map<string, char*> m_funcEntries;
     set<string> m_literalStrs;
     //(FunctionBuilder*) (m_funcBuilder);
-    FunctionBuilder_FP m_funcBuilderFP = NULL;
+    FunctionBuilder_FP m_funcBuilderFP;
 };
 
 
