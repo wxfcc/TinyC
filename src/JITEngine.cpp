@@ -9,6 +9,17 @@ JITEngine::JITEngine(int arch): m_arch(arch), m_textSectionSize(0) {
 JITEngine::~JITEngine() { 
 	os_freeExecutable(m_textSection); 
 }
+unsigned int JITEngine::getCodeSize() {
+    return m_textSectionSize;
+}
+unsigned char* JITEngine::getCode() {
+    return (unsigned char*)m_textSection;
+}
+
+unsigned char* JITEngine::getFunction(const string &name) {
+	return (unsigned char*)*_getFunctionEntry(name); 
+}
+
 FunctionBuilder* JITEngine::beginBuildFunction() {
     FunctionBuilder* builder = NULL;
     if (m_arch == JIT_X86)
@@ -28,9 +39,6 @@ void JITEngine::endBuildFunction(FunctionBuilder* builder) {
     delete builder;
 }
 
-unsigned char* JITEngine::getFunction(const string &name) {
-	return (unsigned char*)*_getFunctionEntry(name); 
-}
 
 void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
     m_funcEntries[funcName] = entry;

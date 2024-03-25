@@ -15,7 +15,7 @@ void x64FunctionBuilder::beginBuild() {
     emit(1, 0x52); // push rdx
     emit(1, 0x55); // push rbp
     emit(3, 0x48, 0x89, 0xe5); // mov rbp, rsp
-    emit(3, 0x48, 0x81, 0xec); emitValue(MAX_LOCAL_COUNT * 8); // sub rsp, MAX_LOCAL_COUNT * 8
+    emit(3, 0x48, 0x81, 0xec); emitValue((MAX_LOCAL_COUNT -1)* 8); // sub rsp, MAX_LOCAL_COUNT * 8, there should keep rsp align 16 bytes for some instructions, like: movaps XMMWORD PTR [rsp+0x10], xmm1
 }
 void x64FunctionBuilder::endBuild() {
     markLabel(&m_retLabel);
@@ -242,11 +242,10 @@ void x64FunctionBuilder::endCall(const string& funcName, int callID, int paramCo
     if ( offset > max || offset < min) {
         int next = 8;       // skip funcPtr
         //emit(5, 0x48, 0x8b, 0x4c, 0x24, 0x08);    // mov rcx, [rsp+8]
-        emit(1, 0xe9);      // jmp rip+offset32, this instruction should save in a special section?
-        emitValue(next);
-        emitValue(funcPtr);
+        emit(1, 0xe9); emitValue(next);         // jmp rip+offset32, this instruction should save in a special section?
+        emitValue(funcPtr);                     // the func ptr to be call, should save in a special section?
         next = -8 - 6;
-        emit(2, 0xff, 0x15); emitValue(next);
+        emit(2, 0xff, 0x15); emitValue(next);   // call qword ptr[rip+offset]
     }
     else {
         int val = (int)offset;

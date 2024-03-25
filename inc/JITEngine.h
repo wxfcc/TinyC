@@ -21,7 +21,9 @@ class JITEngine {
 public:
     JITEngine(int arch);
     ~JITEngine();
-    unsigned char* getFunction(const string &name);
+    unsigned int getCodeSize();
+    unsigned char* getCode();
+    unsigned char* getFunction(const string& name);
 
     void beginBuild();
     char** _getFunctionEntry(const string &name);
@@ -31,9 +33,10 @@ public:
     void endBuild();
     void addFunctionEntry(const char* funcName, char* entry);
     void dumpCode();
+
 protected:
     char *m_textSection;
-    int m_textSectionSize;
+    unsigned int m_textSectionSize;
     map<string, char*> m_funcEntries;
     set<string> m_literalStrs;
 
