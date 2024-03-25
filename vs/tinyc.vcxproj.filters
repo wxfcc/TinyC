@@ -19,6 +19,9 @@
     <Filter Include="test">
       <UniqueIdentifier>{a6b812c6-64aa-4d93-8859-3fa59c893b0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{70c35c30-da6b-40e0-9b06-c29de256bc73}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp">
@@ -65,8 +68,8 @@
     <Text Include="..\test\hello.c">
       <Filter>test</Filter>
     </Text>
-    <Text Include="..\test\asm_x64.txt">
-      <Filter>test</Filter>
+    <Text Include="..\docs\asm_x64.txt">
+      <Filter>Docs</Filter>
     </Text>
   </ItemGroup>
   <ItemGroup>

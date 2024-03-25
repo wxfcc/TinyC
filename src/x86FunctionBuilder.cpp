@@ -1,24 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <stdarg.h>
-
 #include "JITEngine.h"
 
 x86FunctionBuilder::x86FunctionBuilder(JITEngine* parent, char* codeBuf) : FunctionBuilder(parent, codeBuf) {
 }
-
-FunctionBuilder* x86FunctionBuilder::newBuilder(JITEngine* parent, char* codeBuf) {
-    FunctionBuilder* builder = new x86FunctionBuilder(parent, codeBuf);
-    return builder;
-}
-
-
-//string& x86FunctionBuilder::getFuncName() {
-//    return m_funcName;
-//}
-//int x86FunctionBuilder::getCodeSize() const {
-//    return m_codeSize;
-//}
 
 void x86FunctionBuilder::beginBuild() {
     emit(1, 0x52); // push edx

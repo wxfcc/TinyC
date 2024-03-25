@@ -9,7 +9,7 @@
 #define MAX_LOCAL_COUNT 64
 class JITEngine;
 class FunctionBuilder;
-typedef FunctionBuilder* (*FunctionBuilder_FP)(JITEngine* parent, char* codeBuf) ;   // function pointer
+typedef FunctionBuilder* (*FP_FunctionBuilder)(JITEngine* parent, char* codeBuf) ;   // function pointer
 class FunctionBuilder {
 public:
     FunctionBuilder(JITEngine*parent, char *codeBuf);
@@ -58,6 +58,7 @@ protected:
     string m_funcName;
     Label m_retLabel;
     int m_paramCount;
+    int m_beginCall;
 };
 
 

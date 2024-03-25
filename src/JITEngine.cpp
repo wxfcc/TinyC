@@ -3,19 +3,21 @@
 #include "JITEngine.h"
 
 
-JITEngine::JITEngine(FunctionBuilder_FP builder_fp): m_funcBuilderFP(builder_fp), m_textSectionSize(0) {
+JITEngine::JITEngine(int arch): m_arch(arch), m_textSectionSize(0) {
     m_textSection = os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
 }
 JITEngine::~JITEngine() { 
 	os_freeExecutable(m_textSection); 
 }
 FunctionBuilder* JITEngine::beginBuildFunction() {
-    //x86FunctionBuilder* builder = new x86FunctionBuilder(this, m_textSection + m_textSectionSize);
     FunctionBuilder* builder = NULL;
-    if (m_funcBuilderFP) {
-        builder = m_funcBuilderFP(this, m_textSection + m_textSectionSize);
-        builder->beginBuild();
-    }
+    if (m_arch == JIT_X86)
+        builder = new x86FunctionBuilder(this, m_textSection + m_textSectionSize);
+    else if (m_arch == JIT_X64)
+        builder = new x64FunctionBuilder(this, m_textSection + m_textSectionSize);
+
+    builder->beginBuild();
+
     return builder;
 }
 void JITEngine::endBuildFunction(FunctionBuilder* builder) {
@@ -51,6 +53,13 @@ void JITEngine::endBuild() {
             iter->second = f;
         }
     }
+}
+void JITEngine::dumpCode() { 
+    unsigned char* p = (unsigned char*)m_textSection;
+    for (int i = 0; i < m_textSectionSize; i++) {
+        printf("%02x ", p[i]);
+    }
+    printf("\n");
 }
 
 

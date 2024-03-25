@@ -10,14 +10,10 @@ x64:
 0000000140002008 A0 D7 3A 9A FE 7F 00 00 
 =====================================================================
     kk = ret;
-00007FF769461CD9 48 89 05 B8 84 00 00 mov         qword ptr [kk (07FF76946A198h)],rax  
+00007FF769461CD9 48 89 05 B8 84 00 00 mov         qword ptr [kk (rip+0x84b8)],rax  
     kk2 = ret;
 00007FF769461CE0 48 8B 45 00          mov         rax,qword ptr [rbp]  
-00007FF769461CE4 48 89 05 B5 84 00 00 mov         qword ptr [kk2 (07FF76946A1A0h)],rax  
-
-
-07FF76946A198-00007FF769461CD9 - 7=84B8
-07FF76946A1A0-00007FF769461CE4 - 7=84B5
+00007FF769461CE4 48 89 05 B5 84 00 00 mov         qword ptr [kk2 (rip+0x84b5)],rax  
 
 =====================================================================
 x64:                                                                                 x64:                                                                           
@@ -170,7 +166,7 @@ x64:
 00000001400010B0 E8 5A FF FF FF       call        print6 (014000100Fh)  
 00000001400010B5 B9 F6 FF FF FF       mov         ecx,0FFFFFFF6h  
 00000001400010BA FF 15 48 4F 00 00    call        qword ptr [__imp_GetStdHandle (0140006008h)]  
-00000001400010C0 48 89 05 59 30 00 00 mov         qword ptr [hIn (0140004120h)],rax  
+00000001400010C0 48 89 05 59 30 00 00 mov         qword ptr [hIn (0140004120h(rip+0x3059))],rax  
 00000001400010C7 B9 F5 FF FF FF       mov         ecx,0FFFFFFF5h  
 00000001400010CC FF 15 36 4F 00 00    call        qword ptr [__imp_GetStdHandle (0140006008h)]  
 00000001400010D2 48 89 05 4F 30 00 00 mov         qword ptr [hOut (0140004128h)],rax  
@@ -178,7 +174,7 @@ x64:
 00000001400010E2 4C 8D 0D C7 30 00 00 lea         r9,[dwRead (01400041B0h)]  
 00000001400010E9 41 B8 64 00 00 00    mov         r8d,64h  
 00000001400010EF 48 8D 15 3A 30 00 00 lea         rdx,[buf (0140004130h)]  
-00000001400010F6 48 8B 0D 23 30 00 00 mov         rcx,qword ptr [hIn (0140004120h)]  
+00000001400010F6 48 8B 0D 23 30 00 00 mov         rcx,qword ptr [hIn (0140004120h(rip+0x3023))]  
 00000001400010FD FF 15 FD 4E 00 00    call        qword ptr [__imp_ReadConsoleA (0140006000h)]  
 0000000140001103 B8 02 00 00 00       mov         eax,2  
 0000000140001108 48 83 C4 38          add         rsp,38h  

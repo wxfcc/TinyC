@@ -32,8 +32,6 @@ public:
     int beginCall();
     void endCall(const string& funcName, int callID, int paramCount);
     
-    static FunctionBuilder* newBuilder(JITEngine* parent, char* codeBuf);
-
 private:
     void emit(int n, ...);
     template<typename T> void emitValue(T val);

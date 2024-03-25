@@ -12,10 +12,14 @@
 //============================== code generator
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
 #define MAX_LOCAL_COUNT 64
+#define JIT_X86     0
+#define JIT_X64     1
+#define JIT_ARM     2
+#define JIT_ARM64   3
 
 class JITEngine {
 public:
-    JITEngine(FunctionBuilder_FP builder_fp);
+    JITEngine(int arch);
     ~JITEngine();
     unsigned char* getFunction(const string &name);
 
@@ -26,14 +30,14 @@ public:
     void endBuildFunction(FunctionBuilder *builder);
     void endBuild();
     void addFunctionEntry(const char* funcName, char* entry);
-
+    void dumpCode();
 protected:
     char *m_textSection;
     int m_textSectionSize;
     map<string, char*> m_funcEntries;
     set<string> m_literalStrs;
-    //(FunctionBuilder*) (m_funcBuilder);
-    FunctionBuilder_FP m_funcBuilderFP;
+
+    int m_arch;
 };
 
 

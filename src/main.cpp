@@ -186,17 +186,20 @@ int handleInput(){
     }
     return 0;	
 }
-
+typedef int(*FP_Main)();
+void block() {} // just for set debug breakpoint
 int handleFile(char *file){
     int ret = loadFile(file);
     if(ret == 0){
-        int(*mainFunc)() = (int(*)())g_jitEngine->getFunction("_start");
+        FP_Main mainFunc = (FP_Main)g_jitEngine->getFunction("_start");
         if (mainFunc) {
             ret = mainFunc();
         }
         else {
-            mainFunc = (int(*)())g_jitEngine->getFunction("main");
+            mainFunc = (FP_Main)g_jitEngine->getFunction("main");
             if (mainFunc) {
+                g_jitEngine->dumpCode();
+                block();
                 ret = mainFunc();
                 printf("%s return: %d\n", file, ret);
             }
@@ -206,19 +209,32 @@ int handleFile(char *file){
     }
 	return ret;
 }
-void myprintf(const char* s,...) {
-    printf(s);
+// direct call printf will cause segmentation fault  ??
+void myprintf(const char* s, ...) {
+    va_list args;
+    va_start(args, s);
+    int n = (int)va_arg(args, int);
+    va_end(args);
+
+    printf("n=%d", n);
+    //if (n == 0)puts("n=0"); 
+    //else if(n==1)puts("n=1");
+    //puts(s);
+#ifdef    __va_copy
+    va_list ap_save;
+    __va_copy(ap_save, args); // crashed!!
+    //printf(s,n);
+#endif
+
+    //printf("myprintf enter, %d\n",n);
+    //printf("myprintf:s=%p\n",p);
+    //printf("myprintf:%s\n", s);
+    //printf(s);
 }
-#define JIT_X86     0
-#define JIT_X64     1
-#define JIT_ARM     2
-#define JIT_ARM64   3
+
 JITEngine* createJitEngine(int arch){
-    JITEngine* engine = NULL;
-    if(arch == JIT_X86)
-        engine = new JITEngine(x86FunctionBuilder::newBuilder);
-    else if(arch == JIT_X64)
-        engine = new JITEngine(x64FunctionBuilder::newBuilder);
+    JITEngine* engine = new JITEngine(arch);
+
     engine->addFunctionEntry("loadFile", (char*)loadFile);
     engine->addFunctionEntry("runFile", (char*)handleFile);
     engine->addFunctionEntry("printf", (char*)printf);
@@ -228,6 +244,8 @@ JITEngine* createJitEngine(int arch){
 
 
 int main(int argc, char *argv[]) {
+    myprintf("helo", 0x100);
+    //GetStdHandle(0);
     //myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
 	int ret = 0;
     int arch = JIT_X86;
@@ -236,6 +254,7 @@ int main(int argc, char *argv[]) {
 #endif
 	g_jitEngine = createJitEngine(arch);
 
+    printf("myprintf: %p, printf: %p\n", myprintf, printf);
     if (argc >= 2) {
         ret = handleFile(argv[1]);
     }
