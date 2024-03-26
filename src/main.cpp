@@ -245,46 +245,43 @@ void test2(const char* f, int n) {
 
 }
 int test() {
-    myprintf("helo", 0x100,1,2,3,4,5,6);
-    test2("helo", 0x100);
+    //myprintf("helo", 0x100,1,2,3,4,5,6);
     unsigned char* p = g_jitEngine->getCode();
     char** p2 = (char**)p;
     *p2 = (char*)myprintf;
     p += 8;
     FP_Main mainFunc = (FP_Main)p;
+#if 0
+    unsigned char moveax[] = { 0xB4, 0x01, 0xb8, 0x01, 0x00, 0x00, 0x00, 0xc3 }; // for test mov eax, 1
+    memcpy(p, moveax, sizeof(moveax));
+#else 
+    unsigned char code[] = {
 #ifdef _WIN64
-    unsigned char leardi[] = { 0x48, 0x8d, 0x0d, 0x17, 0x00, 0x00, 0x00 };  //lea rcx, rip+8
-    unsigned char learsi[] = { 0x48, 0xc7, 0xc2, 0x08, 0x00, 0x00, 0x00 };  //mov rdx, 8
+        0x48, 0x8d, 0x0d, 0xff, 0xff, 0xff, 0xff,   //lea rcx, rip + offset32
+        0x48, 0xc7, 0xc2, 0x08, 0x00, 0x00, 0x00,   //mov rdx, #imm32
 #else
-    unsigned char leardi[] = { 0x48, 0x8d, 0x3d, 0x1f, 0x00, 0x00, 0x00 };  //lea rdi, rip+8
-    unsigned char learsi[] = { 0x48, 0xc7, 0xc6, 0x08, 0x00, 0x00, 0x00 };  //mov rsi, 8
+        0x48, 0x8d, 0x3d, 0xff, 0xff, 0xff, 0xff,   //lea rdi, rip + offset32
+        0x48, 0xc7, 0xc6, 0x08, 0x00, 0x00, 0x00,   //mov rsi, 8
 #endif
-    unsigned char subrsp[] = { 0x48, 0x81, 0xec, 0x80, 0x00, 0x00, 0x00 }; //sub rsp,0x20
-    unsigned char addrsp[] = { 0x48, 0x81, 0xc4, 0x80, 0x00, 0x00, 0x00 }; //add rsp,0x20
-    unsigned char movrax0[] = { 0xb8, 0x00, 0x00, 0x00, 0x00 }; //mov eax,0
-    memcpy(p, leardi, sizeof(leardi));
-    p += sizeof(leardi);
-    memcpy(p, learsi, sizeof(learsi));
-    p += sizeof(learsi);
-    memcpy(p, subrsp, sizeof(subrsp));
-    p += sizeof(subrsp);
-    memcpy(p, movrax0, sizeof(movrax0));
-    p += sizeof(movrax0);
-
-    int offset = (int)((unsigned char*)p2 - p)-6;
-    unsigned char call[] = { 0xff, 0x15 };   // call [rip-21]
-    memcpy(p, call, sizeof(call));
-    p += sizeof(call);
+        0x48, 0x81, 0xec, 0x80, 0x00, 0x00, 0x00,   //sub rsp,0x20
+        0xb8, 0x00, 0x00, 0x00, 0x00,               //mov eax,0
+        0xff, 0x15, 0xff, 0xff, 0xff, 0xff,         //call [rip + offset32]
+        0x48, 0x81, 0xc4, 0x80, 0x00, 0x00, 0x00,   //add rsp,0x20
+        0xc3,                                       //ret
+        'a', 'b', 'c', 0
+    };
+    int offset;
+    memcpy(p, code, sizeof(code));
+    p += 3 ;
+    offset = sizeof(code) - 4-7;
     *(int*)p = offset;
-    p += 4;
-    memcpy(p, addrsp, sizeof(addrsp));
-    p += sizeof(addrsp);
-    *p = 0xc3;  //ret
-    p++;
-    *p = 0xc3;  //ret
-    p++;
-    memcpy(p, "abcdef", 6);
-    //p2[1] = (char*)0xc3c3c3c3;
+
+    p += 21 + 5 - 3;
+    offset = (int)((unsigned char*)p2 - p)-6;
+    p += 2;
+    *(int*)p = offset;
+
+#endif
     block();
     mainFunc();
     exit(0);
