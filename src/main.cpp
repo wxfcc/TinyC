@@ -86,7 +86,7 @@ char* os_findSymbol(const char *funcName) {
         if (func = (char*)::GetProcAddress(modules[i], funcName)) {
             char moduleName[256] = { 0 };
             GetModuleBaseName(process, modules[i], moduleName, sizeof(moduleName));
-            printf("%s %s\n", moduleName, funcName);
+            printf("%s %s: %p\n", moduleName, funcName, func);
             break;
         }
     }

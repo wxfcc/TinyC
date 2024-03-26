@@ -90,7 +90,9 @@ void x86FunctionBuilder::cmp(TokenID cmpType) {
     markLabel(&label_end);
 }
 
-void x86FunctionBuilder::markLabel(Label* label) { label->mark(m_codeBuf + m_codeSize); }
+void x86FunctionBuilder::markLabel(Label* label) {
+    label->mark(m_codeBuf + m_codeSize); 
+}
 void x86FunctionBuilder::jmp(Label* label) {
     emit(1, 0xe9);
     char* ref = m_codeBuf + m_codeSize;
@@ -109,7 +111,9 @@ void x86FunctionBuilder::falseJmp(Label* label) {
     emit(2, 0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_EQUAL, label);
 }
-void x86FunctionBuilder::ret() { jmp(&m_retLabel); }
+void x86FunctionBuilder::ret() { 
+    jmp(&m_retLabel); 
+}
 void x86FunctionBuilder::retExpr() {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
@@ -132,7 +136,8 @@ void x86FunctionBuilder::endCall(const string& funcName, int callID, int paramCo
 void x86FunctionBuilder::emit(int n, ...) {
     va_list args;
     va_start(args, n);
-    for (int i = 0; i < n; ++i) m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
+    for (int i = 0; i < n; ++i) 
+        m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
     va_end(args);
 }
 
@@ -144,12 +149,12 @@ void x86FunctionBuilder::emitValue(T val) {
 
 void x86FunctionBuilder::condJmp(TokenID tid, Label* label) {
     switch ((int)tid) {
-    case TID_OP_LESS: emit(2, 0x0f, 0x8c); break;
-    case TID_OP_LESSEQ: emit(2, 0x0f, 0x8e); break;
-    case TID_OP_GREATER: emit(2, 0x0f, 0x8f); break;
-    case TID_OP_GREATEREQ: emit(2, 0x0f, 0x8d); break;
-    case TID_OP_EQUAL: emit(2, 0x0f, 0x84); break;
-    case TID_OP_NEQUAL: emit(2, 0x0f, 0x85); break;
+    case TID_OP_LESS:       emit(2, 0x0f, 0x8c); break;
+    case TID_OP_LESSEQ:     emit(2, 0x0f, 0x8e); break;
+    case TID_OP_GREATER:    emit(2, 0x0f, 0x8f); break;
+    case TID_OP_GREATEREQ:  emit(2, 0x0f, 0x8d); break;
+    case TID_OP_EQUAL:      emit(2, 0x0f, 0x84); break;
+    case TID_OP_NEQUAL:     emit(2, 0x0f, 0x85); break;
     }
     char* ref = m_codeBuf + m_codeSize;
     emitValue(NULL);

@@ -1,5 +1,6 @@
 void printPrime(int n) {
     int start = clock();
+    printf("start: %d\n",  start);
     for (int i = 2; i < n; ++i) {
         int flag = true;
         for (int j = 2; j <= i / 2; ++j) {

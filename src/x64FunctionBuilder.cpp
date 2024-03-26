@@ -179,7 +179,7 @@ void x64FunctionBuilder::cmp(TokenID cmpType) {
     Label label_1, label_0, label_end;
     emit(5, 0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8] 
     emit(4, 0x48, 0x8b, 0x14, 0x24); // mov rdx, qword ptr[rsp]
-    emit(4, 0x48, 0x83, 0xc4); emitValue((char)8);// add rsp, 8
+    emit(4, 0x48, 0x83, 0xc4, 0x08); //emitValue((char)8);// add rsp, 8
     emit(3, 0x48, 0x39, 0xd0); // cmp rax, rdx
     condJmp(cmpType, &label_1);
     jmp(&label_0);
@@ -195,9 +195,9 @@ void x64FunctionBuilder::markLabel(Label* label) {
     label->mark(m_codeBuf + m_codeSize); 
 }
 void x64FunctionBuilder::jmp(Label* label) {
-    emit(1, 0xe9);
+    emit(1, 0xe9);                      // jmp rip+offset32
     char* ref = m_codeBuf + m_codeSize;
-    emitValue(NULL);
+    emitValue((int)NULL);
     label->addRef(ref);
 }
 void x64FunctionBuilder::trueJmp(Label* label) {
@@ -238,7 +238,8 @@ void x64FunctionBuilder::endCall(const string& funcName, int callID, int paramCo
     int64 offset = (int64)(funcPtr - rip) - 5;  // 5 = sizeof(call rip+offset)
     int64 max = INT_MAX;
     int64 min = INT_MIN;
-    printf("funcPtr: %p, rip: %p\n", funcPtr, rip);
+    printf("func: %s: %p, rip: %p\n", funcName.c_str(), funcPtr, rip);
+#if 0
     if ( offset > max || offset < min) {
         int next = 8;       // skip funcPtr
         //emit(5, 0x48, 0x8b, 0x4c, 0x24, 0x08);    // mov rcx, [rsp+8]
@@ -247,11 +248,19 @@ void x64FunctionBuilder::endCall(const string& funcName, int callID, int paramCo
         next = -8 - 6;
         emit(2, 0xff, 0x15); emitValue(next);   // call qword ptr[rip+offset]
     }
-    else {
+    else 
+    {
         int val = (int)offset;
-        printf("offset: %p, rip: 0x%x\n", offset, val);
+        printf("offset: %llx, rip: 0x%x\n", offset, val);
         emit(1, 0xe8); emitValue(val);  // call rip+offset
     }
+#else
+    offset = (int64)((char*)entry - rip)-6;
+    if (offset > max || offset < min) {
+        printf("offset=%llx\n", offset);
+    }
+    emit(2, 0xff, 0x15); emitValue((int)offset); // call qword ptr[rip+offset]
+#endif
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
     emit(1, 0x50); // push rax
 
