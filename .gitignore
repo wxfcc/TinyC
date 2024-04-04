@@ -3,3 +3,5 @@ tc
 Debug 
 x64 
 .vs 
+DerivedData
+t.o
