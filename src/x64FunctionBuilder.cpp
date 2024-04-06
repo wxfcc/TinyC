@@ -228,7 +228,14 @@ int x64FunctionBuilder::beginCall() {
     m_beginCall = 1;
     return 0;
 }
-
+/*
+ 1. call rip+offset32
+ 2. call [rip+offset32]
+ 3. call rax
+ 4. call [rax], when func ptr too far
+    call [rsp+0x8]
+    call [rbp+0x8]
+ */
 void x64FunctionBuilder::endCall(const string& funcName, int callID, int paramCount) {
     char** entry = m_parent->_getFunctionEntry(funcName);
     for (int i = 0; i < paramCount - 1; ++i) {

@@ -5,6 +5,7 @@
 
 JITEngine::JITEngine(int arch): m_arch(arch), m_textSectionSize(0) {
     m_textSection = os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
+    funcs = new char*[256];
 }
 JITEngine::~JITEngine() { 
 	os_freeExecutable(m_textSection); 

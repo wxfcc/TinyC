@@ -42,6 +42,7 @@ protected:
     set<string> m_literalStrs;
 
     int m_arch;
+    char**funcs;
 };
 
 
