@@ -10,6 +10,8 @@ x64FunctionBuilder::x64FunctionBuilder(JITEngine* parent, char* codeBuf) : Funct
     m_paramCount = 0;
     m_beginCall = 0;
 }
+x64FunctionBuilder::~x64FunctionBuilder() {
+}
 
 void x64FunctionBuilder::beginBuild() {
     emit(1, 0x52); // push rdx
@@ -241,12 +243,6 @@ void x64FunctionBuilder::endCall(const string& funcName, int callID, int paramCo
     printf("func: %s: %p, rip: %p\n", funcName.c_str(), funcPtr, rip);
 #if 0
     if ( offset > max || offset < min) {
-        int next = 8;       // skip funcPtr
-        //emit(5, 0x48, 0x8b, 0x4c, 0x24, 0x08);    // mov rcx, [rsp+8]
-        emit(1, 0xe9); emitValue(next);         // jmp rip+offset32, this instruction should save in a special section?
-        emitValue(funcPtr);                     // the func ptr to be call, should save in a special section?
-        next = -8 - 6;
-        emit(2, 0xff, 0x15); emitValue(next);   // call qword ptr[rip+offset]
     }
     else 
     {
@@ -257,8 +253,13 @@ void x64FunctionBuilder::endCall(const string& funcName, int callID, int paramCo
 #else
     offset = (int64)((char*)entry - rip)-6;
     if (offset > max || offset < min) {
-        printf("offset=%llx\n", offset);
+        printf("offset too large, %llx\n", offset);
+        int next = 8;                           // skip funcPtr
+        emit(1, 0xe9); emitValue(next);         // jmp rip+offset32, this instruction should save in a special section?
+        emitValue(funcPtr);                     // the func ptr to be call, should be saved in a special section?
+        offset = -8 - 6;
     }
+    
     emit(2, 0xff, 0x15); emitValue((int)offset); // call qword ptr[rip+offset]
 #endif
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));

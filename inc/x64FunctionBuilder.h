@@ -7,7 +7,8 @@ typedef long long int64;
 class x64FunctionBuilder :public FunctionBuilder {
 public:
     x64FunctionBuilder(JITEngine* parent, char* codeBuf);
-
+    ~x64FunctionBuilder();
+    
     void beginBuild();
     void endBuild();
 

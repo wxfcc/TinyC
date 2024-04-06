@@ -1,4 +1,4 @@
-﻿#include <stdio.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
@@ -101,12 +101,20 @@ char* os_findSymbol(const char *funcName) {
 #include <unistd.h>
 #include <sys/mman.h>
 char* os_mallocExecutable(int size) {
-    char *p = NULL;
-    int erro = ::posix_memalign((void**)&p, ::getpagesize(), size);
+    void *p = NULL;
+#ifdef __MACH__
+    p = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, 0, 0);
+    ASSERT(p != NULL);
+
+//    erro = mprotect(p, size, PROT_READ | PROT_EXEC);
+//    ASSERT(erro == 0);
+#else
+    int erro = ::posix_memalign(&p, ::getpagesize(), size);
     ASSERT(erro == 0 && p != NULL);
     erro = ::mprotect(p, size, PROT_READ | PROT_WRITE | PROT_EXEC);
     ASSERT(erro == 0);
-    return p;
+#endif
+    return (char*)p;
 }
 void os_freeExecutable(char *p) {
     ASSERT(p != NULL);
@@ -172,6 +180,7 @@ int handleInput(){
 
             if (!isFuncDefine) {
             	string tf = format("temp_%d", lineNum);
+                g_jitEngine->setExecutable();
             	unsigned char*p = g_jitEngine->getFunction(tf);
 
 	            printf("func %s: %p, code: %02x %02x %02x %02x\n", tf.c_str(), p, p[0], p[1], p[2], p[3]);
@@ -191,6 +200,7 @@ void block() {} // just for set debug breakpoint
 int handleFile(char *file){
     int ret = loadFile(file);
     if(ret == 0){
+        g_jitEngine->setExecutable();
         FP_Main mainFunc = (FP_Main)g_jitEngine->getFunction("_start");
         if (mainFunc) {
             ret = mainFunc();
@@ -299,7 +309,7 @@ int main(int argc, char *argv[]) {
 #endif
 	g_jitEngine = createJitEngine(arch);
 
-    printf("arch: %d, myprintf: %p, printf: %p\n", archs[arch], myprintf, printf);
+    printf("arch: %s, myprintf: %p, printf: %p\n", archs[arch], myprintf, printf);
 
     //test();
 

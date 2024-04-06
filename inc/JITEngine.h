@@ -24,6 +24,7 @@ public:
     unsigned int getCodeSize();
     unsigned char* getCode();
     unsigned char* getFunction(const string& name);
+    int setExecutable();
 
     void beginBuild();
     char** _getFunctionEntry(const string &name);

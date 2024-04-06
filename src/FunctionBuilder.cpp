@@ -8,6 +8,9 @@
 FunctionBuilder::FunctionBuilder(JITEngine*parent, char *codeBuf): 
     m_parent(parent), m_codeBuf(codeBuf), m_codeSize(0), m_paramCount(0){
 }
+FunctionBuilder::~FunctionBuilder(){
+}
+
 
 string& FunctionBuilder::getFuncName() {
 	return m_funcName;

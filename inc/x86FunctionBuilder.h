@@ -6,6 +6,8 @@
 class x86FunctionBuilder: public FunctionBuilder {
 public:
     x86FunctionBuilder(JITEngine* parent, char* codeBuf);
+    ~x86FunctionBuilder();
+
     //string& getFuncName();
     //int getCodeSize() const;
 

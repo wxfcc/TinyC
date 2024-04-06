@@ -8,12 +8,11 @@
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
 #define MAX_LOCAL_COUNT 64
 class JITEngine;
-class FunctionBuilder;
-typedef FunctionBuilder* (*FP_FunctionBuilder)(JITEngine* parent, char* codeBuf) ;   // function pointer
 class FunctionBuilder {
 public:
     FunctionBuilder(JITEngine*parent, char *codeBuf);
-    
+    virtual ~FunctionBuilder();
+
     string& getFuncName();
     int getCodeSize() const;
 
@@ -41,7 +40,7 @@ public:
     virtual void endCall(const string &funcName, int callID, int paramCount) = 0;
     virtual void condJmp(TokenID tid, Label *label) = 0;
     virtual int localIdx2EbpOff(int idx) = 0;
-    
+
     //static FunctionBuilder* newBuilder(JITEngine* parent, char* codeBuf);
 protected:
     void emit(int n, ...);

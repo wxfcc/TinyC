@@ -6,6 +6,8 @@
 
 x86FunctionBuilder::x86FunctionBuilder(JITEngine* parent, char* codeBuf) : FunctionBuilder(parent, codeBuf) {
 }
+x86FunctionBuilder::~x86FunctionBuilder() {
+}
 
 void x86FunctionBuilder::beginBuild() {
     emit(1, 0x52); // push edx
