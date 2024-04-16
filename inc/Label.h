@@ -14,6 +14,7 @@ private:
 private:
     char *m_address;
     vector<char*> m_refs;
+    int type;   // 32/64bit
 };
 
 #endif

@@ -131,8 +131,46 @@ void x64FunctionBuilder::loadLiteralStr(const string& literalStr) {
     //emit(1, 0x68); emitValue(loc); // push loc, wxf, how to fix?
     prepareParam((int64)loc, sizeof(loc));
 }
+//48 8b 44 24 20          mov    rax, QWORD PTR [rsp+0x20]
+//48 8b 5c 24 20          mov    rbx, QWORD PTR [rsp+0x20]
+//48 8b 4c 24 20          mov    rcx, QWORD PTR [rsp + 0x20]
+//48 8b 54 24 20          mov    rdx, QWORD PTR [rsp + 0x20]
+//48 8b 7c 24 20          mov    rdi, QWORD PTR [rsp+0x20]
+//48 8b 74 24 20          mov    rsi, QWORD PTR [rsp + 0x20]
+//c 8b 44 24 20           mov    r8, QWORD PTR [rsp+0x20]
+//4c 8b 4c 24 20          mov    r9, QWORD PTR [rsp+0x20]
+//48 8b 84 24 00 02 00 00   mov    rax, QWORD PTR [rsp + 0x200]
+//48 8b 9c 24 00 02 00 00   mov    rbx, QWORD PTR [rsp+0x200]
+//48 8b 8c 24 00 02 00 00   mov    rcx, QWORD PTR [rsp + 0x200]
+//48 8b 94 24 00 02 00 00   mov    rdx, QWORD PTR [rsp + 0x200]
+//48 8b bc 24 00 02 00 00   mov    rdi, QWORD PTR [rsp + 0x200]
+//48 8b b4 24 00 02 00 00   mov    rsi, QWORD PTR [rsp + 0x200]
+//4c 8b 84 24 00 02 00 00   mov    r8, QWORD PTR [rsp + 0x200]
+//4c 8b 8c 24 00 02 00 00   mov    r9, QWORD PTR [rsp + 0x200]
 void x64FunctionBuilder::loadLocal(int idx) {
-    emit(2, 0xff, 0xb5); emitValue(localIdx2EbpOff(idx)); // push qword ptr [rbp + idxOff]
+    int offset = localIdx2EbpOff(idx);
+    if (m_beginCall) {
+        if (m_paramCount == 0) { //rcx
+            emit(4, 0x48, 0x8b, 0x8c, 0x24); emitValue(offset); // mov rcx, #imm64
+        }
+        else if (m_paramCount == 1) { //rdx
+            emit(4, 0x48, 0x8b, 0x94, 0x24); emitValue(offset); // mov rdx, #imm64
+        }
+        else if (m_paramCount == 2) { //r8
+            emit(4, 0x4c, 0x8b, 0x84, 0x24); emitValue(offset); // mov r8, #imm64
+        }
+        else if (m_paramCount == 3) { //r9
+            emit(4, 0x4c, 0x8b, 0x8c, 0x24); emitValue(offset); // mov r9, #imm64
+        }
+        else {
+            emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+        }
+    }
+    else {
+        emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+    }
+    m_paramCount++;
+
 }
 void x64FunctionBuilder::storeLocal(int idx) {
     emit(4, 0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
@@ -304,16 +342,16 @@ void x64FunctionBuilder::emitRelativeAddr32(char* absPos, int prefixLen) {
 
 void x64FunctionBuilder::condJmp(TokenID tid, Label* label) {
     switch ((int)tid) {
-    case TID_OP_LESS:       emit(2, 0x0f, 0x8c); break;
-    case TID_OP_LESSEQ:     emit(2, 0x0f, 0x8e); break;
-    case TID_OP_GREATER:    emit(2, 0x0f, 0x8f); break;
-    case TID_OP_GREATEREQ:  emit(2, 0x0f, 0x8d); break;
-    case TID_OP_EQUAL:      emit(2, 0x0f, 0x84); break;
-    case TID_OP_NEQUAL:     emit(2, 0x0f, 0x85); break;
+    case TID_OP_LESS:       emit(2, 0x0f, 0x8c); break;     // jl
+    case TID_OP_LESSEQ:     emit(2, 0x0f, 0x8e); break;     // jle
+    case TID_OP_GREATER:    emit(2, 0x0f, 0x8f); break;     // jg
+    case TID_OP_GREATEREQ:  emit(2, 0x0f, 0x8d); break;     // jge
+    case TID_OP_EQUAL:      emit(2, 0x0f, 0x84); break;     // je
+    case TID_OP_NEQUAL:     emit(2, 0x0f, 0x85); break;     // jne
     }
     char* ref = m_codeBuf + m_codeSize;
     emitValue(NULL);
-    label->addRef(ref);
+    label->addRef(ref); // 64bit ??
 }
 
 int x64FunctionBuilder::localIdx2EbpOff(int idx) {
