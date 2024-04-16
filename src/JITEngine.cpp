@@ -1,14 +1,19 @@
 #include <stdio.h>
 #include <stdlib.h>
+#ifndef _WIN32
 #include <sys/mman.h>
+#endif
 #include "JITEngine.h"
 
 JITEngine::JITEngine(int arch): m_arch(arch), m_textSectionSize(0) {
     m_textSection = os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
-    funcs = new char*[256];
+    memset(m_textSection, 0, MAX_TEXT_SECTION_SIZE);
+    m_funcPtr = new char*[MAX_FUNC_PTR_SIZE];
+    memset(m_funcPtr, 0, MAX_FUNC_PTR_SIZE);
 }
 JITEngine::~JITEngine() { 
 	os_freeExecutable(m_textSection); 
+	delete(m_funcPtr);
 }
 unsigned int JITEngine::getCodeSize() {
     return m_textSectionSize;
@@ -95,11 +100,21 @@ void JITEngine::endBuildFunction(FunctionBuilder* builder) {
 
 
 void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
-    m_funcEntries[funcName] = entry;
+    if (m_funcEntries.count(funcName) == 0) {
+        int n = m_funcEntries.size();
+        m_funcEntries[funcName] = &m_funcPtr[n];
+        m_funcPtr[n] = entry;
+    }
+    //m_funcEntries[funcName] = entry;
 }
 
 char** JITEngine::_getFunctionEntry(const string &name) {
-	return &m_funcEntries[name]; 
+    if (m_funcEntries.count(name) == 0) {
+        int n = m_funcEntries.size();
+        m_funcEntries[name] = &m_funcPtr[n];
+        return &m_funcPtr[n];
+    }
+	return m_funcEntries[name]; 
 }
 const char* JITEngine::_getLiteralStringLoc(const string &literalStr) {
     return m_literalStrs.insert(literalStr).first->c_str();
@@ -108,12 +123,13 @@ const char* JITEngine::_getLiteralStringLoc(const string &literalStr) {
 void JITEngine::beginBuild() { 
 }
 void JITEngine::endBuild() {
-    for (map<string, char*>::iterator iter = m_funcEntries.begin(); iter != m_funcEntries.end(); ++iter) {
-        if (iter->second == NULL) {
+    for (map<string, char**>::iterator iter = m_funcEntries.begin(); iter != m_funcEntries.end(); ++iter) {
+        if (*iter->second == NULL) {
             char *f = os_findSymbol(iter->first.c_str());
             ASSERT(f != NULL);
-            iter->second = f;
+            *iter->second = f;
         }
+        printf("%-16s: %p, %p\n", iter->first.c_str(), iter->second, *iter->second);
     }
 }
 void JITEngine::dumpCode() { 
@@ -123,6 +139,3 @@ void JITEngine::dumpCode() {
     }
     printf("\n");
 }
-
-
-//============================== syntax analysis

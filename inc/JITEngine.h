@@ -11,6 +11,8 @@
 
 //============================== code generator
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
+#define MAX_FUNC_COUNT  1024
+#define MAX_FUNC_PTR_SIZE (MAX_FUNC_COUNT * 8)
 #define MAX_LOCAL_COUNT 64
 #define JIT_X86     0
 #define JIT_X64     1
@@ -38,11 +40,11 @@ public:
 protected:
     char *m_textSection;
     unsigned int m_textSectionSize;
-    map<string, char*> m_funcEntries;
+    map<string, char**> m_funcEntries;
     set<string> m_literalStrs;
 
     int m_arch;
-    char**funcs;
+    char ** m_funcPtr;
 };
 
 
