@@ -204,3 +204,60 @@ void* print6(char* a, char* b, char* c, char* d, char* e,char*f) {
 0000000140001088 49 BE 44 44 44 44 44 44 44 44 mov         r14,4444444444444444h  
 0000000140001088 49 BF 44 44 44 44 44 44 44 44 mov         r15,4444444444444444h  
 }
+===============================================================================
+0x55,                   // push   rbp
+0x48, 0x89, 0xe5,       // mov    rbp,rsp
+0x48, 0x89, 0xec,       // mov    rsp,rbp
+0x5d,                   // pop    rbp
+0xc3                    // ret
+
+48 B8 #imm64	mov rax, #imm64
+48 B9 #imm64	mov rcx, #imm64
+48 BA #imm64	mov rdx, #imm64
+48 BB #imm64	mov rbx, #imm64
+48 BC #imm64	mov rsp, #imm64
+48 BD #imm64	mov rbp, #imm64
+48 BE #imm64	mov rsi, #imm64
+48 BF #imm64	mov rdi, #imm64
+49 B8 #imm64	mov r8,	 #imm64
+49 B9 #imm64	mov r9,  #imm64
+49 BA #imm64	mov r10, #imm64
+49 BB #imm64	mov r11, #imm64
+49 BC #imm64	mov r12, #imm64
+49 BD #imm64	mov r13, #imm64
+49 BE #imm64	mov r14, #imm64
+49 BF #imm64	mov r15, #imm64
+
+// 48 8b 44 24 20            mov    rax, QWORD PTR [rsp + 0x20]
+// 48 8b 5c 24 20            mov    rbx, QWORD PTR [rsp + 0x20]
+// 48 8b 4c 24 20            mov    rcx, QWORD PTR [rsp + 0x20]
+// 48 8b 54 24 20            mov    rdx, QWORD PTR [rsp + 0x20]
+// 48 8b 7c 24 20            mov    rdi, QWORD PTR [rsp + 0x20]
+// 48 8b 74 24 20            mov    rsi, QWORD PTR [rsp + 0x20]
+// 4c 8b 44 24 20            mov    r8, QWORD PTR [rsp + 0x20]
+// 4c 8b 4c 24 20            mov    r9, QWORD PTR [rsp + 0x20]
+// 48 8b 84 24 00 02 00 00   mov    rax, QWORD PTR [rsp + 0x200]
+// 48 8b 9c 24 00 02 00 00   mov    rbx, QWORD PTR [rsp + 0x200]
+// 48 8b 8c 24 00 02 00 00   mov    rcx, QWORD PTR [rsp + 0x200]
+// 48 8b 94 24 00 02 00 00   mov    rdx, QWORD PTR [rsp + 0x200]
+// 48 8b bc 24 00 02 00 00   mov    rdi, QWORD PTR [rsp + 0x200]
+// 48 8b b4 24 00 02 00 00   mov    rsi, QWORD PTR [rsp + 0x200]
+// 4c 8b 84 24 00 02 00 00   mov    r8, QWORD PTR [rsp + 0x200]
+// 4c 8b 8c 24 00 02 00 00   mov    r9, QWORD PTR [rsp + 0x200]
+
+// 48 8b 45 20             mov    rax,QWORD PTR [rbp + 0x20]
+// 48 8b 5d 20             mov    rbx,QWORD PTR [rbp + 0x20]
+// 48 8b 4d 20             mov    rcx,QWORD PTR [rbp + 0x20]
+// 48 8b 55 20             mov    rdx,QWORD PTR [rbp + 0x20]
+// 48 8b 7d 20             mov    rdi,QWORD PTR [rbp + 0x20]
+// 48 8b 75 20             mov    rsi,QWORD PTR [rbp + 0x20]
+// 4c 8b 45 20             mov    r8,QWORD PTR [rbp + 0x20]
+// 4c 8b 4d 20             mov    r9,QWORD PTR [rbp + 0x20]
+// 48 8b 85 00 02 00 00    mov    rax,QWORD PTR [rbp + 0x200]
+// 48 8b 9d 00 02 00 00    mov    rbx,QWORD PTR [rbp + 0x200]
+// 48 8b 8d 00 02 00 00    mov    rcx,QWORD PTR [rbp + 0x200]
+// 48 8b 95 00 02 00 00    mov    rdx,QWORD PTR [rbp + 0x200]
+// 48 8b bd 00 02 00 00    mov    rdi,QWORD PTR [rbp + 0x200]
+// 48 8b b5 00 02 00 00    mov    rsi,QWORD PTR [rbp + 0x200]
+// 4c 8b 85 00 02 00 00    mov    r8,QWORD PTR [rbp + 0x200]
+// 4c 8b 8d 00 02 00 00    mov    r9,QWORD PTR [rbp + 0x200]

@@ -131,36 +131,21 @@ void x64FunctionBuilder::loadLiteralStr(const string& literalStr) {
     //emit(1, 0x68); emitValue(loc); // push loc, wxf, how to fix?
     prepareParam((int64)loc, sizeof(loc));
 }
-//48 8b 44 24 20          mov    rax, QWORD PTR [rsp+0x20]
-//48 8b 5c 24 20          mov    rbx, QWORD PTR [rsp+0x20]
-//48 8b 4c 24 20          mov    rcx, QWORD PTR [rsp + 0x20]
-//48 8b 54 24 20          mov    rdx, QWORD PTR [rsp + 0x20]
-//48 8b 7c 24 20          mov    rdi, QWORD PTR [rsp+0x20]
-//48 8b 74 24 20          mov    rsi, QWORD PTR [rsp + 0x20]
-//c 8b 44 24 20           mov    r8, QWORD PTR [rsp+0x20]
-//4c 8b 4c 24 20          mov    r9, QWORD PTR [rsp+0x20]
-//48 8b 84 24 00 02 00 00   mov    rax, QWORD PTR [rsp + 0x200]
-//48 8b 9c 24 00 02 00 00   mov    rbx, QWORD PTR [rsp+0x200]
-//48 8b 8c 24 00 02 00 00   mov    rcx, QWORD PTR [rsp + 0x200]
-//48 8b 94 24 00 02 00 00   mov    rdx, QWORD PTR [rsp + 0x200]
-//48 8b bc 24 00 02 00 00   mov    rdi, QWORD PTR [rsp + 0x200]
-//48 8b b4 24 00 02 00 00   mov    rsi, QWORD PTR [rsp + 0x200]
-//4c 8b 84 24 00 02 00 00   mov    r8, QWORD PTR [rsp + 0x200]
-//4c 8b 8c 24 00 02 00 00   mov    r9, QWORD PTR [rsp + 0x200]
+
 void x64FunctionBuilder::loadLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
     if (m_beginCall) {
         if (m_paramCount == 0) { //rcx
-            emit(4, 0x48, 0x8b, 0x8c, 0x24); emitValue(offset); // mov rcx, #imm64
+            emit(3, 0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rsp + offset32]
         }
         else if (m_paramCount == 1) { //rdx
-            emit(4, 0x48, 0x8b, 0x94, 0x24); emitValue(offset); // mov rdx, #imm64
+            emit(3, 0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rsp + offset32]
         }
         else if (m_paramCount == 2) { //r8
-            emit(4, 0x4c, 0x8b, 0x84, 0x24); emitValue(offset); // mov r8, #imm64
+            emit(3, 0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rsp + offset32]
         }
         else if (m_paramCount == 3) { //r9
-            emit(4, 0x4c, 0x8b, 0x8c, 0x24); emitValue(offset); // mov r9, #imm64
+            emit(3, 0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rsp + offset32]
         }
         else {
             emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]

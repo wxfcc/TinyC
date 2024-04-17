@@ -1,18 +1,23 @@
 #include <stdio.h>
 #include <stdlib.h>
-#ifndef _WIN32
+#ifdef _WIN32
+#include <windows.h>
+#include <psapi.h>
+#else
 #include <sys/mman.h>
 #endif
 #include "JITEngine.h"
 
 JITEngine::JITEngine(int arch): m_arch(arch), m_textSectionSize(0) {
-    m_textSection = os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
+    m_process = NULL;
+    m_textSection = new char[MAX_TEXT_SECTION_SIZE];    // os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
     memset(m_textSection, 0, MAX_TEXT_SECTION_SIZE);
     m_funcPtr = new char*[MAX_FUNC_PTR_SIZE];
     memset(m_funcPtr, 0, MAX_FUNC_PTR_SIZE);
 }
 JITEngine::~JITEngine() { 
-	os_freeExecutable(m_textSection); 
+	//os_freeExecutable(m_textSection); 
+    delete m_textSection;
 	delete(m_funcPtr);
 }
 unsigned int JITEngine::getCodeSize() {
@@ -26,53 +31,20 @@ unsigned char* JITEngine::getFunction(const string &name) {
 	return (unsigned char*)*_getFunctionEntry(name); 
 }
 int JITEngine::setExecutable(){
+#ifdef _WIN32
+    DWORD oldProtect;
+    bool ret = VirtualProtect(m_textSection, MAX_TEXT_SECTION_SIZE, PAGE_EXECUTE_READWRITE, &oldProtect);
+    ASSERT(ret == true);
+
+#elif defined(__linux__) || defined(__MACH__)
 #ifdef __MACH__
-#if 0
-    unsigned char shellcode[] = {
-#if 0
-        0xB8, 0x00, 0x00, 0x00, 0x00,                       // mov eax, 42
-        0x90, 0x90, 0x90,                                   // NOP * 3
-        0x68, 0x01, 0x00, 0x00, 0x00,                       // push 0x00000001
-        0xc7, 0x44, 0x24, 0x04, 0x01, 0x00, 0x00, 0x00,     // mov DWORD PTR [rsp+4],0x0
-        0x58,                                               // pop rax
-        0xc3                                                //ret
-#elif 1
-        0x55,   //push   rbp
-        0x48, 0x89, 0xe5,//                mov    rbp,rsp
-        0x48, 0x89, 0xec,//                mov    rsp,rbp
-        0x5d,             //         pop    rbp
-        0xc3                                                //ret
-        //    0:  52                      push   rdx
-        //    1:  55                      push   rbp
-        //    2:  48 89 e5                mov    rbp,rsp
-        //    5:  48 81 ec f8 01 00 00    sub    rsp,0x1f8
-        //    c:  48 bf e1 07 0a 03 00    movabs rdi,0x6000030a07e1
-        //    13: 60 00 00
-        //    16: 48 be 7b 00 00 00 00    movabs rsi,0x7b
-        //    1d: 00 00 00
-        //    20: ff 15 12 b7 fb 02       call   QWORD PTR [rip+0x2fbb712]        # 0x2fbb738
-        //    26: 48 81 c4 18 00 00 00    add    rsp,0x18
-        //    2d: 50                      push   rax
-        //    2e: 48 81 c4 08 00 00 00    add    rsp,0x8
-        //    35: 68 0c 00 00 00          push   0xc
-        //    3a: 48 8b 04 24             mov    rax,QWORD PTR [rsp]
-        //    3e: 48 83 c4 08             add    rsp,0x8
-        //    42: e9 00 00 00 00          jmp    0x47
-        //    47: 48 89 ec                mov    rsp,rbp
-        //    4a: 5d                      pop    rbp
-        //    4b: 5a                      pop    rdx
-        //    4c: c3                      ret
+    //p = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, 0, 0);
+    //ASSERT(p != NULL);
+#else
+    int erro = posix_memalign(&m_textSection, getpagesize(), MAX_TEXT_SECTION_SIZE);
+    ASSERT(erro == 0 && p != NULL);
 #endif
-    };
-    memcpy(m_textSection, shellcode, sizeof(shellcode));
-    typedef int64_t (*ShellcodeFunction)();
-    ShellcodeFunction function = (ShellcodeFunction)m_textSection;
-    dumpCode();
-    int64_t ret = function();
-    printf("ret: 0x%llx\n", ret);
-#endif
-    
-    int erro = mprotect(m_textSection, MAX_TEXT_SECTION_SIZE, PROT_READ | PROT_EXEC);
+    erro = mprotect(m_textSection, MAX_TEXT_SECTION_SIZE, PROT_READ | PROT_EXEC);
     ASSERT(erro == 0);
 
 #endif
@@ -101,7 +73,7 @@ void JITEngine::endBuildFunction(FunctionBuilder* builder) {
 
 void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
     if (m_funcEntries.count(funcName) == 0) {
-        int n = m_funcEntries.size();
+        size_t n = m_funcEntries.size();
         m_funcEntries[funcName] = &m_funcPtr[n];
         m_funcPtr[n] = entry;
     }
@@ -110,7 +82,7 @@ void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
 
 char** JITEngine::_getFunctionEntry(const string &name) {
     if (m_funcEntries.count(name) == 0) {
-        int n = m_funcEntries.size();
+        size_t n = m_funcEntries.size();
         m_funcEntries[name] = &m_funcPtr[n];
         return &m_funcPtr[n];
     }
@@ -125,7 +97,7 @@ void JITEngine::beginBuild() {
 void JITEngine::endBuild() {
     for (map<string, char**>::iterator iter = m_funcEntries.begin(); iter != m_funcEntries.end(); ++iter) {
         if (*iter->second == NULL) {
-            char *f = os_findSymbol(iter->first.c_str());
+            char *f = findSystemSymbol(iter->first);
             ASSERT(f != NULL);
             *iter->second = f;
         }
@@ -134,8 +106,81 @@ void JITEngine::endBuild() {
 }
 void JITEngine::dumpCode() { 
     unsigned char* p = (unsigned char*)m_textSection;
-    for (int i = 0; i < m_textSectionSize; i++) {
+    for (size_t i = 0; i < m_textSectionSize; i++) {
         printf("%02x ", p[i]);
     }
     printf("\n");
+}
+
+char* JITEngine::findSystemSymbol(const string& name) {
+    char* func = NULL;
+    const char* funcName = name.c_str();
+    if (m_process == NULL) {
+#ifdef _WIN32
+        m_process = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, FALSE, GetCurrentProcessId());
+#else
+        m_process = dlopen(NULL, RTLD_NOW);
+#endif
+        ASSERT(m_process != NULL);
+    }
+
+#ifdef _WIN32
+    vector<HMODULE> modules;
+    DWORD bytes;
+    EnumProcessModules(m_process, NULL, 0, &bytes);
+    modules.resize(bytes / sizeof(modules[0]));
+    EnumProcessModules(m_process, &modules[0], bytes, &bytes);
+
+    ASSERT(modules.size() > 0);
+
+    for (int i = 0; i < (int)modules.size(); ++i) {
+        if (func = (char*)GetProcAddress(modules[i], funcName)) {
+            char moduleName[256] = { 0 };
+            GetModuleBaseName(m_process, modules[i], moduleName, sizeof(moduleName));
+            printf("%s %s: %p\n", moduleName, funcName, func);
+            break;
+        }
+    }
+
+//    CloseHandle(m_process);
+#else
+    func = (char*)dlsym(m_process, funcName);
+//    dlclose(m);
+#endif
+    return func;
+}
+
+int JITEngine::callFunction(const string& name) {
+    int ret = 0;
+    unsigned char* p = getFunction(name);
+
+    if (p) {
+        printf("func %s: %p, code: %02x %02x %02x %02x\n", name.c_str(), p, p[0], p[1], p[2], p[3]);
+        FP_MAIN mainFunc = (FP_MAIN)p;
+        ret = mainFunc();
+    }
+    else {
+        printf("not found %s()\n", name.c_str());
+    }
+    return ret;
+}
+
+int JITEngine::executeCode() {
+    int ret = 0;
+
+    setExecutable();
+    FP_MAIN mainFunc = (FP_MAIN)getFunction("_start");
+    if (mainFunc) {
+        ret = mainFunc();
+    }
+    else {
+        mainFunc = (FP_MAIN)getFunction("main");
+        if (mainFunc) {
+            dumpCode();
+            ret = mainFunc();
+        }
+        else
+            printf("not found main()\n");
+    }
+    return ret;
 }

@@ -51,6 +51,9 @@
     <ClCompile Include="..\src\Label.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\Test.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\hello_mod.c">
@@ -69,6 +72,9 @@
       <Filter>test</Filter>
     </Text>
     <Text Include="..\docs\asm_x64.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\windows_x64_spec.txt">
       <Filter>Docs</Filter>
     </Text>
   </ItemGroup>

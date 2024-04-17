@@ -18,6 +18,7 @@
 #define JIT_X64     1
 #define JIT_ARM     2
 #define JIT_ARM64   3
+typedef int(*FP_MAIN)();
 
 class JITEngine {
 public:
@@ -36,6 +37,9 @@ public:
     void endBuild();
     void addFunctionEntry(const char* funcName, char* entry);
     void dumpCode();
+    char* findSystemSymbol(const string& name);
+    int callFunction(const string& name);
+    int executeCode();
 
 protected:
     char *m_textSection;
@@ -45,6 +49,7 @@ protected:
 
     int m_arch;
     char ** m_funcPtr;
+    void* m_process;
 };
 
 

@@ -1,0 +1,8 @@
+
+in windows x64 mode, the parameter order of function call: 
+	rcx 
+	rdx 
+	r8 
+	r9 
+	[rsp] 
+	[rsp-8] 
