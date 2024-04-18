@@ -54,9 +54,9 @@ int JITEngine::setExecutable(){
 FunctionBuilder* JITEngine::beginBuildFunction() {
     FunctionBuilder* builder = NULL;
     if (m_arch == JIT_X86)
-        builder = new x86FunctionBuilder(this, m_textSection + m_textSectionSize);
+        builder = new FunctionBuilderX86(this, m_textSection + m_textSectionSize);
     else if (m_arch == JIT_X64)
-        builder = new x64FunctionBuilder(this, m_textSection + m_textSectionSize);
+        builder = new FunctionBuilderX64(this, m_textSection + m_textSectionSize);
 
     builder->beginBuild();
 

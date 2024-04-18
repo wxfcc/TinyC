@@ -30,10 +30,10 @@
     <ClCompile Include="..\src\FunctionBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\x64FunctionBuilder.cpp">
+    <ClCompile Include="..\src\FunctionBuilderX64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\x86FunctionBuilder.cpp">
+    <ClCompile Include="..\src\FunctionBuilderX86.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileParser.cpp">
@@ -100,10 +100,10 @@
     <ClInclude Include="..\inc\Label.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\x64FunctionBuilder.h">
+    <ClInclude Include="..\inc\FunctionBuilderX64.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\x86FunctionBuilder.h">
+    <ClInclude Include="..\inc\FunctionBuilderX86.h">
       <Filter>Inc</Filter>
     </ClInclude>
   </ItemGroup>

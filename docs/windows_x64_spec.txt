@@ -4,5 +4,18 @@ in windows x64 mode, the parameter order of function call:
 	rdx 
 	r8 
 	r9 
-	[rsp] 
-	[rsp-8] 
+	[rsp+20h] 
+	[rsp+28h]
+	...
+
+
+myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
+00007FF730D6FA4F 48 B8 9A 78 56 34 12 00 00 00	mov         rax,123456789Ah  
+00007FF730D6FA59 48 89 44 24 30					mov         qword ptr [rsp+30h],rax  
+00007FF730D6FA5E 48 B8 89 67 45 23 01 00 00 00	mov         rax,123456789h  
+00007FF730D6FA68 48 89 44 24 28					mov         qword ptr [rsp+28h],rax  
+00007FF730D6FA6D C7 44 24 20 04 00 00 00		mov         dword ptr [rsp+20h],4  
+00007FF730D6FA75 41 B9 03 00 00 00				mov         r9d,3  
+00007FF730D6FA7B 41 B8 02 00 00 00				mov         r8d,2  
+00007FF730D6FA81 BA 01 00 00 00					mov         edx,1  
+00007FF730D6FA86 48 8D 0D 0F CF 01 00			lea         rcx,[string "helo" (07FF730D8C99Ch)]  

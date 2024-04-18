@@ -43,8 +43,8 @@
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Scaner.cpp" />
     <ClCompile Include="..\src\Test.cpp" />
-    <ClCompile Include="..\src\x64FunctionBuilder.cpp" />
-    <ClCompile Include="..\src\x86FunctionBuilder.cpp" />
+    <ClCompile Include="..\src\FunctionBuilderX64.cpp" />
+    <ClCompile Include="..\src\FunctionBuilderX86.cpp" />
     <Text Include="..\docs\asm_x64.txt" />
     <Text Include="..\docs\windows_x64_spec.txt" />
     <Text Include="..\test\hello.c">
@@ -83,8 +83,8 @@
     <ClInclude Include="..\inc\JITEngine.h" />
     <ClInclude Include="..\inc\Label.h" />
     <ClInclude Include="..\inc\Scanner.h" />
-    <ClInclude Include="..\inc\x64FunctionBuilder.h" />
-    <ClInclude Include="..\inc\x86FunctionBuilder.h" />
+    <ClInclude Include="..\inc\FunctionBuilderX64.h" />
+    <ClInclude Include="..\inc\FunctionBuilderX86.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

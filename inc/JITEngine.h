@@ -6,8 +6,8 @@
 #include "Label.h"
 #include "common.h"
 #include "FunctionBuilder.h"
-#include "x86FunctionBuilder.h"
-#include "x64FunctionBuilder.h"
+#include "FunctionBuilderX86.h"
+#include "FunctionBuilderX64.h"
 
 //============================== code generator
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)

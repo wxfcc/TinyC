@@ -18,10 +18,10 @@ x64:
 =====================================================================
 x64:                                                                                 x64:                                                                           
 0140001000 48 83 EC 48                  sub         rsp,48h                          0140001000 48 83 EC 48                 sub         rsp,48h                      
-0140001004 B9 F5 FF FF FF               mov         ecx,0FFFFFFF5h                   0140001004 B9 F5 FF FF FF              mov         ecx,0FFFFFFF5h               
+0140001004 B9 F5 FF FF FF               mov         ecx, 0FFFFFFF5h                   0140001004 B9 F5 FF FF FF              mov         ecx, 0FFFFFFF5h               
 0140001009 FF 15 F9 0F 00 00            call        qword ptr [140002008 h]          0140001009 E8 30 00 00 00              call        014000103E             
 014000100F 48 89 44 24 30               mov         qword ptr [rsp+30 h],rax         014000100E 89 44 24 30                 mov         dword ptr [rsp+30 h],eax      
-0140001014 48 C7 44 24 20 00 00 00 00   mov         qword ptr [rsp+20 h],0           0140001012 48 C7 44 24 20 00 00 00 00  mov         qword ptr [rsp+20 h],0  
+0140001014 48 C7 44 24 20 00 00 00 00   mov         qword ptr [rsp+20 h], 0           0140001012 48 C7 44 24 20 00 00 00 00  mov         qword ptr [rsp+20 h], 0  
 014000101D 45 33 C9                     xor         r9d,r9d                          014000101B 45 33 C9                    xor         r9d,r9d                      
 0140001020 41 B8 06 00 00 00            mov         r8d,6                            014000101E 41 B8 06 00 00 00           mov         r8d,6                        
 0140001026 48 8B 15 D3 1F 00 00         mov         rdx,qword ptr [140003000 h]      0140001024 48 8B 15 D5 1F 00 00        mov         rdx,qword ptr [140003000 h]   
@@ -79,10 +79,10 @@ x64:
 0000000140001016 48 8B F1             mov         rsi,rcx  
 0000000140001019 B9 07 00 00 00       mov         ecx,7  
 000000014000101E F3 A4                rep movs    byte ptr [rdi],byte ptr [rsi]  
-0000000140001020 B9 F5 FF FF FF       mov         ecx,0FFFFFFF5h  
+0000000140001020 B9 F5 FF FF FF       mov         ecx, 0FFFFFFF5h  
 0000000140001025 E8 30 00 00 00       call        000000014000105A  
 000000014000102A 89 44 24 30          mov         dword ptr [rsp+30 h],eax  
-000000014000102E 48 C7 44 24 20 00 00 00 00 mov         qword ptr [rsp+20 h],0  
+000000014000102E 48 C7 44 24 20 00 00 00 00 mov         qword ptr [rsp+20 h], 0  
 0000000140001037 45 33 C9             xor         r9d,r9d  
 000000014000103A 41 B8 07 00 00 00    mov         r8d,7  
 0000000140001040 48 8D 54 24 34       lea         rdx,[rsp+34 h]  
@@ -105,26 +105,26 @@ x64:
 00000001`40001100 55                    push    rbp
 00000001`40001101 4889e5                mov     rbp,rsp
 00000001`40001104 4883ec68              sub     rsp,68h
-00000001`40001108 b9f6ffffff            mov     ecx,0FFFFFFF6h
+00000001`40001108 b9f6ffffff            mov     ecx, 0FFFFFFF6h
 00000001`4000110d ff15521f0000          call    qword ptr [a+0x3065 (00000001`40003065)]
 00000001`40001113 488905e6160000        mov     qword ptr [a+0x2800 (00000001`40002800)],rax
-00000001`4000111a b9f5ffffff            mov     ecx,0FFFFFFF5h
+00000001`4000111a b9f5ffffff            mov     ecx, 0FFFFFFF5h
 00000001`4000111f ff15401f0000          call    qword ptr [a+0x3065 (00000001`40003065)]
 00000001`40001125 488905dc160000        mov     qword ptr [a+0x2808 (00000001`40002808)],rax
-00000001`4000112c 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`4000112c 48c744242000000000    mov     qword ptr [rsp+20h], 0
 00000001`40001135 4533c9                xor     r9d,r9d
-00000001`40001138 41b80c000000          mov     r8d,0Ch
+00000001`40001138 41b80c000000          mov     r8d, 0Ch
 00000001`4000113e 48ba0240004001000000  mov     rdx,offset a+0x4002 (00000001`40004002)
 00000001`40001148 488b0db9160000        mov     rcx,qword ptr [a+0x2808 (00000001`40002808)]
 00000001`4000114f ff15001f0000          call    qword ptr [a+0x3055 (00000001`40003055)]
-00000001`40001155 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`40001155 48c744242000000000    mov     qword ptr [rsp+20h], 0
 00000001`4000115e 4533c9                xor     r9d,r9d
-00000001`40001161 41b80b000000          mov     r8d,0Bh
+00000001`40001161 41b80b000000          mov     r8d, 0Bh
 00000001`40001167 48ba0f40004001000000  mov     rdx,offset a+0x400f (00000001`4000400f)
 00000001`40001171 488b0d90160000        mov     rcx,qword ptr [a+0x2808 (00000001`40002808)]
 00000001`40001178 ff15d71e0000          call    qword ptr [a+0x3055 (00000001`40003055)]
-00000001`4000117e c6050029004000        mov     byte ptr [00000001`80003a85],0
-00000001`40001185 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`4000117e c6050029004000        mov     byte ptr [00000001`80003a85], 0
+00000001`40001185 48c744242000000000    mov     qword ptr [rsp+20h], 0
 00000001`4000118e 4533c9                xor     r9d,r9d
 00000001`40001191 41b810000000          mov     r8d,10h
 00000001`40001197 48ba0029004000000000  mov     rdx,40002900h
@@ -133,7 +133,7 @@ x64:
 00000001`400011ae bb00290040            mov     ebx,40002900h
 00000001`400011b3 b980100040            mov     ecx,40001080h
 00000001`400011b8 ffd1                  call    rcx
-00000001`400011ba 48c744242000000000    mov     qword ptr [rsp+20h],0
+00000001`400011ba 48c744242000000000    mov     qword ptr [rsp+20h], 0
 00000001`400011c3 4533c9                xor     r9d,r9d
 00000001`400011c6 41b801000000          mov     r8d,1
 00000001`400011cc 48ba0040004001000000  mov     rdx,offset a+0x4000 (00000001`40004000)
@@ -164,13 +164,13 @@ x64:
 000000014000109C 48 BA 22 22 22 22 22 22 22 22 mov         rdx,2222222222222222h  
 00000001400010A6 48 B9 11 11 11 11 11 11 11 11 mov         rcx,1111111111111111h  
 00000001400010B0 E8 5A FF FF FF       call        print6 (014000100Fh)  
-00000001400010B5 B9 F6 FF FF FF       mov         ecx,0FFFFFFF6h  
+00000001400010B5 B9 F6 FF FF FF       mov         ecx, 0FFFFFFF6h  
 00000001400010BA FF 15 48 4F 00 00    call        qword ptr [__imp_GetStdHandle (0140006008h)]  
 00000001400010C0 48 89 05 59 30 00 00 mov         qword ptr [hIn (0140004120h(rip+0x3059))],rax  
-00000001400010C7 B9 F5 FF FF FF       mov         ecx,0FFFFFFF5h  
+00000001400010C7 B9 F5 FF FF FF       mov         ecx, 0FFFFFFF5h  
 00000001400010CC FF 15 36 4F 00 00    call        qword ptr [__imp_GetStdHandle (0140006008h)]  
 00000001400010D2 48 89 05 4F 30 00 00 mov         qword ptr [hOut (0140004128h)],rax  
-00000001400010D9 48 C7 44 24 20 00 00 00 00 mov         qword ptr [rsp+20h],0  
+00000001400010D9 48 C7 44 24 20 00 00 00 00 mov         qword ptr [rsp+20h], 0  
 00000001400010E2 4C 8D 0D C7 30 00 00 lea         r9,[dwRead (01400041B0h)]  
 00000001400010E9 41 B8 64 00 00 00    mov         r8d,64h  
 00000001400010EF 48 8D 15 3A 30 00 00 lea         rdx,[buf (0140004130h)]  
@@ -227,6 +227,44 @@ void* print6(char* a, char* b, char* c, char* d, char* e,char*f) {
 49 BD #imm64	mov r13, #imm64
 49 BE #imm64	mov r14, #imm64
 49 BF #imm64	mov r15, #imm64
+
+# Assign a value to the low 32 bits of a 64-bit register, setting the high 32 bits to 0.
+48 c7 c0 #imm32         mov    rax, #imm32
+48 c7 c0 01 00 00 00    mov    rax, 0x1
+48 c7 c1 01 00 00 00    mov    rcx, 0x1
+48 c7 c2 01 00 00 00    mov    rdx, 0x1
+48 c7 c3 01 00 00 00    mov    rbx, 0x1
+48 c7 c4 01 00 00 00    mov    rsp,0x1
+48 c7 c5 01 00 00 00    mov    rbp,0x1
+48 c7 c6 01 00 00 00    mov    rsi, 0x1
+48 c7 c7 01 00 00 00    mov    rdi, 0x1
+49 c7 c0 01 00 00 00    mov    r8, 0x1
+49 c7 c1 01 00 00 00    mov    r9, 0x1
+49 c7 c2 01 00 00 00    mov    r10, 0x1
+49 c7 c3 01 00 00 00    mov    r11, 0x1
+49 c7 c4 01 00 00 00    mov    r12, 0x1
+49 c7 c5 01 00 00 00    mov    r13, 0x1
+49 c7 c6 01 00 00 00    mov    r14, 0x1
+49 c7 c7 01 00 00 00    mov    r15, 0x1
+
+# Assign a value to a 32 bits register, setting the high 32 bits of the 64-bit register to 0.
+b8 #imm32               mov    eax, #imm32
+b8 01 00 00 00          mov    eax, 0x1
+b9 01 00 00 00          mov    ecx, 0x1
+ba 01 00 00 00          mov    edx, 0x1
+bb 01 00 00 00          mov    ebx, 0x1
+bc 01 00 00 00          mov    esp, 0x1
+bd 01 00 00 00          mov    ebp, 0x1
+be 01 00 00 00          mov    esi, 0x1
+bf 01 00 00 00          mov    edi, 0x1
+41 b8 01 00 00 00       mov    r8d, 0x1
+41 b9 01 00 00 00       mov    r9d, 0x1
+41 ba 01 00 00 00       mov    r10d, 0x1
+41 bb 01 00 00 00       mov    r11d, 0x1
+41 bc 01 00 00 00       mov    r12d, 0x1
+41 bd 01 00 00 00       mov    r13d, 0x1
+41 be 01 00 00 00       mov    r14d, 0x1
+41 bf 01 00 00 00       mov    r15d, 0x1
 
 // 48 8b 44 24 20            mov    rax, QWORD PTR [rsp + 0x20]
 // 48 8b 5c 24 20            mov    rbx, QWORD PTR [rsp + 0x20]

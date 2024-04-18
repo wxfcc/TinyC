@@ -11,6 +11,7 @@ using namespace std;
 void block();
 void myprintf(const char* s, ...);
 int test(JITEngine* g_jitEngine);
+int test2(JITEngine* g_jitEngine);
 
 static JITEngine* g_jitEngine;
 static string format(const char *fmt, ...) {
@@ -117,7 +118,7 @@ JITEngine* createJitEngine(int arch){
 
 int main(int argc, char *argv[]) {
     //GetStdHandle(0);
-    //myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
+    myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
 	int ret = 0;
     int arch = JIT_X86;
     const char*archs[] = {"x86", "x64"};
@@ -129,6 +130,7 @@ int main(int argc, char *argv[]) {
     printf("arch: %s, myprintf: %p, printf: %p\n", archs[arch], myprintf, printf);
 
     //test(g_jitEngine);
+    //test2(g_jitEngine);
 
     if (argc >= 2) {
         ret = handleFile(argv[1]);
