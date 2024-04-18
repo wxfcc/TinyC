@@ -83,6 +83,9 @@
     <Text Include="..\docs\helo0_x86_asm.txt">
       <Filter>Docs</Filter>
     </Text>
+    <Text Include="..\test\hello1.c">
+      <Filter>test</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\common.h">

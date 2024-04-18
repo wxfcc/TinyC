@@ -119,6 +119,7 @@ void FunctionX64::loadLiteralStr(const string& literalStr) {
 void FunctionX64::loadLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
     if (m_beginCall) {
+        //for windows
         if (m_paramCount == 0) { //rcx
             emit(3, 0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
         }
@@ -136,7 +137,21 @@ void FunctionX64::loadLocal(int idx) {
         }
     }
     else {
-        emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+        if (m_paramCount == 0) { //rcx
+            emit(1, 0x51); // push rcx
+        }
+        else if (m_paramCount == 1) { //rdx
+            emit(1, 0x52); // push rdx
+        }
+        else if (m_paramCount == 2) { //r8
+            emit(2, 0x41, 0x50); // push r8
+        }
+        else if (m_paramCount == 3) { //r9
+            emit(2, 0x41, 0x51); // push r9
+        }
+        else {
+            emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+        }
     }
     m_paramCount++;
 

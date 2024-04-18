@@ -1,0 +1,32 @@
+000002257BEC4D10 52                   push        rdx
+000002257BEC4D11 55                   push        rbp
+000002257BEC4D12 48 89 E5             mov         rbp,rsp
+000002257BEC4D15 48 81 EC F8 01 00 00 sub         rsp,1F8h
+000002257BEC4D1C FF B5 10 00 00 00    push        qword ptr [rbp+10h]
+000002257BEC4D22 48 8B 04 24          mov         rax,qword ptr [rsp]
+000002257BEC4D26 48 83 C4 08          add         rsp,8
+000002257BEC4D2A E9 00 00 00 00       jmp         000002257BEC4D2F
+000002257BEC4D2F 48 89 EC             mov         rsp,rbp
+000002257BEC4D32 5D                   pop         rbp
+000002257BEC4D33 5A                   pop         rdx
+000002257BEC4D34 C3                   ret
+
+000002257BEC4D35 52                   push        rdx
+000002257BEC4D36 55                   push        rbp
+000002257BEC4D37 48 89 E5             mov         rbp,rsp
+000002257BEC4D3A 48 81 EC F8 01 00 00 sub         rsp,1F8h
+000002257BEC4D41 48 B9 09 00 00 00 00 00 00 00 mov         rcx,9
+000002257BEC4D4B FF 15 1F 80 00 00    call        qword ptr [2257BECCD70h]
+000002257BEC4D51 48 81 C4 08 00 00 00 add         rsp,8
+000002257BEC4D58 50                   push        rax
+000002257BEC4D59 48 8B 04 24          mov         rax,qword ptr [rsp]
+000002257BEC4D5D 48 89 85 F8 FF FF FF mov         qword ptr [rbp-8],rax
+000002257BEC4D64 48 83 C4 08          add         rsp,8
+000002257BEC4D68 FF B5 F8 FF FF FF    push        qword ptr [rbp-8]
+000002257BEC4D6E 48 8B 04 24          mov         rax,qword ptr [rsp]
+000002257BEC4D72 48 83 C4 08          add         rsp,8
+000002257BEC4D76 E9 00 00 00 00       jmp         000002257BEC4D7B
+000002257BEC4D7B 48 89 EC             mov         rsp,rbp
+000002257BEC4D7E 5D                   pop         rbp
+000002257BEC4D7F 5A                   pop         rdx
+000002257BEC4D80 C3                   ret

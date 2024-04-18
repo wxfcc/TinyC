@@ -1,0 +1,32 @@
+015633A8 52                   push        edx
+015633A9 55                   push        ebp
+015633AA 8B EC                mov         ebp,esp
+015633AC 81 EC 00 01 00 00    sub         esp,100h
+015633B2 FF B5 0C 00 00 00    push        dword ptr [ebp+0Ch]
+015633B8 8B 04 24             mov         eax,dword ptr [esp]
+015633BB 83 C4 04             add         esp,4
+015633BE E9 00 00 00 00       jmp         015633C3
+015633C3 8B E5                mov         esp,ebp
+015633C5 5D                   pop         ebp
+015633C6 5A                   pop         edx
+015633C7 C3                   ret
+
+015633C8 52                   push        edx
+015633C9 55                   push        ebp
+015633CA 8B EC                mov         ebp,esp
+015633CC 81 EC 00 01 00 00    sub         esp,100h
+015633D2 68 09 00 00 00       push        9
+015633D7 FF 15 E8 B3 56 01    call        dword ptr ds:[156B3E8h]
+015633DD 81 C4 04 00 00 00    add         esp,4
+015633E3 50                   push        eax
+015633E4 8B 04 24             mov         eax,dword ptr [esp]
+015633E7 89 85 FC FF FF FF    mov         dword ptr [ebp-4],eax
+015633ED 83 C4 04             add         esp,4
+015633F0 FF B5 FC FF FF FF    push        dword ptr [ebp-4]
+015633F6 8B 04 24             mov         eax,dword ptr [esp]
+015633F9 83 C4 04             add         esp,4
+015633FC E9 00 00 00 00       jmp         01563401
+01563401 8B E5                mov         esp,ebp
+01563403 5D                   pop         ebp
+01563404 5A                   pop         edx
+01563405 C3                   ret
