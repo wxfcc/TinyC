@@ -3,27 +3,27 @@
 #include <stdarg.h>
 
 #include "JITEngine.h"
-#include "FunctionBuilder.h"
+#include "Function.h"
 
-FunctionBuilder::FunctionBuilder(JITEngine*parent, char *codeBuf): 
+Function::Function(JITEngine*parent, char *codeBuf): 
     m_parent(parent), m_codeBuf(codeBuf), m_codeSize(0), m_paramCount(0){
 }
-FunctionBuilder::~FunctionBuilder(){
+Function::~Function(){
 }
 
 
-string& FunctionBuilder::getFuncName() {
+string& Function::getFuncName() {
 	return m_funcName;
 }
-int FunctionBuilder::getCodeSize() const{ 
+int Function::getCodeSize() const{ 
 	return m_codeSize;
 }
 
-void FunctionBuilder::markLabel(Label *label){ 
+void Function::markLabel(Label *label){ 
     label->mark(m_codeBuf + m_codeSize); 
 }
 
-void FunctionBuilder::emit(int n, ...) {
+void Function::emit(int n, ...) {
     va_list args;
     va_start(args, n);
     for (int i = 0; i < n; ++i) 
@@ -32,7 +32,7 @@ void FunctionBuilder::emit(int n, ...) {
 }
 
 template<typename T>
-void FunctionBuilder::emitValue(T val) {
+void Function::emitValue(T val) {
     memcpy(m_codeBuf + m_codeSize, &val, sizeof(val));
     m_codeSize += sizeof(val);
 }

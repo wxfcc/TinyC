@@ -27,13 +27,13 @@
     <ClCompile Include="..\src\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\FunctionBuilder.cpp">
+    <ClCompile Include="..\src\Function.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\FunctionBuilderX64.cpp">
+    <ClCompile Include="..\src\FunctionX64.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\FunctionBuilderX86.cpp">
+    <ClCompile Include="..\src\FunctionX86.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\src\FileParser.cpp">
@@ -77,12 +77,18 @@
     <Text Include="..\docs\windows_x64_spec.txt">
       <Filter>Docs</Filter>
     </Text>
+    <Text Include="..\docs\helo0_x64_asm.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\helo0_x86_asm.txt">
+      <Filter>Docs</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\common.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\FunctionBuilder.h">
+    <ClInclude Include="..\inc\Function.h">
       <Filter>Inc</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\FileParser.h">
@@ -100,10 +106,10 @@
     <ClInclude Include="..\inc\Label.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\FunctionBuilderX64.h">
+    <ClInclude Include="..\inc\FunctionX64.h">
       <Filter>Inc</Filter>
     </ClInclude>
-    <ClInclude Include="..\inc\FunctionBuilderX86.h">
+    <ClInclude Include="..\inc\FunctionX86.h">
       <Filter>Inc</Filter>
     </ClInclude>
   </ItemGroup>

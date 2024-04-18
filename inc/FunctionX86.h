@@ -1,22 +1,22 @@
-#ifndef __X64_FUNCTION_BUILDER_H__
-#define __X64_FUNCTION_BUILDER_H__
+#ifndef __X86_FUNCTION_BUILDER_H__
+#define __X86_FUNCTION_BUILDER_H__
 #include "Label.h"
+#include "Function.h"
 #include "JITEngine.h"
-typedef long long int64;
 
-class FunctionBuilderX64 :public FunctionBuilder {
+class FunctionX86: public Function {
 public:
-    FunctionBuilderX64(JITEngine* parent, char* codeBuf);
-    ~FunctionBuilderX64();
-    
+    FunctionX86(JITEngine* parent, char* codeBuf);
+    ~FunctionX86();
+
+    //string& getFuncName();
+    //int getCodeSize() const;
+
     void beginBuild();
     void endBuild();
 
-    void prepareParam(int64 paraVal, int size);
-    void prepareParamForWindows(int64 paraVal, int size);
-    void prepareParamForLinux(int64 paraVal, int size);
     void loadImm(int imm);
-    void loadImm64(int64 imm);
+
     void loadLiteralStr(const string& literalStr);
     void loadLocal(int idx);
     void storeLocal(int idx);
@@ -34,18 +34,16 @@ public:
     void retExpr();
     int beginCall();
     void endCall(const string& funcName, int callID, int paramCount);
-
-protected:
+    
+private:
     void emit(int n, ...);
     template<typename T> void emitValue(T val);
-    void emitRelativeAddr32(char* absPos, int prefixLen);
 
     void condJmp(TokenID tid, Label* label);
 
     int localIdx2EbpOff(int idx);
 
     //
-    //x64JITEngine* m_parent;
 };
 
 #endif

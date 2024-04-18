@@ -1,0 +1,53 @@
+00000174C6654D10 52                   push        rdx  
+00000174C6654D11 55                   push        rbp  
+00000174C6654D12 48 89 E5             mov         rbp,rsp  
+00000174C6654D15 48 81 EC F8 01 00 00 sub         rsp,1F8h  
+00000174C6654D1C FF B5 10 00 00 00    push        qword ptr [rbp+10h]  
+
+00000174C6654D22 48 8B 04 24          mov         rax,qword ptr [rsp]		# retExpr
+00000174C6654D26 48 83 C4 08          add         rsp,8  
+00000174C6654D2A E9 00 00 00 00       jmp         00000174C6654D2F  
+00000174C6654D2F 48 89 EC             mov         rsp,rbp  
+00000174C6654D32 5D                   pop         rbp  
+00000174C6654D33 5A                   pop         rdx  
+00000174C6654D34 C3                   ret  
+
+00000174C6654D35 52                   push        rdx  
+00000174C6654D36 55                   push        rbp  
+00000174C6654D37 48 89 E5             mov         rbp,rsp  
+00000174C6654D3A 48 81 EC F8 01 00 00 sub         rsp,1F8h  
+00000174C6654D41 68 79 00 00 00       push        79h  
+00000174C6654D46 48 8B 04 24          mov         rax,qword ptr [rsp]  
+00000174C6654D4A 48 89 85 F8 FF FF FF mov         qword ptr [rbp-8],rax  
+00000174C6654D51 48 83 C4 08          add         rsp,8  
+00000174C6654D55 48 B9 58 2F 67 C6 74 01 00 00 mov         rcx,174C6672F58h  
+00000174C6654D5F FF 15 13 80 00 00    call        qword ptr [174C665CD78h]  
+00000174C6654D65 48 81 C4 08 00 00 00 add         rsp,8  
+00000174C6654D6C 50                   push        rax  
+00000174C6654D6D 48 81 C4 08 00 00 00 add         rsp,8  
+00000174C6654D74 48 B9 09 00 00 00 00 00 00 00 mov         rcx,9  
+00000174C6654D7E FF 15 EC 7F 00 00    call        qword ptr [174C665CD70h]  
+00000174C6654D84 48 81 C4 08 00 00 00 add         rsp,8  
+00000174C6654D8B 50                   push        rax  
+00000174C6654D8C 48 81 C4 08 00 00 00 add         rsp,8  
+00000174C6654D93 48 B9 B0 E5 64 C6 74 01 00 00 mov         rcx,174C664E5B0h  
+00000174C6654D9D 48 8B 95 F8 FF FF FF mov         rdx,qword ptr [rbp-8]  
+00000174C6654DA4 49 B8 7B 00 00 00 00 00 00 00 mov         r8,7Bh  
+00000174C6654DAE FF 15 AC 7F 00 00    call        qword ptr [174C665CD60h]  
+00000174C6654DB4 48 81 C4 28 00 00 00 add         rsp,28h  
+00000174C6654DBB 50                   push        rax  
+00000174C6654DBC 48 81 C4 08 00 00 00 add         rsp,8  
+00000174C6654DC3 48 B9 50 E8 64 C6 74 01 00 00 mov         rcx,174C664E850h  
+00000174C6654DCD 48 BA 7B 00 00 00 00 00 00 00 mov         rdx,7Bh  
+00000174C6654DD7 FF 15 83 7F 00 00    call        qword ptr [174C665CD60h]  
+00000174C6654DDD 48 81 C4 18 00 00 00 add         rsp,18h  
+00000174C6654DE4 50                   push        rax  
+00000174C6654DE5 48 81 C4 08 00 00 00 add         rsp,8  
+00000174C6654DEC 68 0C 00 00 00       push        0Ch  
+00000174C6654DF1 48 8B 04 24          mov         rax,qword ptr [rsp]  
+00000174C6654DF5 48 83 C4 08          add         rsp,8  
+00000174C6654DF9 E9 00 00 00 00       jmp         00000174C6654DFE  
+00000174C6654DFE 48 89 EC             mov         rsp,rbp  
+00000174C6654E01 5D                   pop         rbp  
+00000174C6654E02 5A                   pop         rdx  
+00000174C6654E03 C3                   ret  

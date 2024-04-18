@@ -8,7 +8,7 @@ using namespace std;
 
 class FunctionParser {
 public:
-    FunctionParser(FunctionBuilder* builder, Scanner* scanner);
+    FunctionParser(Function* builder, Scanner* scanner);
     void parse();
 private:
     void _function_define();
@@ -40,7 +40,7 @@ private:
     Label* getLastBreakLabel();
 
 private:
-    FunctionBuilder*m_builder;
+    Function*m_builder;
     Scanner *m_scanner;
     vector<map<string, int> > m_nestedLocals;
     map<string, int> m_args;

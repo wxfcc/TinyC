@@ -11,7 +11,7 @@ void FileParser::parse() {
 
 bool FileParser::parseFunction() {
     if (m_scanner->LA(1).tid != TID_EOF) {
-        FunctionBuilder *builder = m_engine->beginBuildFunction();
+        Function *builder = m_engine->beginBuildFunction();
         FunctionParser(builder, m_scanner).parse();
         m_engine->endBuildFunction(builder);
         return true;

@@ -4,18 +4,18 @@
 #include <stdarg.h>
 #include "JITEngine.h"
 
-FunctionBuilderX86::FunctionBuilderX86(JITEngine* parent, char* codeBuf) : FunctionBuilder(parent, codeBuf) {
+FunctionX86::FunctionX86(JITEngine* parent, char* codeBuf) : Function(parent, codeBuf) {
 }
-FunctionBuilderX86::~FunctionBuilderX86() {
+FunctionX86::~FunctionX86() {
 }
 
-void FunctionBuilderX86::beginBuild() {
+void FunctionX86::beginBuild() {
     emit(1, 0x52); // push edx
     emit(1, 0x55); // push ebp
     emit(2, 0x8b, 0xec); // mov ebp, esp
     emit(2, 0x81, 0xec); emitValue(MAX_LOCAL_COUNT * 4); // sub esp, MAX_LOCAL_COUNT * 4
 }
-void FunctionBuilderX86::endBuild() {
+void FunctionX86::endBuild() {
     markLabel(&m_retLabel);
     emit(2, 0x8b, 0xe5);  // mov esp,ebp 
     emit(1, 0x5d); // pop ebp  
@@ -23,35 +23,35 @@ void FunctionBuilderX86::endBuild() {
     emit(1, 0xc3); // ret
 }
 
-void FunctionBuilderX86::loadImm(int imm) {
+void FunctionX86::loadImm(int imm) {
     emit(1, 0x68); emitValue(imm); // push imm
 }
-void FunctionBuilderX86::loadLiteralStr(const string& literalStr) {
+void FunctionX86::loadLiteralStr(const string& literalStr) {
     const char* loc = m_parent->_getLiteralStringLoc(literalStr);
     emit(1, 0x68); emitValue(loc); // push loc
 }
-void FunctionBuilderX86::loadLocal(int idx) {
+void FunctionX86::loadLocal(int idx) {
     emit(2, 0xff, 0xb5); emitValue(localIdx2EbpOff(idx)); // push dword ptr [ebp + idxOff]
 }
-void FunctionBuilderX86::storeLocal(int idx) {
+void FunctionX86::storeLocal(int idx) {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(2, 0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov dword ptr [ebp + idxOff], eax
     emit(2, 0x83, 0xc4); emitValue((char)4); // add esp, 4
 }
-void FunctionBuilderX86::incLocal(int idx) {
+void FunctionX86::incLocal(int idx) {
     emit(2, 0xff, 0x85); emitValue(localIdx2EbpOff(idx)); // inc dword ptr [ebp + idxOff]
 }
-void FunctionBuilderX86::decLocal(int idx) {
+void FunctionX86::decLocal(int idx) {
     emit(2, 0xff, 0x8d); emitValue(localIdx2EbpOff(idx)); // dec dword ptr [ebp + idxOff]
 }
-void FunctionBuilderX86::pop(int n) {
+void FunctionX86::pop(int n) {
     emit(2, 0x81, 0xc4); emitValue(n * 4); // add esp, n * 4
 }
-void FunctionBuilderX86::dup() {
+void FunctionX86::dup() {
     emit(3, 0xff, 0x34, 0x24); // push dword ptr [esp]
 }
 
-void FunctionBuilderX86::doArithmeticOp(TokenID opType) {
+void FunctionX86::doArithmeticOp(TokenID opType) {
     emit(4, 0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4]
     switch (opType) {
     case TID_OP_ADD:
@@ -76,7 +76,7 @@ void FunctionBuilderX86::doArithmeticOp(TokenID opType) {
     emit(4, 0x89, 0x44, 0x24, 0x04); // mov dword ptr [esp+4], eax
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
 }
-void FunctionBuilderX86::cmp(TokenID cmpType) {
+void FunctionX86::cmp(TokenID cmpType) {
     Label label_1, label_0, label_end;
     emit(4, 0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4] 
     emit(3, 0x8b, 0x14, 0x24); // mov edx, dword ptr[esp]
@@ -92,40 +92,40 @@ void FunctionBuilderX86::cmp(TokenID cmpType) {
     markLabel(&label_end);
 }
 
-void FunctionBuilderX86::markLabel(Label* label) {
+void FunctionX86::markLabel(Label* label) {
     label->mark(m_codeBuf + m_codeSize); 
 }
-void FunctionBuilderX86::jmp(Label* label) {
+void FunctionX86::jmp(Label* label) {
     emit(1, 0xe9);
     char* ref = m_codeBuf + m_codeSize;
     emitValue(NULL);
     label->addRef(ref);
 }
-void FunctionBuilderX86::trueJmp(Label* label) {
+void FunctionX86::trueJmp(Label* label) {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
     emit(2, 0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_NEQUAL, label);
 }
-void FunctionBuilderX86::falseJmp(Label* label) {
+void FunctionX86::falseJmp(Label* label) {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
     emit(2, 0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_EQUAL, label);
 }
-void FunctionBuilderX86::ret() { 
+void FunctionX86::ret() { 
     jmp(&m_retLabel); 
 }
-void FunctionBuilderX86::retExpr() {
+void FunctionX86::retExpr() {
     emit(3, 0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
     emit(3, 0x83, 0xc4, 0x04); // add esp, 4
     jmp(&m_retLabel);
 }
 
-int FunctionBuilderX86::beginCall() {
+int FunctionX86::beginCall() {
     return 0;
 }
-void FunctionBuilderX86::endCall(const string& funcName, int callID, int paramCount) {
+void FunctionX86::endCall(const string& funcName, int callID, int paramCount) {
     char** entry = m_parent->_getFunctionEntry(funcName);
     for (int i = 0; i < paramCount - 1; ++i) {
         emit(3, 0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 4); // push dword ptr [esp+4*i]
@@ -135,7 +135,7 @@ void FunctionBuilderX86::endCall(const string& funcName, int callID, int paramCo
     emit(1, 0x50); // push eax
 }
 
-void FunctionBuilderX86::emit(int n, ...) {
+void FunctionX86::emit(int n, ...) {
     va_list args;
     va_start(args, n);
     for (int i = 0; i < n; ++i) 
@@ -144,12 +144,12 @@ void FunctionBuilderX86::emit(int n, ...) {
 }
 
 template<typename T>
-void FunctionBuilderX86::emitValue(T val) {
+void FunctionX86::emitValue(T val) {
     memcpy(m_codeBuf + m_codeSize, &val, sizeof(val));
     m_codeSize += sizeof(val);
 }
 
-void FunctionBuilderX86::condJmp(TokenID tid, Label* label) {
+void FunctionX86::condJmp(TokenID tid, Label* label) {
     switch ((int)tid) {
     case TID_OP_LESS:       emit(2, 0x0f, 0x8c); break;
     case TID_OP_LESSEQ:     emit(2, 0x0f, 0x8e); break;
@@ -163,7 +163,7 @@ void FunctionBuilderX86::condJmp(TokenID tid, Label* label) {
     label->addRef(ref);
 }
 
-int FunctionBuilderX86::localIdx2EbpOff(int idx) {
+int FunctionX86::localIdx2EbpOff(int idx) {
     return idx < 0 ? 8 - idx * 4 : -(1 + idx) * 4;
 }
 

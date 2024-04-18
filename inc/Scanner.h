@@ -16,7 +16,7 @@ struct Token {
 class Scanner { 
 public:
     explicit Scanner(const char *src);
-    Token LA(int n);
+    Token LA(int n);    //Lookahead ?
     Token next(int n);
 
 private:

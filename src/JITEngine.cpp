@@ -51,18 +51,18 @@ int JITEngine::setExecutable(){
     return 0;
 }
 
-FunctionBuilder* JITEngine::beginBuildFunction() {
-    FunctionBuilder* builder = NULL;
+Function* JITEngine::beginBuildFunction() {
+    Function* builder = NULL;
     if (m_arch == JIT_X86)
-        builder = new FunctionBuilderX86(this, m_textSection + m_textSectionSize);
+        builder = new FunctionX86(this, m_textSection + m_textSectionSize);
     else if (m_arch == JIT_X64)
-        builder = new FunctionBuilderX64(this, m_textSection + m_textSectionSize);
+        builder = new FunctionX64(this, m_textSection + m_textSectionSize);
 
     builder->beginBuild();
 
     return builder;
 }
-void JITEngine::endBuildFunction(FunctionBuilder* builder) {
+void JITEngine::endBuildFunction(Function* builder) {
     builder->endBuild();
     *_getFunctionEntry(builder->getFuncName()) = m_textSection + m_textSectionSize;
     m_textSectionSize += builder->getCodeSize();

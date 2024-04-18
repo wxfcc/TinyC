@@ -5,9 +5,8 @@
 #include <map>
 #include "Label.h"
 #include "common.h"
-#include "FunctionBuilder.h"
-#include "FunctionBuilderX86.h"
-#include "FunctionBuilderX64.h"
+#include "FunctionX86.h"
+#include "FunctionX64.h"
 
 //============================== code generator
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
@@ -32,8 +31,8 @@ public:
     void beginBuild();
     char** _getFunctionEntry(const string &name);
     const char* _getLiteralStringLoc(const string &literalStr);
-    FunctionBuilder* beginBuildFunction();
-    void endBuildFunction(FunctionBuilder *builder);
+    Function* beginBuildFunction();
+    void endBuildFunction(Function *builder);
     void endBuild();
     void addFunctionEntry(const char* funcName, char* entry);
     void dumpCode();
