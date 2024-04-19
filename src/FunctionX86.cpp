@@ -135,20 +135,6 @@ void FunctionX86::endCall(const string& funcName, int callID, int paramCount) {
     emit(1, 0x50); // push eax
 }
 
-void FunctionX86::emit(int n, ...) {
-    va_list args;
-    va_start(args, n);
-    for (int i = 0; i < n; ++i) 
-        m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
-    va_end(args);
-}
-
-template<typename T>
-void FunctionX86::emitValue(T val) {
-    memcpy(m_codeBuf + m_codeSize, &val, sizeof(val));
-    m_codeSize += sizeof(val);
-}
-
 void FunctionX86::condJmp(TokenID tid, Label* label) {
     switch ((int)tid) {
     case TID_OP_LESS:       emit(2, 0x0f, 0x8c); break;

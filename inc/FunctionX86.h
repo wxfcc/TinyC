@@ -36,8 +36,6 @@ public:
     void endCall(const string& funcName, int callID, int paramCount);
     
 private:
-    void emit(int n, ...);
-    template<typename T> void emitValue(T val);
 
     void condJmp(TokenID tid, Label* label);
 

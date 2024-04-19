@@ -1,5 +1,3 @@
-#include <stdio.h>
-
 #include "FileParser.h"
 using namespace std;
 

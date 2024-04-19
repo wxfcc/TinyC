@@ -5,6 +5,7 @@
 #include <map>
 #include "Label.h"
 #include "common.h"
+#include "Scanner.h"
 #include "FunctionX86.h"
 #include "FunctionX64.h"
 

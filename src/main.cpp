@@ -12,6 +12,7 @@ void block();
 void myprintf(const char* s, ...);
 int test(JITEngine* g_jitEngine);
 int test2(JITEngine* g_jitEngine);
+void func1(int a);
 
 static JITEngine* g_jitEngine;
 static string format(const char *fmt, ...) {
@@ -113,10 +114,17 @@ JITEngine* createJitEngine(int arch){
     engine->addFunctionEntry("runFile", (char*)handleFile);
     engine->addFunctionEntry("printf", (char*)printf);
     engine->addFunctionEntry("myprintf", (char*)myprintf);
+    engine->addFunctionEntry("func1", (char*)func1);
 	return engine;
 }
-
+int __fastcall t(int a, int b, int c, int d, int e, int f, int g) {
+    return a;
+}
 int main(int argc, char *argv[]) {
+#if 0
+    t(1,2,3,4,5,6,7);
+    return 0;
+#else
     //GetStdHandle(0);
     myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
 	int ret = 0;
@@ -138,7 +146,7 @@ int main(int argc, char *argv[]) {
     else{
     	ret = handleInput();    	
     }    
-
     return ret;
+#endif
 }
 

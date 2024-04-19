@@ -7,18 +7,21 @@
 #include "JITEngine.h"
 
 FunctionX64::FunctionX64(JITEngine* parent, char* codeBuf) : Function(parent, codeBuf) {
-    m_paramCount = 0;
-    m_beginCall = 0;
 }
 FunctionX64::~FunctionX64() {
+    printf("FunctionX64: %s, param count=%d\n", m_funcName.c_str(), m_paramCount);
+    //printf("FunctionX64: %s, local variable count=%d\n", m_funcName.c_str(), m_localVarCount);
 }
-
+//call from JITEngine
+//generate prologue code
 void FunctionX64::beginBuild() {
     emit(1, 0x52); // push rdx
     emit(1, 0x55); // push rbp
     emit(3, 0x48, 0x89, 0xe5); // mov rbp, rsp
     emit(3, 0x48, 0x81, 0xec); emitValue((MAX_LOCAL_COUNT -1)* 8); // sub rsp, MAX_LOCAL_COUNT * 8, there should keep rsp align 16 bytes for some instructions, like: movaps XMMWORD PTR [rsp+0x10], xmm1
 }
+//call from JITEngine
+//generate epilogue code
 void FunctionX64::endBuild() {
     markLabel(&m_retLabel);
     emit(3, 0x48, 0x89, 0xec);  // mov rsp,rbp 
@@ -30,16 +33,16 @@ void FunctionX64::endBuild() {
  in windows x64 mode, the order of parameter: rcx rdx r8 r9 [rsp] ...
 */
 void FunctionX64::prepareParamForWindows(int64 paraVal, int size) {
-    if (m_paramCount == 0) { //rcx
+    if (m_paramIndex == 0) { //rcx
         emit(2, 0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
     }
-    else if (m_paramCount == 1) { //rdx
+    else if (m_paramIndex == 1) { //rdx
         emit(2, 0x48, 0xba); emitValue((int64)paraVal); // mov rdx, #imm64
     }
-    else if (m_paramCount == 2) { //r8
+    else if (m_paramIndex == 2) { //r8
         emit(2, 0x49, 0xb8); emitValue((int64)paraVal); // mov r8, #imm64
     }
-    else if (m_paramCount == 3) { //r9
+    else if (m_paramIndex == 3) { //r9
         emit(2, 0x49, 0xb9); emitValue((int64)paraVal); // mov r9, #imm64
     }
     else {
@@ -59,22 +62,22 @@ void FunctionX64::prepareParamForWindows(int64 paraVal, int size) {
  in linux x64 mode, the order of parameter: rdi rsi rdx rcx r8 r9 [rsp] ...
 */
 void FunctionX64::prepareParamForLinux(int64 paraVal, int size) {
-    if (m_paramCount == 0) { 
+    if (m_paramIndex == 0) {
         emit(2, 0x48, 0xbf); emitValue((int64)paraVal); // mov rdi, #imm64
     }
-    else if (m_paramCount == 1) { 
+    else if (m_paramIndex == 1) { 
         emit(2, 0x48, 0xbe); emitValue((int64)paraVal); // mov rsi, #imm64
     }
-    else if (m_paramCount == 2) { 
+    else if (m_paramIndex == 2) { 
         emit(2, 0x48, 0xba); emitValue((int64)paraVal); // mov rdx, #imm64
     }
-    else if (m_paramCount == 3) { 
+    else if (m_paramIndex == 3) { 
         emit(2, 0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
     }
-    else if (m_paramCount == 4) { 
+    else if (m_paramIndex == 4) { 
         emit(2, 0x49, 0xb8); emitValue((int64)paraVal); // mov r8, #imm64
     }
-    else if (m_paramCount == 5) { 
+    else if (m_paramIndex == 5) { 
         emit(2, 0x49, 0xb9); emitValue((int64)paraVal); // mov r9, #imm64
     }
     else {
@@ -96,7 +99,7 @@ void FunctionX64::prepareParam(int64 paraVal, int size) {
 #else
     prepareParamForLinux(paraVal, size);
 #endif
-    m_paramCount++;
+    m_paramIndex++;
 }
 void FunctionX64::loadImm(int imm) {
     if(m_beginCall)
@@ -120,16 +123,16 @@ void FunctionX64::loadLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
     if (m_beginCall) {
         //for windows
-        if (m_paramCount == 0) { //rcx
+        if (m_paramIndex == 0) { //rcx
             emit(3, 0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
         }
-        else if (m_paramCount == 1) { //rdx
+        else if (m_paramIndex == 1) { //rdx
             emit(3, 0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rbp + offset32]
         }
-        else if (m_paramCount == 2) { //r8
+        else if (m_paramIndex == 2) { //r8
             emit(3, 0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rbp + offset32]
         }
-        else if (m_paramCount == 3) { //r9
+        else if (m_paramIndex == 3) { //r9
             emit(3, 0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
         }
         else {
@@ -137,23 +140,23 @@ void FunctionX64::loadLocal(int idx) {
         }
     }
     else {
-        if (m_paramCount == 0) { //rcx
+        if (m_paramIndex == 0) { //rcx
             emit(1, 0x51); // push rcx
         }
-        else if (m_paramCount == 1) { //rdx
+        else if (m_paramIndex == 1) { //rdx
             emit(1, 0x52); // push rdx
         }
-        else if (m_paramCount == 2) { //r8
+        else if (m_paramIndex == 2) { //r8
             emit(2, 0x41, 0x50); // push r8
         }
-        else if (m_paramCount == 3) { //r9
+        else if (m_paramIndex == 3) { //r9
             emit(2, 0x41, 0x51); // push r9
         }
         else {
             emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
-    m_paramCount++;
+    m_paramIndex++;
 
 }
 void FunctionX64::storeLocal(int idx) {
@@ -244,13 +247,25 @@ void FunctionX64::retExpr() {
     emit(4, 0x48, 0x83, 0xc4, 0x08); // add rsp, 8
     jmp(&m_retLabel);
 }
-
+//call from FunctionParser, begin prepare parametes for call
+//48 89 4d 00             mov    QWORD PTR [rbp+0x0],rcx
+//48 89 4d 10             mov    QWORD PTR [rbp+0x10],rcx
+//48 89 55 10             mov    QWORD PTR [rbp+0x10],rdx
+//48 89 5d 10             mov    QWORD PTR [rbp+0x10],rbx
+//48 89 8d 00 01 00 00    mov    QWORD PTR [rbp+0x100],rcx
+//48 89 95 00 01 00 00    mov    QWORD PTR [rbp+0x100],rdx
 int FunctionX64::beginCall() {
-    m_paramCount = 0;
     m_beginCall = 1;
+    if (m_paramCount > 0) {
+        emit(4, 0x48, 0x89, 0x4d, 0x10);//          mov    QWORD PTR[rsp + 0x08], rcx
+    }
+    if (m_paramCount > 1) {
+        emit(4, 0x48, 0x89, 0x55, 0x18);//          mov    QWORD PTR[rsp + 0x10], rdx
+    }
     return 0;
 }
 /*
+//call from FunctionParser
  1. call rip+offset32
  2. call [rip+offset32]
  3. call rax
@@ -269,7 +284,7 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
     int64 offset = (int64)(funcPtr - rip) - 5;  // 5 = sizeof(call rip+offset)
     int64 max = INT_MAX;
     int64 min = INT_MIN;
-    printf("func: %-16s: %p, rip: %p\n", funcName.c_str(), funcPtr, rip);
+    printf("endCall£¬ funcName: %-16s: paramCount=%d, address: %p, rip: %p\n", funcName.c_str(), paramCount, funcPtr, rip);
 #if 0
     if ( offset > max || offset < min) {
     }
@@ -294,23 +309,11 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
     emit(1, 0x50); // push rax
 
-    m_paramCount = 0;
+    m_paramIndex = 0;
     m_beginCall = 0;
+    //m_paramCount = paramCount;
 }
 
-void FunctionX64::emit(int n, ...) {
-    va_list args;
-    va_start(args, n);
-    for (int i = 0; i < n; ++i) 
-        m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
-    va_end(args);
-}
-
-template<typename T>
-void FunctionX64::emitValue(T val) {
-    memcpy(m_codeBuf + m_codeSize, &val, sizeof(val));
-    m_codeSize += sizeof(val);
-}
 // relative rip
 void FunctionX64::emitRelativeAddr32(char* absPos, int prefixLen) {
     char* rip = m_codeBuf + m_codeSize - prefixLen;

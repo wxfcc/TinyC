@@ -18,32 +18,7 @@ static string unescape(const string &s) {
     }
     return r;
 }
-static string format(const char *fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    static vector<char> buf(256);
-    while ((int)buf.size() == vsnprintf(&buf[0], buf.size(), fmt, args)) {
-        buf.resize(buf.size() * 3 / 2);
-    }
-    va_end(args);
-    return &buf[0];
-}
-static string readFile(const string &fileName) {
-    string r;
-    FILE *f = fopen(fileName.c_str(), "rb");
-    if (f == NULL) return r;
-    fseek(f, 0, SEEK_END);
-    int size = ftell(f);
-    fseek(f, 0, SEEK_SET);
-    r.resize(size + 1, 0);
-    int bytes = (int)fread(&r[0], size, 1, f);
-    ASSERT(bytes == 1);
-    fclose(f);
-    return r;
-}
-//============================== lexical analysis
-//============================== platform details for jit
-//============================== syntax analysis
+
 FunctionParser::FunctionParser(Function *builder, Scanner *scanner): m_builder(builder), m_scanner(scanner) {
 }
 
@@ -53,14 +28,15 @@ void FunctionParser::parse() {
 
 void FunctionParser::_function_define() {
     m_scanner->next(1); // type
-    string lexeme = m_scanner->next(1).lexeme;
-    m_builder->getFuncName() = lexeme;
+    string funcName = m_scanner->next(1).lexeme;
     ASSERT(m_scanner->next(1).tid == TID_LP);
     while (m_scanner->LA(1).tid != TID_RP) {
         string type = m_scanner->next(1).lexeme;
         declareArg(m_scanner->next(1).lexeme, type);
         if (m_scanner->LA(1).tid == TID_COMMA) m_scanner->next(1);
     }
+    m_builder->setFuncName(funcName, (int)m_args.size());
+    //m_builder->setArgsCount(m_args.size());
     ASSERT(m_scanner->next(1).tid == TID_RP);
     _block();
 }
@@ -266,6 +242,7 @@ void FunctionParser::_expr_led() {
         default: ASSERT(0); break;
     }
 }
+// parse funcation parameters and generate call code
 void FunctionParser::_expr_call(const Token &funcToken) {
     ASSERT(m_scanner->next(1).tid == TID_LP);
     int callID = m_builder->beginCall();

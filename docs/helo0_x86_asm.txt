@@ -1,56 +1,68 @@
-013233D0 52                   push        edx
-013233D1 55                   push        ebp
-013233D2 8B EC                mov         ebp,esp
-013233D4 81 EC 00 01 00 00    sub         esp,100h
-013233DA FF B5 0C 00 00 00    push        dword ptr [ebp+0Ch]
+// add
+00F93300 52                   push        edx  
+00F93301 55                   push        ebp  
+00F93302 8B EC                mov         ebp,esp  
+00F93304 81 EC 00 01 00 00    sub         esp,100h  
+00F9330A FF B5 0C 00 00 00    push        dword ptr [ebp+0Ch]  
+00F93310 FF B5 10 00 00 00    push        dword ptr [ebp+10h]  
+00F93316 8B 44 24 04          mov         eax,dword ptr [esp+4]  
+00F9331A 03 04 24             add         eax,dword ptr [esp]  
+00F9331D 89 44 24 04          mov         dword ptr [esp+4],eax  
+00F93321 83 C4 04             add         esp,4  
+00F93324 8B 04 24             mov         eax,dword ptr [esp]  
+00F93327 83 C4 04             add         esp,4  
+00F9332A E9 00 00 00 00       jmp         00F9332F  
+00F9332F 8B E5                mov         esp,ebp  
+00F93331 5D                   pop         ebp  
+00F93332 5A                   pop         edx  
+00F93333 C3                   ret  
 
-013233E0 8B 04 24             mov         eax,dword ptr [esp]		# retExpr
-013233E3 83 C4 04             add         esp,4
-013233E6 E9 00 00 00 00       jmp         013233EB
-013233EB 8B E5                mov         esp,ebp
-013233ED 5D                   pop         ebp
-013233EE 5A                   pop         edx
-013233EF C3                   ret
-
-013233F0 52                   push        edx
-013233F1 55                   push        ebp
-013233F2 8B EC                mov         ebp,esp
-013233F4 81 EC 00 01 00 00    sub         esp,100h
-013233FA 68 79 00 00 00       push        79h
-013233FF 8B 04 24             mov         eax,dword ptr [esp]
-01323402 89 85 FC FF FF FF    mov         dword ptr [ebp-4],eax
-01323408 83 C4 04             add         esp,4
-0132340B 68 BC 66 33 01       push        13366BCh
-01323410 FF 15 14 B4 32 01    call        dword ptr ds:[132B414h]
-01323416 81 C4 04 00 00 00    add         esp,4
-0132341C 50                   push        eax
-0132341D 81 C4 04 00 00 00    add         esp,4
-01323423 68 09 00 00 00       push        9
-01323428 FF 15 10 B4 32 01    call        dword ptr ds:[132B410h]
-0132342E 81 C4 04 00 00 00    add         esp,4
-01323434 50                   push        eax
-01323435 81 C4 04 00 00 00    add         esp,4
-0132343B 68 C0 00 32 01       push        13200C0h
-01323440 FF B5 FC FF FF FF    push        dword ptr [ebp-4]
-01323446 68 7B 00 00 00       push        7Bh
-0132344B FF B4 24 04 00 00 00 push        dword ptr [esp+4]
-01323452 FF B4 24 0C 00 00 00 push        dword ptr [esp+0Ch]
-01323459 FF 15 08 B4 32 01    call        dword ptr ds:[132B408h]
-0132345F 81 C4 14 00 00 00    add         esp,14h
-01323465 50                   push        eax
-01323466 81 C4 04 00 00 00    add         esp,4
-0132346C 68 50 02 32 01       push        1320250h
-01323471 68 7B 00 00 00       push        7Bh
-01323476 FF B4 24 04 00 00 00 push        dword ptr [esp+4]
-0132347D FF 15 08 B4 32 01    call        dword ptr ds:[132B408h]
-01323483 81 C4 0C 00 00 00    add         esp,0Ch
-01323489 50                   push        eax
-0132348A 81 C4 04 00 00 00    add         esp,4
-01323490 68 0C 00 00 00       push        0Ch
-01323495 8B 04 24             mov         eax,dword ptr [esp]
-01323498 83 C4 04             add         esp,4
-0132349B E9 00 00 00 00       jmp         013234A0
-013234A0 8B E5                mov         esp,ebp
-013234A2 5D                   pop         ebp
-013234A3 5A                   pop         edx
-013234A4 C3                   ret
+// main
+00F93334 52                   push        edx  
+00F93335 55                   push        ebp  
+00F93336 8B EC                mov         ebp,esp  
+00F93338 81 EC 00 01 00 00    sub         esp,100h  
+00F9333E 68 79 00 00 00       push        79h  
+00F93343 8B 04 24             mov         eax,dword ptr [esp]  
+00F93346 89 85 FC FF FF FF    mov         dword ptr [ebp-4],eax  
+00F9334C 83 C4 04             add         esp,4  
+00F9334F 68 AC 6F FA 00       push        0FA6FACh  
+00F93354 FF 15 48 B3 F9 00    call        dword ptr ds:[0F9B348h]  	// puts
+00F9335A 81 C4 04 00 00 00    add         esp,4  
+00F93360 50                   push        eax  
+00F93361 81 C4 04 00 00 00    add         esp,4  
+00F93367 68 09 00 00 00       push        9  
+00F9336C 68 02 00 00 00       push        2  
+00F93371 FF B4 24 04 00 00 00 push        dword ptr [esp+4]  
+00F93378 FF 15 44 B3 F9 00    call        dword ptr ds:[0F9B344h]  	// add
+00F9337E 81 C4 0C 00 00 00    add         esp,0Ch  
+00F93384 50                   push        eax  
+00F93385 8B 04 24             mov         eax,dword ptr [esp]  
+00F93388 89 85 F8 FF FF FF    mov         dword ptr [ebp-8],eax  
+00F9338E 83 C4 04             add         esp,4  
+00F93391 68 70 00 F9 00       push        0F90070h  
+00F93396 FF B5 FC FF FF FF    push        dword ptr [ebp-4]  
+00F9339C 68 7B 00 00 00       push        7Bh  
+00F933A1 FF B5 F8 FF FF FF    push        dword ptr [ebp-8]  
+00F933A7 FF B4 24 04 00 00 00 push        dword ptr [esp+4]  
+00F933AE FF B4 24 0C 00 00 00 push        dword ptr [esp+0Ch]  
+00F933B5 FF B4 24 14 00 00 00 push        dword ptr [esp+14h]  
+00F933BC FF 15 38 B3 F9 00    call        dword ptr ds:[0F9B338h]  
+00F933C2 81 C4 1C 00 00 00    add         esp,1Ch  
+00F933C8 50                   push        eax  
+00F933C9 81 C4 04 00 00 00    add         esp,4  
+00F933CF 68 40 03 F9 00       push        0F90340h  
+00F933D4 68 7B 00 00 00       push        7Bh  
+00F933D9 FF B4 24 04 00 00 00 push        dword ptr [esp+4]  
+00F933E0 FF 15 38 B3 F9 00    call        dword ptr ds:[0F9B338h]  
+00F933E6 81 C4 0C 00 00 00    add         esp,0Ch  
+00F933EC 50                   push        eax  
+00F933ED 81 C4 04 00 00 00    add         esp,4  
+00F933F3 68 0C 00 00 00       push        0Ch  
+00F933F8 8B 04 24             mov         eax,dword ptr [esp]  
+00F933FB 83 C4 04             add         esp,4  
+00F933FE E9 00 00 00 00       jmp         00F93403  
+00F93403 8B E5                mov         esp,ebp  
+00F93405 5D                   pop         ebp  
+00F93406 5A                   pop         edx  
+00F93407 C3                   ret  

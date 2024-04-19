@@ -41,6 +41,10 @@ void myprintf(const char* s, ...) {
     //printf(s);
 }
 
+void func1(int a) {
+    printf("func1, a=%d\n", a);
+}
+
 void test2(const char* f, int n) {
 
 }

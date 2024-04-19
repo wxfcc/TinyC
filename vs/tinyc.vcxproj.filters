@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Inc">
-      <UniqueIdentifier>{7d187a64-0102-40c8-8635-7225e92fa1f8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="test">
       <UniqueIdentifier>{a6b812c6-64aa-4d93-8859-3fa59c893b0c}</UniqueIdentifier>
     </Filter>
@@ -89,31 +86,31 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\common.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\Function.h">
-      <Filter>Inc</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\FileParser.h">
-      <Filter>Inc</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Function.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\FunctionParser.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\Scanner.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\JITEngine.h">
-      <Filter>Inc</Filter>
-    </ClInclude>
-    <ClInclude Include="..\inc\Label.h">
-      <Filter>Inc</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\FunctionX64.h">
-      <Filter>Inc</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\FunctionX86.h">
-      <Filter>Inc</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\JITEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Label.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\Scanner.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,7 +1,10 @@
-int echo(int a) {
-    return a;
+int main() {
+//    func1(1);
+    echoInt(10,11);
+    return 123;
 }
-int main()  {
-    int a = echo(9);
-    return a;
+void echoInt(int a,int b) {
+//    a = a + 1;
+    func1(a);
+    //printf("a = %d\n", a);
 }

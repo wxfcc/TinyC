@@ -98,6 +98,9 @@ void JITEngine::endBuild() {
     for (map<string, char**>::iterator iter = m_funcEntries.begin(); iter != m_funcEntries.end(); ++iter) {
         if (*iter->second == NULL) {
             char *f = findSystemSymbol(iter->first);
+            if (f == NULL) {
+                printf("Can't find %s\n", iter->first.c_str());
+            }
             ASSERT(f != NULL);
             *iter->second = f;
         }

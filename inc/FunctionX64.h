@@ -37,8 +37,6 @@ public:
     void endCall(const string& funcName, int callID, int paramCount);
 
 protected:
-    void emit(int n, ...);
-    template<typename T> void emitValue(T val);
     void emitRelativeAddr32(char* absPos, int prefixLen);
 
     void condJmp(TokenID tid, Label* label);

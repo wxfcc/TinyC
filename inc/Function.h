@@ -13,7 +13,8 @@ public:
     Function(JITEngine*parent, char *codeBuf);
     virtual ~Function();
 
-    string& getFuncName();
+    void setFuncName(string& name, int argsCount);
+    const string& getFuncName();
     int getCodeSize() const;
 
     virtual void beginBuild() = 0;
@@ -41,10 +42,15 @@ public:
     virtual void condJmp(TokenID tid, Label *label) = 0;
     virtual int localIdx2EbpOff(int idx) = 0;
 
-    //static Function* newBuilder(JITEngine* parent, char* codeBuf);
 protected:
     void emit(int n, ...);
-    template<typename T> void emitValue(T val);
+
+    template<typename T>
+    void emitValue(T val) {
+        memcpy(m_codeBuf + m_codeSize, &val, sizeof(val));
+        m_codeSize += sizeof(val);
+    }
+
     //void emit8(char val);
     //void emit16(short val);
     //void emit32(int val);
@@ -56,8 +62,10 @@ protected:
     int m_codeSize;
     string m_funcName;
     Label m_retLabel;
-    int m_paramCount;
     int m_beginCall;
+    int m_paramCount;
+    int m_paramIndex;
+    int m_localVarCount;
 };
 
 
