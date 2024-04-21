@@ -24,9 +24,11 @@ class JITEngine {
 public:
     JITEngine(int arch);
     ~JITEngine();
-    unsigned int getCodeSize();
-    unsigned char* getCode();
-    unsigned char* getFunction(const string& name);
+    char* mallocAlign(int size);
+    void freeAlign(char*p, int size);
+    int getCodeSize();
+    char* getCode();
+    char* getFunction(const string& name);
     int setExecutable();
 
     void beginBuild();
@@ -40,10 +42,13 @@ public:
     char* findSystemSymbol(const string& name);
     int callFunction(const string& name);
     int executeCode();
+    const char *getArch();
+
 
 protected:
-    char *m_textSection;
-    unsigned int m_textSectionSize;
+    char *m_code;
+    int m_codeMax;
+    int m_codeSize;
     map<string, char**> m_funcEntries;
     set<string> m_literalStrs;
 

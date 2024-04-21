@@ -2,6 +2,9 @@
 #define __COMMON__H__
 #include <stdexcept>
 
+typedef long long int64;
+typedef unsigned char byte;
+
 #define _TO_STRING(e) #e
 #define TO_STRING(e) _TO_STRING(e)
 #define FILE_LINE __FILE__ "(" TO_STRING(__LINE__) ")"

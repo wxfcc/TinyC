@@ -54,7 +54,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "../test/hello0.c"
+            argument = "../test/hello.c"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

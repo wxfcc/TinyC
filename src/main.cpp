@@ -3,6 +3,7 @@
 #include <string.h>
 #include <functional>
 #include <iostream>
+#include <unistd.h>
 #include "JITEngine.h"
 #include "Scanner.h"
 #include "FileParser.h"
@@ -13,6 +14,7 @@ void myprintf(const char* s, ...);
 int test(JITEngine* g_jitEngine);
 int test2(JITEngine* g_jitEngine);
 void func1(int a);
+void test_parameters();
 
 static JITEngine* g_jitEngine;
 static string format(const char *fmt, ...) {
@@ -54,7 +56,7 @@ static int loadFile(const char *fileName) {
     }
 }
 
-int handleInput(){
+static int handleInput(){
     int lineNum = 0;
     for (string line; ; ++lineNum) {
         printf(">>> ");
@@ -99,7 +101,7 @@ int handleInput(){
     return 0;	
 }
 
-int handleFile(char *file){
+static int handleFile(char *file){
     int ret = loadFile(file);
     if(ret == 0){
         ret = g_jitEngine->executeCode();
@@ -107,6 +109,7 @@ int handleFile(char *file){
     }
 	return ret;
 }
+
 JITEngine* createJitEngine(int arch){
     JITEngine* engine = new JITEngine(arch);
 
@@ -117,25 +120,17 @@ JITEngine* createJitEngine(int arch){
     engine->addFunctionEntry("func1", (char*)func1);
 	return engine;
 }
-int __fastcall t(int a, int b, int c, int d, int e, int f, int g) {
-    return a;
-}
+
 int main(int argc, char *argv[]) {
 #if 0
-    t(1,2,3,4,5,6,7);
-    return 0;
+    test_parameters();
 #else
-    //GetStdHandle(0);
-    myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
 	int ret = 0;
     int arch = JIT_X86;
-    const char*archs[] = {"x86", "x64"};
 #if defined _WIN64 || defined __x86_64__
     arch = JIT_X64;
 #endif
 	g_jitEngine = createJitEngine(arch);
-
-    printf("arch: %s, myprintf: %p, printf: %p\n", archs[arch], myprintf, printf);
 
     //test(g_jitEngine);
     //test2(g_jitEngine);

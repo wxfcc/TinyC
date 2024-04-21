@@ -284,7 +284,7 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
     int64 offset = (int64)(funcPtr - rip) - 5;  // 5 = sizeof(call rip+offset)
     int64 max = INT_MAX;
     int64 min = INT_MIN;
-    printf("endCall£¬ funcName: %-16s: paramCount=%d, address: %p, rip: %p\n", funcName.c_str(), paramCount, funcPtr, rip);
+    printf("endCall, funcName: %-16s: paramCount=%d, address: %p, rip: %p\n", funcName.c_str(), paramCount, funcPtr, rip);
 #if 0
     if ( offset > max || offset < min) {
     }

@@ -5,46 +5,81 @@
 #include <psapi.h>
 #else
 #include <sys/mman.h>
+#include <dlfcn.h>
+#include <unistd.h>
 #endif
 #include "JITEngine.h"
 
-JITEngine::JITEngine(int arch): m_arch(arch), m_textSectionSize(0) {
+JITEngine::JITEngine(int arch){
+    m_arch = arch;
     m_process = NULL;
-    m_textSection = new char[MAX_TEXT_SECTION_SIZE];    // os_mallocExecutable(MAX_TEXT_SECTION_SIZE);
-    memset(m_textSection, 0, MAX_TEXT_SECTION_SIZE);
-    m_funcPtr = new char*[MAX_FUNC_PTR_SIZE];
+    m_codeSize = 0;
+    m_codeMax = MAX_TEXT_SECTION_SIZE;
+    m_code = mallocAlign(m_codeMax);
+    memset(m_code, 0, m_codeMax);
+//    m_funcPtr = new char*[MAX_FUNC_PTR_SIZE];
+    m_funcPtr = (char **)mallocAlign(MAX_FUNC_PTR_SIZE);
     memset(m_funcPtr, 0, MAX_FUNC_PTR_SIZE);
-}
-JITEngine::~JITEngine() { 
-	//os_freeExecutable(m_textSection); 
-    delete m_textSection;
-	delete(m_funcPtr);
-}
-unsigned int JITEngine::getCodeSize() {
-    return m_textSectionSize;
-}
-unsigned char* JITEngine::getCode() {
-    return (unsigned char*)m_textSection;
+    
+    printf("arch: %s, ", getArch());
+    printf("m_code: %p, m_funcPtr: %p\n", m_code, m_funcPtr);
 }
 
-unsigned char* JITEngine::getFunction(const string &name) {
-	return (unsigned char*)*_getFunctionEntry(name); 
+JITEngine::~JITEngine() {
+    freeAlign(m_code, m_codeMax);
+	delete(m_funcPtr);
+}
+
+char* JITEngine::mallocAlign(int size){
+    char* buf = NULL;
+#if 0 //ndef _WIN32
+    buf = new char[MAX_TEXT_SECTION_SIZE];
+    m_code = buf;
+    //align m_code with pagesize
+    int ps = getpagesize();
+    int m = m_buf & (ps-1);
+    if(m){
+        int r = ps - m;
+        m_codeMax -= r;
+        m_code += r;
+    }
+#endif
+
+#ifdef _WIN32
+    buf = (char*)VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_EXECUTE_READWRITE);
+#else
+    buf = (char*)mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, 0, 0);
+#endif
+    ASSERT(buf != NULL);
+
+    return buf;
+}
+
+void JITEngine::freeAlign(char*p, int size){
+    munmap(p, size);
+}
+
+int JITEngine::getCodeSize() {
+    return m_codeSize;
+}
+char* JITEngine::getCode() {
+    return m_code;
+}
+
+char* JITEngine::getFunction(const string &name) {
+	return *_getFunctionEntry(name);
 }
 int JITEngine::setExecutable(){
 #ifdef _WIN32
     DWORD oldProtect;
-    bool ret = VirtualProtect(m_textSection, MAX_TEXT_SECTION_SIZE, PAGE_EXECUTE_READWRITE, &oldProtect);
+    bool ret = VirtualProtect(m_code, m_codeMax, PAGE_EXECUTE_READWRITE, &oldProtect);
     ASSERT(ret == true);
 
 #elif defined(__linux__) || defined(__MACH__)
-#ifdef __MACH__
-    //p = mmap(NULL, size, PROT_READ | PROT_WRITE, MAP_ANON | MAP_PRIVATE, 0, 0);
-    //ASSERT(p != NULL);
-#else
-    int erro = posix_memalign(&m_textSection, getpagesize(), MAX_TEXT_SECTION_SIZE);
-    ASSERT(erro == 0 && p != NULL);
-#endif
-    erro = mprotect(m_textSection, MAX_TEXT_SECTION_SIZE, PROT_READ | PROT_EXEC);
+    int erro = mprotect(m_code, m_codeMax, PROT_READ | PROT_EXEC);
+    if(erro){
+        printf("error=%d, %s\n", errno, strerror(errno) );
+    }
     ASSERT(erro == 0);
 
 #endif
@@ -54,9 +89,9 @@ int JITEngine::setExecutable(){
 Function* JITEngine::beginBuildFunction() {
     Function* builder = NULL;
     if (m_arch == JIT_X86)
-        builder = new FunctionX86(this, m_textSection + m_textSectionSize);
+        builder = new FunctionX86(this, m_code + m_codeSize);
     else if (m_arch == JIT_X64)
-        builder = new FunctionX64(this, m_textSection + m_textSectionSize);
+        builder = new FunctionX64(this, m_code + m_codeSize);
 
     builder->beginBuild();
 
@@ -64,16 +99,16 @@ Function* JITEngine::beginBuildFunction() {
 }
 void JITEngine::endBuildFunction(Function* builder) {
     builder->endBuild();
-    *_getFunctionEntry(builder->getFuncName()) = m_textSection + m_textSectionSize;
-    m_textSectionSize += builder->getCodeSize();
-    ASSERT(m_textSectionSize <= MAX_TEXT_SECTION_SIZE);
+    *_getFunctionEntry(builder->getFuncName()) = m_code + m_codeSize;
+    m_codeSize += builder->getCodeSize();
+    ASSERT(m_codeSize <= m_codeMax);
     delete builder;
 }
 
 
 void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
     if (m_funcEntries.count(funcName) == 0) {
-        size_t n = m_funcEntries.size();
+        int n = (int)m_funcEntries.size();
         m_funcEntries[funcName] = &m_funcPtr[n];
         m_funcPtr[n] = entry;
     }
@@ -82,7 +117,7 @@ void JITEngine::addFunctionEntry(const char* funcName, char* entry) {
 
 char** JITEngine::_getFunctionEntry(const string &name) {
     if (m_funcEntries.count(name) == 0) {
-        size_t n = m_funcEntries.size();
+        int n = (int)m_funcEntries.size();
         m_funcEntries[name] = &m_funcPtr[n];
         return &m_funcPtr[n];
     }
@@ -108,8 +143,8 @@ void JITEngine::endBuild() {
     }
 }
 void JITEngine::dumpCode() { 
-    unsigned char* p = (unsigned char*)m_textSection;
-    for (size_t i = 0; i < m_textSectionSize; i++) {
+    unsigned char* p = (unsigned char*)m_code;
+    for (int i = 0; i < m_codeSize; i++) {
         printf("%02x ", p[i]);
     }
     printf("\n");
@@ -155,7 +190,7 @@ char* JITEngine::findSystemSymbol(const string& name) {
 
 int JITEngine::callFunction(const string& name) {
     int ret = 0;
-    unsigned char* p = getFunction(name);
+    char* p = getFunction(name);
 
     if (p) {
         printf("func %s: %p, code: %02x %02x %02x %02x\n", name.c_str(), p, p[0], p[1], p[2], p[3]);
@@ -186,4 +221,11 @@ int JITEngine::executeCode() {
             printf("not found main()\n");
     }
     return ret;
+}
+
+const char *JITEngine::getArch() {
+    static const char*archs[] = {"x86", "x64", "arm", "arm64"};
+    if(m_arch < sizeof(archs)/sizeof(char*))
+        return archs[m_arch];
+    return "unkown";
 }

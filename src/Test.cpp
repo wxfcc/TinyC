@@ -50,7 +50,7 @@ void test2(const char* f, int n) {
 }
 int test(JITEngine* jit) {
     //myprintf("helo", 0x100,1,2,3,4,5,6);
-    unsigned char* p = jit->getCode();
+    unsigned char* p = (unsigned char*)jit->getCode();
     char** p2 = (char**)p;
     *p2 = (char*)myprintf;
     p += 8;
@@ -93,7 +93,7 @@ int test(JITEngine* jit) {
 }
 
 int test2(JITEngine* jit) {
-    unsigned char* p = jit->getCode();
+    unsigned char* p = (unsigned char*)jit->getCode();
     FP_Main mainFunc = (FP_Main)p;
     unsigned char code[] = {
         //mov rax, #imm64
@@ -157,4 +157,15 @@ int test2(JITEngine* jit) {
     return 0;
 }
 
+// __cdecl __fastcall __stdcall __pascal,  '__fastcall/__stdcall/__pascal' calling convention is not supported for this target
+static int __pascal t(int a, int b, int c, int d, int e, int f, int g) {
+    return a;
+}
+
+void test_parameters() {
+    t(1,2,3,4,5,6,7);
+    t(1,2,3,4,5,6,7);
+    myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
+    exit(0);
+}
 

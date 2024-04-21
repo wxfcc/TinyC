@@ -3,7 +3,6 @@
 #include "Label.h"
 #include "Function.h"
 #include "JITEngine.h"
-typedef long long int64;
 
 class FunctionX64 :public Function {
 public:

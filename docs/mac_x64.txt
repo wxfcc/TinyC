@@ -1,0 +1,34 @@
+tinyc`t:
+    0x100015570 <+0>:  pushq  %rbp
+    0x100015571 <+1>:  movq   %rsp, %rbp
+    0x100015574 <+4>:  movl   0x10(%rbp), %eax
+    0x100015577 <+7>:  movl   %edi, -0x4(%rbp)
+    0x10001557a <+10>: movl   %esi, -0x8(%rbp)
+    0x10001557d <+13>: movl   %edx, -0xc(%rbp)
+    0x100015580 <+16>: movl   %ecx, -0x10(%rbp)
+    0x100015583 <+19>: movl   %r8d, -0x14(%rbp)
+    0x100015587 <+23>: movl   %r9d, -0x18(%rbp)
+->  0x10001558b <+27>: movl   -0x4(%rbp), %eax
+    0x10001558e <+30>: popq   %rbp
+    0x10001558f <+31>: retq   
+
+tinyc`main:
+    0x100015590 <+0>:  pushq  %rbp
+    0x100015591 <+1>:  movq   %rsp, %rbp
+    0x100015594 <+4>:  subq   $0x20, %rsp
+    0x100015598 <+8>:  movl   $0x0, -0x4(%rbp)
+    0x10001559f <+15>: movl   %edi, -0x8(%rbp)
+    0x1000155a2 <+18>: movq   %rsi, -0x10(%rbp)
+->  0x1000155a6 <+22>: movl   $0x1, %edi
+    0x1000155ab <+27>: movl   $0x2, %esi
+    0x1000155b0 <+32>: movl   $0x3, %edx
+    0x1000155b5 <+37>: movl   $0x4, %ecx
+    0x1000155ba <+42>: movl   $0x5, %r8d
+    0x1000155c0 <+48>: movl   $0x6, %r9d
+    0x1000155c6 <+54>: movl   $0x7, (%rsp)
+    0x1000155cd <+61>: callq  0x100015570               ; t at main.cpp:120
+    0x1000155d2 <+66>: xorl   %eax, %eax
+    0x1000155d4 <+68>: addq   $0x20, %rsp
+    0x1000155d8 <+72>: popq   %rbp
+    0x1000155d9 <+73>: retq   
+
