@@ -17,6 +17,7 @@
 		72921B4E2BD3D2DF00624690 /* FunctionX86.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B4B2BD3D2DF00624690 /* FunctionX86.cpp */; };
 		72921B4F2BD3D2DF00624690 /* FunctionX64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B4C2BD3D2DF00624690 /* FunctionX64.cpp */; };
 		72921B512BD3D35D00624690 /* Test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B502BD3D35D00624690 /* Test.cpp */; };
+		72921B532BD6C95500624690 /* FunctionX64Linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B522BD6C95500624690 /* FunctionX64Linux.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -43,6 +44,7 @@
 		72921B4B2BD3D2DF00624690 /* FunctionX86.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionX86.cpp; sourceTree = "<group>"; };
 		72921B4C2BD3D2DF00624690 /* FunctionX64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionX64.cpp; sourceTree = "<group>"; };
 		72921B502BD3D35D00624690 /* Test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Test.cpp; sourceTree = "<group>"; };
+		72921B522BD6C95500624690 /* FunctionX64Linux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionX64Linux.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,6 +77,7 @@
 		727800942BBF2297000B5A2A /* ../src */ = {
 			isa = PBXGroup;
 			children = (
+				72921B522BD6C95500624690 /* FunctionX64Linux.cpp */,
 				72921B502BD3D35D00624690 /* Test.cpp */,
 				72921B4A2BD3D2DF00624690 /* Function.cpp */,
 				72921B4C2BD3D2DF00624690 /* FunctionX64.cpp */,
@@ -151,6 +154,7 @@
 				727800A42BBF2757000B5A2A /* JITEngine.cpp in Sources */,
 				72921B4F2BD3D2DF00624690 /* FunctionX64.cpp in Sources */,
 				72921B4D2BD3D2DF00624690 /* Function.cpp in Sources */,
+				72921B532BD6C95500624690 /* FunctionX64Linux.cpp in Sources */,
 				72921B4E2BD3D2DF00624690 /* FunctionX86.cpp in Sources */,
 				727800A52BBF2757000B5A2A /* Label.cpp in Sources */,
 				727800A62BBF2757000B5A2A /* main.cpp in Sources */,
