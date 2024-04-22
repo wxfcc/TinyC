@@ -1,5 +1,5 @@
-#ifndef __X86_FUNCTION_BUILDER_H__
-#define __X86_FUNCTION_BUILDER_H__
+#ifndef __FUNCTION_X86_H__
+#define __FUNCTION_X86_H__
 #include "Label.h"
 #include "Function.h"
 #include "JITEngine.h"
@@ -14,6 +14,7 @@ public:
 
     void beginBuild();
     void endBuild();
+    void prepareParam(int64 paraVal, int size);
 
     void loadImm(int imm);
 

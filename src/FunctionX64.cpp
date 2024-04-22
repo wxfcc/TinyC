@@ -32,7 +32,9 @@ void FunctionX64::endBuild() {
 /*
  in windows x64 mode, the order of parameter: rcx rdx r8 r9 [rsp] ...
 */
-void FunctionX64::prepareParamForWindows(int64 paraVal, int size) {
+void FunctionX64::prepareParam(int64 paraVal, int size) {
+    printf("FunctionX64Linux::prepareParam\n");
+
     if (m_paramIndex == 0) { //rcx
         emit(2, 0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
     }
@@ -57,50 +59,9 @@ void FunctionX64::prepareParamForWindows(int64 paraVal, int size) {
 
         }
     }
-}
-/*
- in linux x64 mode, the order of parameter: rdi rsi rdx rcx r8 r9 [rsp] ...
-*/
-void FunctionX64::prepareParamForLinux(int64 paraVal, int size) {
-    if (m_paramIndex == 0) {
-        emit(2, 0x48, 0xbf); emitValue((int64)paraVal); // mov rdi, #imm64
-    }
-    else if (m_paramIndex == 1) { 
-        emit(2, 0x48, 0xbe); emitValue((int64)paraVal); // mov rsi, #imm64
-    }
-    else if (m_paramIndex == 2) { 
-        emit(2, 0x48, 0xba); emitValue((int64)paraVal); // mov rdx, #imm64
-    }
-    else if (m_paramIndex == 3) { 
-        emit(2, 0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
-    }
-    else if (m_paramIndex == 4) { 
-        emit(2, 0x49, 0xb8); emitValue((int64)paraVal); // mov r8, #imm64
-    }
-    else if (m_paramIndex == 5) { 
-        emit(2, 0x49, 0xb9); emitValue((int64)paraVal); // mov r9, #imm64
-    }
-    else {
-        if (size <= 4) {
-            emit(1, 0x68); emitValue((int)paraVal); // push #imm32, in fact it'll push #imm64 with the hi 32 bits as 0 
-        }
-        else {
-            emit(2, 0x48, 0xb8); emitValue((int64)paraVal); // mov #rax, #imm64
-            emit(1, 0x50); // push rax
-            // 48 C7 44 24 20 04 00 00 00             mov    qword ptr [rsp+20h], 4 
-            // 48 c7 84 24 20 01 00 00 00 00 00 00    mov    QWORD PTR [rsp + 0x120], 0x0
-
-        }
-    }
-}
-void FunctionX64::prepareParam(int64 paraVal, int size) {
-#ifdef _WIN32
-    prepareParamForWindows(paraVal, size);
-#else
-    prepareParamForLinux(paraVal, size);
-#endif
     m_paramIndex++;
 }
+
 void FunctionX64::loadImm(int imm) {
     if(m_beginCall)
         prepareParam(imm, sizeof(imm));
@@ -156,9 +117,9 @@ void FunctionX64::loadLocal(int idx) {
             emit(2, 0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
-    m_paramIndex++;
-
+    m_paramIndex++; //??
 }
+
 void FunctionX64::storeLocal(int idx) {
     emit(4, 0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     emit(3, 0x48, 0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov qword ptr [rbp + idxOff], rax

@@ -22,7 +22,9 @@ void FunctionX86::endBuild() {
     emit(1, 0x5a); // pop edx  
     emit(1, 0xc3); // ret
 }
+void FunctionX86::prepareParam(int64 paraVal, int size) {
 
+}
 void FunctionX86::loadImm(int imm) {
     emit(1, 0x68); emitValue(imm); // push imm
 }

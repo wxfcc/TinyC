@@ -1,5 +1,5 @@
-#ifndef __X64_FUNCTION_BUILDER_H__
-#define __X64_FUNCTION_BUILDER_H__
+#ifndef __FUNCTION_X64_H__
+#define __FUNCTION_X64_H__
 #include "Label.h"
 #include "Function.h"
 #include "JITEngine.h"
@@ -13,8 +13,8 @@ public:
     void endBuild();
 
     void prepareParam(int64 paraVal, int size);
-    void prepareParamForWindows(int64 paraVal, int size);
-    void prepareParamForLinux(int64 paraVal, int size);
+    //void prepareParamForWindows(int64 paraVal, int size);
+    //void prepareParamForLinux(int64 paraVal, int size);
     void loadImm(int imm);
     void loadImm64(int64 imm);
     void loadLiteralStr(const string& literalStr);

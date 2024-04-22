@@ -19,6 +19,7 @@ public:
 
     virtual void beginBuild() = 0;
     virtual void endBuild() = 0;
+    virtual void prepareParam(int64 paraVal, int size) = 0;
 
     virtual void loadImm(int imm) = 0;
     

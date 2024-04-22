@@ -158,7 +158,7 @@ int test2(JITEngine* jit) {
 }
 
 // __cdecl __fastcall __stdcall __pascal,  '__fastcall/__stdcall/__pascal' calling convention is not supported for this target
-static int __pascal t(int a, int b, int c, int d, int e, int f, int g) {
+static int t(int a, int b, int c, int d, int e, int f, int g) {
     return a;
 }
 

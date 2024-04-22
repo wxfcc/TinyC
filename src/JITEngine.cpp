@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
@@ -10,8 +11,9 @@
 #endif
 #include "JITEngine.h"
 
-JITEngine::JITEngine(int arch){
+JITEngine::JITEngine(int arch, int os){
     m_arch = arch;
+    m_os = os;
     m_process = NULL;
     m_codeSize = 0;
     m_codeMax = MAX_TEXT_SECTION_SIZE;
@@ -21,7 +23,7 @@ JITEngine::JITEngine(int arch){
     m_funcPtr = (char **)mallocAlign(MAX_FUNC_PTR_SIZE);
     memset(m_funcPtr, 0, MAX_FUNC_PTR_SIZE);
     
-    printf("arch: %s, ", getArch());
+    printf("JITEngine for os: %s, arch: %s, ", getOs(), getArch());
     printf("m_code: %p, m_funcPtr: %p\n", m_code, m_funcPtr);
 }
 
@@ -56,7 +58,11 @@ char* JITEngine::mallocAlign(int size){
 }
 
 void JITEngine::freeAlign(char*p, int size){
+#ifdef _WIN32
+    VirtualFree(p, size, MEM_COMMIT);
+#else
     munmap(p, size);
+#endif
 }
 
 int JITEngine::getCodeSize() {
@@ -90,8 +96,12 @@ Function* JITEngine::beginBuildFunction() {
     Function* builder = NULL;
     if (m_arch == JIT_X86)
         builder = new FunctionX86(this, m_code + m_codeSize);
-    else if (m_arch == JIT_X64)
-        builder = new FunctionX64(this, m_code + m_codeSize);
+    else if (m_arch == JIT_X64) {
+        if(m_os == JIT_OS_WINDOWS)
+            builder = new FunctionX64(this, m_code + m_codeSize);
+        else if(m_os == JIT_OS_LINUX || m_os == JIT_OS_MACOS)
+            builder = new FunctionX64Linux(this, m_code + m_codeSize);
+    }
 
     builder->beginBuild();
 
@@ -227,5 +237,11 @@ const char *JITEngine::getArch() {
     static const char*archs[] = {"x86", "x64", "arm", "arm64"};
     if(m_arch < sizeof(archs)/sizeof(char*))
         return archs[m_arch];
+    return "unkown";
+}
+const char *JITEngine::getOs() {
+    static const char*oss[] = {"windows", "linux", "macos"};
+    if(m_os < sizeof(oss)/sizeof(char*))
+        return oss[m_os];
     return "unkown";
 }

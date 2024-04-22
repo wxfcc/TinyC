@@ -1,0 +1,22 @@
+E:\>cl /PD /Zc:preprocessor /E /EP t.c
+Microsoft (R) C/C++ Optimizing Compiler Version 19.29.30154 for x64
+Copyright (C) Microsoft Corporation.  All rights reserved.
+
+t.c
+
+
+#define _M_X64 100
+#define _MSC_EXTENSIONS 1
+#define _MSC_BUILD 0
+#define _WIN64 1
+#define _IS_ASSIGNABLE_NOCHECK_SUPPORTED 1
+#define _M_AMD64 100
+#define _MT 1
+#define _MSVC_WARNING_LEVEL 1L
+#define __STDC_HOSTED__ 1
+#define _MSC_FULL_VER 192930154
+#define _MSC_VER 1929
+#define _MSVC_TRADITIONAL 0
+#define _MSVC_EXECUTION_CHARACTER_SET 936
+#define _INTEGRAL_MAX_BITS 64
+#define _WIN32 1

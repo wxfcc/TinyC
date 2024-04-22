@@ -51,6 +51,9 @@
     <ClCompile Include="..\src\Test.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FunctionX64Linux.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\hello_mod.c">
@@ -110,6 +113,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\inc\Scanner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\inc\FunctionX64Linux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

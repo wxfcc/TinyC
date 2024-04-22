@@ -3,7 +3,6 @@
 #include <string.h>
 #include <functional>
 #include <iostream>
-#include <unistd.h>
 #include "JITEngine.h"
 #include "Scanner.h"
 #include "FileParser.h"
@@ -110,8 +109,8 @@ static int handleFile(char *file){
 	return ret;
 }
 
-JITEngine* createJitEngine(int arch){
-    JITEngine* engine = new JITEngine(arch);
+JITEngine* createJitEngine(int arch, int os){
+    JITEngine* engine = new JITEngine(arch, os);
 
     engine->addFunctionEntry("loadFile", (char*)loadFile);
     engine->addFunctionEntry("runFile", (char*)handleFile);
@@ -126,11 +125,16 @@ int main(int argc, char *argv[]) {
     test_parameters();
 #else
 	int ret = 0;
-    int arch = JIT_X86;
+    int arch = JIT_X86, os = JIT_OS_WINDOWS;
 #if defined _WIN64 || defined __x86_64__
     arch = JIT_X64;
 #endif
-	g_jitEngine = createJitEngine(arch);
+#if defined __linux__ 
+    os = JIT_OS_LINUX;
+#elif defined __apple__
+    os = JIT_OS_MACOS;
+#endif
+    g_jitEngine = createJitEngine(arch, os);
 
     //test(g_jitEngine);
     //test2(g_jitEngine);
