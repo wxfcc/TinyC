@@ -34,11 +34,10 @@ void Function::markLabel(Label *label){
     label->mark(m_codeBuf + m_codeSize); 
 }
 
-void Function::emit(int n, ...) {
+void Function::emitCode(int n, ...) {
     va_list args;
     va_start(args, n);
     for (int i = 0; i < n; ++i) 
         m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
     va_end(args);
 }
-
