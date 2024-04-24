@@ -42,7 +42,6 @@ private:
 
     int localIdx2EbpOff(int idx);
 
-    //
 };
 
 #endif

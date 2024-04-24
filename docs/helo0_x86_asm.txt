@@ -3,10 +3,10 @@
 00F93301 55                   push        ebp  
 00F93302 8B EC                mov         ebp,esp  
 00F93304 81 EC 00 01 00 00    sub         esp,100h  
-00F9330A FF B5 0C 00 00 00    push        dword ptr [ebp+0Ch]  
-00F93310 FF B5 10 00 00 00    push        dword ptr [ebp+10h]  
-00F93316 8B 44 24 04          mov         eax,dword ptr [esp+4]  
-00F9331A 03 04 24             add         eax,dword ptr [esp]  
+00F9330A FF B5 0C 00 00 00    push        dword ptr [ebp+0Ch]		// param 1
+00F93310 FF B5 10 00 00 00    push        dword ptr [ebp+10h]		// param 2
+00F93316 8B 44 24 04          mov         eax,dword ptr [esp+4]		// param 1 -> rax
+00F9331A 03 04 24             add         eax,dword ptr [esp]		// add param 2
 00F9331D 89 44 24 04          mov         dword ptr [esp+4],eax  
 00F93321 83 C4 04             add         esp,4  
 00F93324 8B 04 24             mov         eax,dword ptr [esp]  
@@ -31,8 +31,8 @@
 00F9335A 81 C4 04 00 00 00    add         esp,4  
 00F93360 50                   push        eax  
 00F93361 81 C4 04 00 00 00    add         esp,4  
-00F93367 68 09 00 00 00       push        9  
-00F9336C 68 02 00 00 00       push        2  
+00F93367 68 09 00 00 00       push        9							// param 1
+00F9336C 68 02 00 00 00       push        2							// param 2
 00F93371 FF B4 24 04 00 00 00 push        dword ptr [esp+4]  
 00F93378 FF 15 44 B3 F9 00    call        dword ptr ds:[0F9B344h]  	// add
 00F9337E 81 C4 0C 00 00 00    add         esp,0Ch  

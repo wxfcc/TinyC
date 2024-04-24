@@ -86,6 +86,27 @@
     <Text Include="..\test\hello1.c">
       <Filter>test</Filter>
     </Text>
+    <Text Include="..\docs\issues.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\mac_x64.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\vc_macro.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\vc_x64.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\helo1_x64_asm.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\helo1_x86_asm.txt">
+      <Filter>Docs</Filter>
+    </Text>
+    <Text Include="..\docs\gcc_linux_macro.txt">
+      <Filter>Docs</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\common.h">

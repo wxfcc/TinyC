@@ -52,7 +52,7 @@ void FunctionX64::prepareParam(int64 paraVal, int size) {
             emit(0x68); emitValue((int)paraVal); // push #imm32, in fact it'll push #imm64 with the hi 32 bits as 0 
         }
         else {
-            emit(0x48, 0xb8); emitValue((int64)paraVal); // mov #rax, #imm64
+            emit(0x48, 0xb8); emitValue((int64)paraVal); // mov rax, #imm64
             emit(0x50); // push rax
             // 48 C7 44 24 20 04 00 00 00             mov    qword ptr [rsp+20h], 4 
             // 48 c7 84 24 20 01 00 00 00 00 00 00    mov    QWORD PTR [rsp + 0x120], 0x0
@@ -206,7 +206,7 @@ void FunctionX64::ret() {
 void FunctionX64::retExpr() {
     emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
-    jmp(&m_retLabel);
+jmp(&m_retLabel);
 }
 //call from FunctionParser, begin prepare parametes for call
 //48 89 4d 00             mov    QWORD PTR [rbp+0x0],rcx
@@ -240,23 +240,23 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
         //emit(0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 8); // push qword ptr [rsp+8*i]
     }
     //emit(0xff, 0x15); emitValue(entry); // call [entry]  #call   QWORD PTR [rip+entry] 
-    char* rip = m_codeBuf + m_codeSize ;
+    char* rip = m_codeBuf + m_codeSize;
     char* funcPtr = *entry;
     int64 offset = (int64)(funcPtr - rip) - 5;  // 5 = sizeof(call rip+offset)
     int64 max = INT_MAX;
     int64 min = INT_MIN;
     printf("endCall, funcName: %-16s: paramCount=%d, address: %p, rip: %p\n", funcName.c_str(), paramCount, funcPtr, rip);
 #if 0
-    if ( offset > max || offset < min) {
+    if (offset > max || offset < min) {
     }
-    else 
+    else
     {
         int val = (int)offset;
         printf("offset: %llx, rip: 0x%x\n", offset, val);
         emit(0xe8); emitValue(val);  // call rip+offset
     }
 #else
-    offset = (int64)((char*)entry - rip)-6;
+    offset = (int64)((char*)entry - rip) - 6;
     if (offset > max || offset < min) {
         printf("offset too large, %llx\n", offset);
         int next = 8;                           // skip funcPtr
@@ -264,7 +264,7 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
         emitValue(funcPtr);                     // the func ptr to be call, should be saved in a special section?
         offset = -8 - 6;
     }
-    
+
     emit(0xff, 0x15); emitValue((int)offset); // call qword ptr[rip+offset]
 #endif
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
@@ -305,4 +305,11 @@ void FunctionX64::condJmp(TokenID tid, Label* label) {
 int FunctionX64::localIdx2EbpOff(int idx) {
     return idx < 0 ? 8 - idx * 8 : -(1 + idx) * 8;
 }
-
+#if 0
+void call_rip_offset32(int offset){
+    //emit(0xe8); emitValue(offset);  // call rip+offset
+}
+void push_qword_ptr_rbp(int offset) {
+    //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + offset]
+}
+#endif

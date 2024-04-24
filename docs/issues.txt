@@ -1,0 +1,4 @@
+
+the parameters passing issue between internal functions
+	x86 via sp
+	x64 via register, like __fastcall
