@@ -62,7 +62,7 @@ protected:
 #define jmp_rip_offset32(offset32)          emit(0xe9); emitValue(offset32);                // jmp rip+offset32
 #define jne(offset32)                       emit(0x0f, 0x85); emitValue(offset32);          // jne
 #define mov_qword_ptr_rsp_rax(offset8)      emit(0x48, 0x89, 0x44, 0x24, offset8);          // mov qword ptr [rsp+8], rax
-#define mov_qword_ptr_rsp_rbx(offset32)     emit(0x48, 0x89, 0x85); emitValue(offset32);    // mov qword ptr [rbp + idxOff], rax
+#define mov_qword_ptr_rbp_rax(offset32)     emit(0x48, 0x89, 0x85); emitValue(offset32);    // mov qword ptr [rbp + idxOff], rax
 #define mov_qword_ptr_rsp_rcx(offset8)      emit(0x48, 0x89, 0x4d, offset8);                // mov    QWORD PTR[rsp + 0x08], rcx
 #define mov_qword_ptr_rsp_rdx(offset8)      emit(0x48, 0x89, 0x55, offset8);                // mov    QWORD PTR[rsp + 0x10], rdx
 #define mov_r8_imm64(n)                     emit(0x49, 0xb8); emitValue((int64)n);          // mov r8, #imm64
@@ -78,7 +78,7 @@ protected:
 #define mov_rcx_rbp_offset32(offset32)      emit(0x48, 0x8b, 0x8d); emitValue(offset32);    // mov rcx, [rbp + offset32]
 #define mov_rdx_imm64(n)                    emit(0x48, 0xba); emitValue((int64)n);          // mov rdx, #imm64
 #define mov_rdx_qword_ptr_rsp0()            emit(0x48, 0x8b, 0x14, 0x24);                   // mov rdx, qword ptr[rsp]
-#define mov_rdx_rbp(offset32)               emit(0x48, 0x8b, 0x95); emitValue(offset32);    // mov rdx, [rbp + offset32]
+#define mov_rdx_rbp_offset32(offset32)      emit(0x48, 0x8b, 0x95); emitValue(offset32);    // mov rdx, [rbp + offset32]
 #define mov_rsp_rbp()                       emit(0x48, 0x89, 0xec);                         // mov rsp,rbp 
 #define pop_rbp()                           emit(0x5d);                                     // pop rbp  
 #define pop_rdx()                           emit(0x5a);                                     // pop rdx  

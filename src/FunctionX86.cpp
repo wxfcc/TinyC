@@ -10,92 +10,92 @@ FunctionX86::~FunctionX86() {
 }
 
 void FunctionX86::beginBuild() {
-    emit(0x52); // push edx
-    emit(0x55); // push ebp
-    emit(0x8b, 0xec); // mov ebp, esp
-    emit(0x81, 0xec); emitValue(MAX_LOCAL_COUNT * 4); // sub esp, MAX_LOCAL_COUNT * 4
+    push_edx(); // emit(0x52); // push edx
+    push_ebp(); // emit(0x55); // push ebp
+    mov_ebp_esp();  //emit(0x8b, 0xec); // mov ebp, esp
+    sub_esp(MAX_LOCAL_COUNT * 4);  //emit(0x81, 0xec); emitValue(MAX_LOCAL_COUNT * 4); // sub esp, MAX_LOCAL_COUNT * 4
 }
 void FunctionX86::endBuild() {
     markLabel(&m_retLabel);
-    emit(0x8b, 0xe5);  // mov esp,ebp 
-    emit(0x5d); // pop ebp  
-    emit(0x5a); // pop edx  
-    emit(0xc3); // ret
+    mov_esp_ebp();//emit(0x8b, 0xe5);  // mov esp,ebp 
+    pop_ebp();  //emit(0x5d); // pop ebp  
+    pop_edx(); //emit(0x5a); // pop edx  
+    retn(); //emit(0xc3); // ret
 }
 void FunctionX86::prepareParam(int64 paraVal, int size) {
 
 }
 void FunctionX86::loadImm(int imm) {
-    emit(0x68); emitValue(imm); // push imm
+    push_32(imm);//emit(0x68); emitValue(imm); // push imm
 }
 void FunctionX86::loadLiteralStr(const string& literalStr) {
     const char* loc = m_parent->_getLiteralStringLoc(literalStr);
-    emit(0x68); emitValue(loc); // push loc
+    push_32(loc);// emit(0x68); emitValue(loc); // push loc
 }
 void FunctionX86::loadLocal(int idx) {
-    emit(0xff, 0xb5); emitValue(localIdx2EbpOff(idx)); // push dword ptr [ebp + idxOff]
+    push_dword_ptr_ebp(localIdx2EbpOff(idx)); // emit(0xff, 0xb5); emitValue(localIdx2EbpOff(idx)); // push dword ptr [ebp + idxOff]
 }
 void FunctionX86::storeLocal(int idx) {
-    emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-    emit(0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov dword ptr [ebp + idxOff], eax
-    emit(0x83, 0xc4); emitValue((char)4); // add esp, 4
+    mov_eax_dword_ptr_esp0();// emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
+    mov_dword_ptr_ebp_eax(localIdx2EbpOff(idx)); // emit(0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov dword ptr [ebp + idxOff], eax
+    add_esp8(4); // emit(0x83, 0xc4); emitValue((char)4); // add esp, 4
 }
 void FunctionX86::incLocal(int idx) {
-    emit(0xff, 0x85); emitValue(localIdx2EbpOff(idx)); // inc dword ptr [ebp + idxOff]
+    inc_dword_ptr_ebp(localIdx2EbpOff(idx));//emit(0xff, 0x85); emitValue(localIdx2EbpOff(idx)); // inc dword ptr [ebp + idxOff]
 }
 void FunctionX86::decLocal(int idx) {
-    emit(0xff, 0x8d); emitValue(localIdx2EbpOff(idx)); // dec dword ptr [ebp + idxOff]
+    dec_dword_ptr_ebp(localIdx2EbpOff(idx));//emit(0xff, 0x8d); emitValue(localIdx2EbpOff(idx)); // dec dword ptr [ebp + idxOff]
 }
 void FunctionX86::pop(int n) {
-    emit(0x81, 0xc4); emitValue(n * 4); // add esp, n * 4
+    add_esp(n * 4);//emit(0x81, 0xc4); emitValue(n * 4); // add esp, n * 4
 }
 void FunctionX86::dup() {
-    emit(0xff, 0x34, 0x24); // push dword ptr [esp]
+    push_dword_ptr_esp0();//emit(0xff, 0x34, 0x24); // push dword ptr [esp]
 }
 
 void FunctionX86::doArithmeticOp(TokenID opType) {
-    emit(0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4]
+    mov_eax_dword_ptr_esp8(4);//emit(0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4]
     switch (opType) {
     case TID_OP_ADD:
-        emit(0x03, 0x04, 0x24); // add eax, dword ptr [esp]
+        add_eax_dword_ptr_esp0();//emit(0x03, 0x04, 0x24); // add eax, dword ptr [esp]
         break;
     case TID_OP_SUB:
-        emit(0x2b, 0x04, 0x24); // sub eax, dword ptr [esp]
+        sub_eax_dword_ptr_esp0();//emit(0x2b, 0x04, 0x24); // sub eax, dword ptr [esp]
         break;
     case TID_OP_MUL:
-        emit(0x0f, 0xaf, 0x04, 0x24); // imul eax, dword ptr [esp]
+        imul_eax_dword_ptr_esp0();//emit(0x0f, 0xaf, 0x04, 0x24); // imul eax, dword ptr [esp]
         break;
     case TID_OP_DIV:
     case TID_OP_MOD:
-        emit(0x33, 0xd2); // xor edx, edx
-        emit(0xf7, 0x3c, 0x24); // idiv dword ptr [esp]
+        xor_edx_edx();// emit(0x33, 0xd2); // xor edx, edx
+        idiv_dword_ptr_esp0();//emit(0xf7, 0x3c, 0x24); // idiv dword ptr [esp]
         if (opType == TID_OP_MOD) {
-            emit(0x8b, 0xc2); // mov eax, edx
+            mov_eax_edx();//emit(0x8b, 0xc2); // mov eax, edx
         }
         break;
     default: ASSERT(0); break;
     }
-    emit(0x89, 0x44, 0x24, 0x04); // mov dword ptr [esp+4], eax
-    emit(0x83, 0xc4, 0x04); // add esp, 4
+    mov_dword_ptr_esp_eax(4);   //emit(0x89, 0x44, 0x24, 0x04); // mov dword ptr [esp+4], eax
+    add_esp8(4);    // emit(0x83, 0xc4, 0x04); // add esp, 4
 }
 void FunctionX86::cmp(TokenID cmpType) {
     Label label_1, label_0, label_end;
-    emit(0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4] 
-    emit(0x8b, 0x14, 0x24); // mov edx, dword ptr[esp]
-    emit(0x83, 0xc4); emitValue((char)8);// add esp, 8
-    emit(0x3b, 0xc2); // cmp eax, edx
+    mov_eax_dword_ptr_esp8(4);//emit(0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4] 
+    mov_edx_dword_ptr_esp0();//emit(0x8b, 0x14, 0x24); // mov edx, dword ptr[esp]
+    add_esp(8);//emit(0x83, 0xc4); emitValue((char)8);// add esp, 8
+    cmp_eax_edx();//emit(0x3b, 0xc2); // cmp eax, edx
     condJmp(cmpType, &label_1);
     jmp(&label_0);
     markLabel(&label_1);
-    emit(0x6a, 0x01); // push 1
+    push_8(1);//emit(0x6a, 0x01); // push 1
     jmp(&label_end);
     markLabel(&label_0);
-    emit(0x6a, 0x00); // push 0
+    push_8(0);//emit(0x6a, 0x00); // push 0
     markLabel(&label_end);
 }
 
 void FunctionX86::markLabel(Label* label) {
-    label->mark(m_codeBuf + m_codeSize); 
+    label->mark(m_codeBuf + m_codeSize);
 }
 void FunctionX86::jmp(Label* label) {
     emit(0xe9);
@@ -115,8 +115,8 @@ void FunctionX86::falseJmp(Label* label) {
     emit(0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_EQUAL, label);
 }
-void FunctionX86::ret() { 
-    jmp(&m_retLabel); 
+void FunctionX86::ret() {
+    jmp(&m_retLabel);
 }
 void FunctionX86::retExpr() {
     emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
