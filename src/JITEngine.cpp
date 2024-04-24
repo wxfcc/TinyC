@@ -23,7 +23,7 @@ JITEngine::JITEngine(int arch, int os){
     m_funcPtr = (char **)mallocAlign(MAX_FUNC_PTR_SIZE);
     memset(m_funcPtr, 0, MAX_FUNC_PTR_SIZE);
     
-    printf("JITEngine for os: %s, arch: %s, ", getOs(), getArch());
+    printf("JITEngine for %s/%s, ", getOs(), getArch());
     printf("m_code: %p, m_funcPtr: %p\n", m_code, m_funcPtr);
 }
 

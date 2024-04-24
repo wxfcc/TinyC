@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
 #endif
 #if defined __linux__ 
     os = JIT_OS_LINUX;
-#elif defined __apple__
+#elif defined __APPLE__
     os = JIT_OS_MACOS;
 #endif
     g_jitEngine = createJitEngine(arch, os);
