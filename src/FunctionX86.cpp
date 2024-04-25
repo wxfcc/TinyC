@@ -47,7 +47,8 @@ void FunctionX86::decLocal(int idx) {
     dec_dword_ptr_ebp(localIdx2EbpOff(idx));//emit(0xff, 0x8d); emitValue(localIdx2EbpOff(idx)); // dec dword ptr [ebp + idxOff]
 }
 void FunctionX86::pop(int n) {
-    add_esp(n * 4);//emit(0x81, 0xc4); emitValue(n * 4); // add esp, n * 4
+    if(n != 0)
+        add_esp(n * 4);//emit(0x81, 0xc4); emitValue(n * 4); // add esp, n * 4
 }
 void FunctionX86::dup() {
     push_dword_ptr_esp0();//emit(0xff, 0x34, 0x24); // push dword ptr [esp]
@@ -82,7 +83,7 @@ void FunctionX86::cmp(TokenID cmpType) {
     Label label_1, label_0, label_end;
     mov_eax_dword_ptr_esp8(4);//emit(0x8b, 0x44, 0x24, 0x04); // mov eax, dword ptr [esp+4] 
     mov_edx_dword_ptr_esp0();//emit(0x8b, 0x14, 0x24); // mov edx, dword ptr[esp]
-    add_esp(8);//emit(0x83, 0xc4); emitValue((char)8);// add esp, 8
+    add_esp8(8);//emit(0x83, 0xc4); emitValue((char)8);// add esp, 8
     cmp_eax_edx();//emit(0x3b, 0xc2); // cmp eax, edx
     condJmp(cmpType, &label_1);
     jmp(&label_0);
@@ -98,29 +99,28 @@ void FunctionX86::markLabel(Label* label) {
     label->mark(m_codeBuf + m_codeSize);
 }
 void FunctionX86::jmp(Label* label) {
-    emit(0xe9);
-    char* ref = m_codeBuf + m_codeSize;
-    emitValue(NULL);
+    jmp_eip_offset32(0);//emit(0xe9);    emitValue(NULL);
+    char* ref = m_codeBuf + m_codeSize - 4;
     label->addRef(ref);
 }
 void FunctionX86::trueJmp(Label* label) {
-    emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-    emit(0x83, 0xc4, 0x04); // add esp, 4
-    emit(0x85, 0xc0); // test eax, eax
+    mov_eax_dword_ptr_esp0();//emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
+    add_esp8(4);//emit(0x83, 0xc4, 0x04); // add esp, 4
+    test_eax_eax();//emit(0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_NEQUAL, label);
 }
 void FunctionX86::falseJmp(Label* label) {
-    emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-    emit(0x83, 0xc4, 0x04); // add esp, 4
-    emit(0x85, 0xc0); // test eax, eax
+    mov_eax_dword_ptr_esp0();//emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
+    add_esp8(4);//emit(0x83, 0xc4, 0x04); // add esp, 4
+    test_eax_eax();//emit(0x85, 0xc0); // test eax, eax
     condJmp(TID_OP_EQUAL, label);
 }
 void FunctionX86::ret() {
     jmp(&m_retLabel);
 }
 void FunctionX86::retExpr() {
-    emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
-    emit(0x83, 0xc4, 0x04); // add esp, 4
+    mov_eax_dword_ptr_esp0();//emit(0x8b, 0x04, 0x24); // mov eax, dword ptr [esp]
+    add_esp8(4);//emit(0x83, 0xc4, 0x04); // add esp, 4
     jmp(&m_retLabel);
 }
 
@@ -130,24 +130,22 @@ int FunctionX86::beginCall() {
 void FunctionX86::endCall(const string& funcName, int callID, int paramCount) {
     char** entry = m_parent->_getFunctionEntry(funcName);
     for (int i = 0; i < paramCount - 1; ++i) {
-        emit(0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 4); // push dword ptr [esp+4*i]
+        push_dword_ptr_esp(((i + 1) * 2 - 1) * 4);//emit(0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 4); // push dword ptr [esp+4*i]
     }
-    emit(0xff, 0x15); emitValue(entry); // call [entry]
+    call_qword_ptr_rip(entry);//emit(0xff, 0x15); emitValue(entry); // call [entry]
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
-    emit(0x50); // push eax
+    push_eax();//emit(0x50); // push eax
 }
 
 void FunctionX86::condJmp(TokenID tid, Label* label) {
-    switch ((int)tid) {
-    case TID_OP_LESS:       emit(0x0f, 0x8c); break;
-    case TID_OP_LESSEQ:     emit(0x0f, 0x8e); break;
-    case TID_OP_GREATER:    emit(0x0f, 0x8f); break;
-    case TID_OP_GREATEREQ:  emit(0x0f, 0x8d); break;
-    case TID_OP_EQUAL:      emit(0x0f, 0x84); break;
-    case TID_OP_NEQUAL:     emit(0x0f, 0x85); break;
-    }
-    char* ref = m_codeBuf + m_codeSize;
-    emitValue(NULL);
+    if (tid == TID_OP_LESS) { jl(0); }
+    else if (tid == TID_OP_LESSEQ) { jle(0); }
+    else if (tid == TID_OP_GREATER) { jg(0); }
+    else if (tid == TID_OP_GREATEREQ) { jge(0); }
+    else if (tid == TID_OP_EQUAL) { je(0); }
+    else if (tid == TID_OP_NEQUAL) { jne(0); }
+
+    char* ref = m_codeBuf + m_codeSize - 4;
     label->addRef(ref);
 }
 

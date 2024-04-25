@@ -204,7 +204,8 @@ void FunctionParser::_expr_nud() {
                 m_builder->incLocal(localIdx);
             else m_builder->decLocal(localIdx);
             m_builder->loadLocal(localIdx);
-        } break;
+            break;
+        } 
         default: 
             ASSERT(0); break;
     }

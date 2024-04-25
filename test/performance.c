@@ -9,7 +9,8 @@ void printPrime(int n) {
                 break;
             }
         }
-        if (flag);
+        if (flag)
+                printf("%d\n", i);
     }
     printf("printPrime: %d\n", clock() - start);
 }
