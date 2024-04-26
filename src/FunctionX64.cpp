@@ -292,17 +292,15 @@ void FunctionX64::emitRelativeAddr32(char* absPos, int prefixLen) {
 
 
 void FunctionX64::condJmp(TokenID tid, Label* label) {
-    switch ((int)tid) {
-    case TID_OP_LESS:       emit(0x0f, 0x8c); break;     // jl
-    case TID_OP_LESSEQ:     emit(0x0f, 0x8e); break;     // jle
-    case TID_OP_GREATER:    emit(0x0f, 0x8f); break;     // jg
-    case TID_OP_GREATEREQ:  emit(0x0f, 0x8d); break;     // jge
-    case TID_OP_EQUAL:      emit(0x0f, 0x84); break;     // je
-    case TID_OP_NEQUAL:     emit(0x0f, 0x85); break;     // jne
-    }
-    char* ref = m_codeBuf + m_codeSize;
-    emitValue(NULL);
-    label->addRef(ref); // 64bit ??
+    if (tid == TID_OP_LESS) { jl(0); }
+    else if (tid == TID_OP_LESSEQ) { jle(0); }
+    else if (tid == TID_OP_GREATER) { jg(0); }
+    else if (tid == TID_OP_GREATEREQ) { jge(0); }
+    else if (tid == TID_OP_EQUAL) { je(0); }
+    else if (tid == TID_OP_NEQUAL) { jne(0); }
+
+    char* ref = m_codeBuf + m_codeSize - sizeof(int);
+    label->addRef(ref); 
 }
 
 int FunctionX64::localIdx2EbpOff(int idx) {

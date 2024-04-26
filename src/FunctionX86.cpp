@@ -30,7 +30,7 @@ void FunctionX86::loadImm(int imm) {
 }
 void FunctionX86::loadLiteralStr(const string& literalStr) {
     const char* loc = m_parent->_getLiteralStringLoc(literalStr);
-    push_32(loc);// emit(0x68); emitValue(loc); // push loc
+    push_32((long long)loc);// emit(0x68); emitValue(loc); // push loc
 }
 void FunctionX86::loadLocal(int idx) {
     push_dword_ptr_ebp(localIdx2EbpOff(idx)); // emit(0xff, 0xb5); emitValue(localIdx2EbpOff(idx)); // push dword ptr [ebp + idxOff]
@@ -100,7 +100,7 @@ void FunctionX86::markLabel(Label* label) {
 }
 void FunctionX86::jmp(Label* label) {
     jmp_eip_offset32(0);//emit(0xe9);    emitValue(NULL);
-    char* ref = m_codeBuf + m_codeSize - 4;
+    char* ref = m_codeBuf + m_codeSize - sizeof(int);
     label->addRef(ref);
 }
 void FunctionX86::trueJmp(Label* label) {
@@ -132,7 +132,7 @@ void FunctionX86::endCall(const string& funcName, int callID, int paramCount) {
     for (int i = 0; i < paramCount - 1; ++i) {
         push_dword_ptr_esp(((i + 1) * 2 - 1) * 4);//emit(0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 4); // push dword ptr [esp+4*i]
     }
-    call_qword_ptr_rip(entry);//emit(0xff, 0x15); emitValue(entry); // call [entry]
+    call_qword_ptr_rip((long long)entry);//emit(0xff, 0x15); emitValue(entry); // call [entry]
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
     push_eax();//emit(0x50); // push eax
 }
