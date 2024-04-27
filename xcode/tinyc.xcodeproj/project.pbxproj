@@ -45,6 +45,15 @@
 		72921B4C2BD3D2DF00624690 /* FunctionX64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionX64.cpp; sourceTree = "<group>"; };
 		72921B502BD3D35D00624690 /* Test.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Test.cpp; sourceTree = "<group>"; };
 		72921B522BD6C95500624690 /* FunctionX64Linux.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionX64Linux.cpp; sourceTree = "<group>"; };
+		72921B552BDCABA300624690 /* hello_mod.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello_mod.c; sourceTree = "<group>"; };
+		72921B562BDCABA300624690 /* test.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test.c; sourceTree = "<group>"; };
+		72921B572BDCABA300624690 /* hello0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello0.c; sourceTree = "<group>"; };
+		72921B582BDCABA300624690 /* hello1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello1.c; sourceTree = "<group>"; };
+		72921B592BDCABA300624690 /* hello_win.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello_win.c; sourceTree = "<group>"; };
+		72921B5A2BDCABA300624690 /* hello2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello2.c; sourceTree = "<group>"; };
+		72921B5B2BDCABA300624690 /* hello.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello.c; sourceTree = "<group>"; };
+		72921B632BDCABB000624690 /* performance.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = performance.c; sourceTree = "<group>"; };
+		72921B662BDD5EE700624690 /* tinyc.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = tinyc.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +70,8 @@
 		7277C4492BBC64A00054171F = {
 			isa = PBXGroup;
 			children = (
+				72921B662BDD5EE700624690 /* tinyc.entitlements */,
+				72921B542BDCAB5100624690 /* ../test */,
 				727800942BBF2297000B5A2A /* ../src */,
 				7277C4532BBC64A00054171F /* Products */,
 			);
@@ -90,6 +101,21 @@
 				727800982BBF22BE000B5A2A /* Scaner.cpp */,
 			);
 			path = ../src;
+			sourceTree = "<group>";
+		};
+		72921B542BDCAB5100624690 /* ../test */ = {
+			isa = PBXGroup;
+			children = (
+				72921B632BDCABB000624690 /* performance.c */,
+				72921B552BDCABA300624690 /* hello_mod.c */,
+				72921B592BDCABA300624690 /* hello_win.c */,
+				72921B5B2BDCABA300624690 /* hello.c */,
+				72921B572BDCABA300624690 /* hello0.c */,
+				72921B582BDCABA300624690 /* hello1.c */,
+				72921B5A2BDCABA300624690 /* hello2.c */,
+				72921B562BDCABA300624690 /* test.c */,
+			);
+			path = ../test;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -287,11 +313,15 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
-				CODE_SIGN_STYLE = Manual;
+				CODE_SIGN_ENTITLEMENTS = tinyc.entitlements;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = CHSKR457Y2;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wxf.tinyc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE_SPECIFIER = "";
 			};
@@ -301,10 +331,13 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_CXX_LANGUAGE_STANDARD = "c++98";
+				CODE_SIGN_ENTITLEMENTS = tinyc.entitlements;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 478553BFKW;
 				ENABLE_HARDENED_RUNTIME = YES;
 				GCC_C_LANGUAGE_STANDARD = c99;
+				PRODUCT_BUNDLE_IDENTIFIER = com.wxf.tinyc;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;

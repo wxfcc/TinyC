@@ -82,11 +82,12 @@ int JITEngine::setExecutable(){
     ASSERT(ret == true);
 
 #elif defined(__linux__) || defined(__MACH__)
-    int erro = mprotect(m_code, m_codeMax, PROT_READ | PROT_EXEC);
-    if(erro){
+    int err = mprotect(m_code, m_codeMax, PROT_READ | PROT_EXEC);
+    printf("setExecutable err=%d\n", err);
+    if(err){
         printf("error=%d, %s\n", errno, strerror(errno) );
     }
-    ASSERT(erro == 0);
+    ASSERT(err == 0);
 
 #endif
     return 0;
@@ -212,24 +213,36 @@ int JITEngine::callFunction(const string& name) {
     }
     return ret;
 }
+//SIGSEGV
+static void signal_handler(int signo){
+    const char *name = "";
+    if(signo == SIGBUS) name="SIGBUS";
+    if(signo == SIGSEGV) name="SIGSEGV";
+    
+    printf("signo=%d, %s\n", signo, name);
+    exit(0);
+}
+static void signal_init(){
+    for(int i=1;i<32;i++){
+        signal(i, signal_handler);
+    }
+}
 
 int JITEngine::executeCode() {
     int ret = 0;
+    signal_init();
 
     setExecutable();
     FP_MAIN mainFunc = (FP_MAIN)getFunction("_start");
+    if(mainFunc == NULL)
+        mainFunc = (FP_MAIN)getFunction("main");
     if (mainFunc) {
+        dumpCode();
+        printf("mainFunc=%p\n", mainFunc);
         ret = mainFunc();
     }
-    else {
-        mainFunc = (FP_MAIN)getFunction("main");
-        if (mainFunc) {
-            dumpCode();
-            ret = mainFunc();
-        }
-        else
-            printf("not found main()\n");
-    }
+    else
+        printf("not found main()\n");
     return ret;
 }
 
