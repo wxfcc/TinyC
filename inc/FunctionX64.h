@@ -34,6 +34,7 @@ public:
     void retExpr();
     int beginCall();
     void endCall(const string& funcName, int callID, int paramCount);
+    void saveParameters();
 
 public:
 protected:
@@ -62,9 +63,11 @@ protected:
 #define jmp_rip_offset32(offset32)          {emit(0xe9); emitValue(offset32);}               // jmp rip+offset32
 #define jne(offset32)                       {emit(0x0f, 0x85); emitValue(offset32);}         // jne
 #define mov_qword_ptr_rsp_rax(offset8)      {emit(0x48, 0x89, 0x44, 0x24, offset8);}         // mov qword ptr [rsp+8], rax
+#define mov_qword_ptr_rsp_rcx(offset8)      {emit(0x48, 0x89, 0x4c, 0x24, offset8);}               // mov    QWORD PTR[rsp + 0x08], rcx
+#define mov_qword_ptr_rsp_rdx(offset8)      {emit(0x48, 0x89, 0x54, 0x24, offset8);}               // mov    QWORD PTR[rsp + 0x10], rdx
 #define mov_qword_ptr_rbp_rax(offset32)     {emit(0x48, 0x89, 0x85); emitValue(offset32);}   // mov qword ptr [rbp + idxOff], rax
-#define mov_qword_ptr_rsp_rcx(offset8)      {emit(0x48, 0x89, 0x4d, offset8);}               // mov    QWORD PTR[rsp + 0x08], rcx
-#define mov_qword_ptr_rsp_rdx(offset8)      {emit(0x48, 0x89, 0x55, offset8);}               // mov    QWORD PTR[rsp + 0x10], rdx
+#define mov_qword_ptr_rbp_rcx(offset8)      {emit(0x48, 0x89, 0x4d, offset8);}               // mov    QWORD PTR[rsp + 0x08], rcx
+#define mov_qword_ptr_rbp_rdx(offset8)      {emit(0x48, 0x89, 0x55, offset8);}               // mov    QWORD PTR[rsp + 0x10], rdx
 #define mov_r8_imm64(n)                     {emit(0x49, 0xb8); emitValue((int64)n);}         // mov r8, #imm64
 #define mov_r8_rbp_offset32(offset32)       {emit(0x4c, 0x8b, 0x85); emitValue(offset32);}   // mov r8, [rbp + offset32]
 #define mov_r9_imm64(n)                     {emit(0x49, 0xb9); emitValue((int64)n);}         // mov r9, #imm64
@@ -76,6 +79,14 @@ protected:
 #define mov_rbp_rsp()                       {emit(0x48, 0x89, 0xe5);}                        // mov rbp, rsp
 #define mov_rcx_imm64(n)                    {emit(0x48, 0xb9); emitValue((int64)n);}         // mov rcx, #imm64
 #define mov_rcx_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0x8d); emitValue(offset32);}   // mov rcx, [rbp + offset32]
+#define mov_rcx_rsp_offset32(offset32)      {emit(0x48, 0x8b, 0x8c, 0x24); emitValue(offset32);}        // mov rcx, [rsp + offset32]
+#define mov_rdx_rsp_offset8(offset8)        {emit(0x48, 0x8b, 0x54, 0x24); emitValue((char)offset8);}   // mov rdx, [rsp + offset8]
+#define mov_rdx_rsp_offset32(offset32)      {emit(0x48, 0x8b, 0x94, 0x24); emitValue(offset32);}        // mov rdx, [rsp + offset32]
+#define mov_r8_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x44, 0x24); emitValue((char)offset8);}   // mov r8, [rsp + offset8]
+#define mov_r8_rsp_offset32(offset32)       {emit(0x4C, 0x8B, 0x84, 0x24); emitValue(offset32);}        // mov r8, [rsp + offset32]
+#define mov_r9_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x4C, 0x24); emitValue((char)offset8);}   // mov r9, [rsp + offset8]
+#define mov_r9_rsp_offset32(offset32)       {emit(0x4C, 0x8B, 0x8C, 0x24); emitValue(offset32);}        // mov r9, [rsp + offset32]
+
 #define mov_rdx_imm64(n)                    {emit(0x48, 0xba); emitValue((int64)n);}         // mov rdx, #imm64
 #define mov_rdx_qword_ptr_rsp0()            {emit(0x48, 0x8b, 0x14, 0x24);}                  // mov rdx, qword ptr[rsp]
 #define mov_rdx_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0x95); emitValue(offset32);}   // mov rdx, [rbp + offset32]

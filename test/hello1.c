@@ -6,5 +6,5 @@ int main() {
 void echoInt(int a,int b) {
 //    a = a + 1;
     func1(a);
-    //printf("a = %d\n", a);
+    printf("a = %d, b=%d\n", a,b);
 }

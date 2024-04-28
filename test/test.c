@@ -75,13 +75,13 @@ void perform() {
 int main()  {
     // test for comment
     testAnd(); // test for comment too
-    //testOr();
-    ////printPrime(30);
-    //printf("factorial %d,%d\n", 10, factorial(10));
-    //printFeb1();
-    //printFeb2();
-    //print9x9();
-    //perform();
+    testOr();
+    printPrime(30);
+    printf("factorial %d,%d\n", 10, factorial(10));
+    printFeb1();
+    printFeb2();
+    print9x9();
+    perform();
     printf("15-3*(2*2+(7-2)) = %d, expect: -12\n", 15-3*(2*2+(7-2)));
     return 0;
 }

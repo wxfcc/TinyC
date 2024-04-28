@@ -150,6 +150,14 @@ void FunctionX86::condJmp(TokenID tid, Label* label) {
 }
 
 int FunctionX86::localIdx2EbpOff(int idx) {
-    return idx < 0 ? 8 - idx * 4 : -(1 + idx) * 4;
+    int offset = 0;
+    if (idx < 0)
+        offset = 8 - idx * 4;
+    else
+        offset = -(1 + idx) * 4;
+    return offset; // idx < 0 ? 8 - idx * 4 : -(1 + idx) * 4;
 }
 
+void FunctionX86::saveParameters() {
+
+}

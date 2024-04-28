@@ -22,3 +22,5 @@ DerivedData
 *.xcuserstate
 #Pods
 enc_temp_folder
+tc.exe 
+tc32.exe

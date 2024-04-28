@@ -67,9 +67,9 @@ void Scanner::fetchN(int n) {
 			do { ++m_src; } while (m_src[0] != '*' || m_src[1] != '/');
 			m_src += 2;
 		}
-		else if (isdigit(m_src[0]) || m_src[0] == '-') {
+		else if (isdigit(m_src[0]) /*|| m_src[0] == '-'*/) {	// there's a conflict: int n = -1; int m=n - 1; 
 			const char* begin = m_src;
-            if(m_src[0] == '-')m_src++;
+            //if(m_src[0] == '-')m_src++;
 			while (isdigit(*++m_src));
 			m_LAList.push_back(Token(TID_INT, begin, m_src));
 		}

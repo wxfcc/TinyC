@@ -61,7 +61,7 @@ void FunctionX64::prepareParam(int64 paraVal, int size) {
 
         }
     }
-    m_paramIndex++;
+    //m_paramIndex++;
 }
 
 void FunctionX64::loadImm(int imm) {
@@ -72,17 +72,17 @@ void FunctionX64::loadImm(int imm) {
     }
 }
 void FunctionX64::loadImm64(int64 imm) {
-    //emit(0x68); emitValue(imm); // push imm
     prepareParam(imm, sizeof(imm));
 }
 void FunctionX64::loadLiteralStr(const string& literalStr) {
     const char* loc = m_parent->_getLiteralStringLoc(literalStr);
-    //emit(0x68); emitValue(loc); // push loc, wxf, how to fix?
     prepareParam((int64)loc, sizeof(loc));
 }
 
 void FunctionX64::loadLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
+    //push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+    //return;
     if (m_beginCall) {
         //for windows
         if (m_paramIndex == 0) { //rcx
@@ -118,12 +118,13 @@ void FunctionX64::loadLocal(int idx) {
             push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
-    m_paramIndex++; //??
+    //m_paramIndex++; //??
 }
 
 void FunctionX64::storeLocal(int idx) {
     mov_rax_qword_ptr_rsp0(); //emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     mov_qword_ptr_rbp_rax(localIdx2EbpOff(idx)); //emit(0x48, 0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov qword ptr [rbp + idxOff], rax
+    //mov_qword_ptr_rsp_rax(localIdx2EbpOff(idx));
     add_rsp(8); // emit(0x48, 0x83, 0xc4); emitValue((char)8); // add rsp, 8
 }
 void FunctionX64::incLocal(int idx) {
@@ -211,20 +212,8 @@ void FunctionX64::retExpr() {
     jmp(&m_retLabel);
 }
 //call from FunctionParser, begin prepare parametes for call
-//48 89 4d 00             mov    QWORD PTR [rbp+0x0],rcx
-//48 89 4d 10             mov    QWORD PTR [rbp+0x10],rcx
-//48 89 55 10             mov    QWORD PTR [rbp+0x10],rdx
-//48 89 5d 10             mov    QWORD PTR [rbp+0x10],rbx
-//48 89 8d 00 01 00 00    mov    QWORD PTR [rbp+0x100],rcx
-//48 89 95 00 01 00 00    mov    QWORD PTR [rbp+0x100],rdx
 int FunctionX64::beginCall() {
     m_beginCall = 1;
-    if (m_paramCount > 0) {
-        mov_qword_ptr_rsp_rcx(0x10); //emit(0x48, 0x89, 0x4d, 0x10);//          mov    QWORD PTR[rsp + 0x10], rcx
-    }
-    if (m_paramCount > 1) {
-        mov_qword_ptr_rsp_rdx(0x10); //emit(0x48, 0x89, 0x55, 0x18);//          mov    QWORD PTR[rsp + 0x18], rdx
-    }
     return 0;
 }
 /*
@@ -304,8 +293,23 @@ void FunctionX64::condJmp(TokenID tid, Label* label) {
 }
 
 int FunctionX64::localIdx2EbpOff(int idx) {
-    return idx < 0 ? 8 - idx * 8 : -(1 + idx) * 8;
+    int offset = 0;
+    if (idx < 0)
+        offset = 16 - idx * 8;
+    else
+        offset = -(1 + idx) * 8;
+    return offset;
 }
+
+void FunctionX64::saveParameters() {
+    if (m_paramCount > 0) {
+        mov_qword_ptr_rbp_rcx(0x18); //emit(0x48, 0x89, 0x4d, 0x10);// mov    QWORD PTR[rbp + 0x18], rcx
+    }
+    if (m_paramCount > 1) {
+        mov_qword_ptr_rbp_rdx(0x20); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
+    }
+}
+
 #if 0
 void call_rip_offset32(int offset){
     //emit(0xe8); emitValue(offset);  // call rip+offset

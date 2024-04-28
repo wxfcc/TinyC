@@ -35,7 +35,8 @@ public:
     void retExpr();
     int beginCall();
     void endCall(const string& funcName, int callID, int paramCount);
-    
+    void saveParameters();
+
 private:
 
     void condJmp(TokenID tid, Label* label);

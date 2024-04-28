@@ -188,7 +188,7 @@ void FunctionParser::_expr_nud() {
             if (m_scanner->LA(1).tid == TID_LP) 
                 _expr_call(token);
             else 
-                m_builder->loadLocal(getLocal(token.lexeme)); 
+                m_builder->loadLocal(getLocal(token.lexeme));
             break;
         case TID_LP: _expr(0); 
             ASSERT(m_scanner->next(1).tid == TID_RP); break;
@@ -207,6 +207,7 @@ void FunctionParser::_expr_nud() {
             break;
         } 
         default: 
+            printf("unexpect token: %d, %s\n", token.tid, token.lexeme.c_str());
             ASSERT(0); break;
     }
 }
@@ -249,11 +250,13 @@ void FunctionParser::_expr_call(const Token &funcToken) {
     int callID = m_builder->beginCall();
     int paramCount = 0;
     while (m_scanner->LA(1).tid != TID_RP) {
-        ++paramCount;
+        m_builder->setParamIndex(paramCount);
         _expr(0);
         if (m_scanner->LA(1).tid == TID_COMMA) 
             m_scanner->next(1);
+        ++paramCount;
     }
+    m_builder->setParamIndex(-1);
     ASSERT(m_scanner->next(1).tid == TID_RP);
     m_builder->endCall(funcToken.lexeme, callID, paramCount);
 }
@@ -282,6 +285,7 @@ int FunctionParser::getOperatorLBP(TokenID tid) {
         case TID_OP_MOD: 
         	return 40;
         default: 
+            printf("unexpect token: %d\n", tid);
             ASSERT(0); 
             return 0;
     }

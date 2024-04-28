@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <signal.h>
 #ifdef _WIN32
 #include <windows.h>
 #include <psapi.h>
@@ -153,6 +154,9 @@ void JITEngine::endBuild() {
         printf("%-16s: %p, %p\n", iter->first.c_str(), iter->second, *iter->second);
     }
 }
+//disassemble:
+//  x64: objdump -b binary -m i386:x86-64 -M intel -D <code.bin>
+//  x86: objdump -b binary -m i386 -M intel -D <code.bin>
 void JITEngine::dumpCode() { 
     unsigned char* p = (unsigned char*)m_code;
     for (int i = 0; i < m_codeSize; i++) {
@@ -214,6 +218,9 @@ int JITEngine::callFunction(const string& name) {
     return ret;
 }
 //SIGSEGV
+#ifndef SIGBUS
+#define SIGBUS 10
+#endif
 static void signal_handler(int signo){
     const char *name = "";
     if(signo == SIGBUS) name="SIGBUS";

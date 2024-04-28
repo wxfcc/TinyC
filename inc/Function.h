@@ -47,6 +47,8 @@ public:
     virtual void endCall(const string &funcName, int callID, int paramCount) = 0;
     virtual void condJmp(TokenID tid, Label *label) = 0;
     virtual int localIdx2EbpOff(int idx) = 0;
+    virtual void saveParameters() = 0;
+    void setParamIndex(int paramIndex);
 
 protected:
     void emitCode(int n, ...);
