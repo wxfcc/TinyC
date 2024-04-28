@@ -84,6 +84,7 @@ void FunctionX64::loadLocal(int idx) {
     //push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
     //return;
     if (m_beginCall) {
+#ifdef _WIN32
         //for windows
         if (m_paramIndex == 0) { //rcx
             mov_rcx_rbp_offset32(offset); //emit(0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
@@ -97,7 +98,22 @@ void FunctionX64::loadLocal(int idx) {
         else if (m_paramIndex == 3) { //r9
             mov_r9_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
         }
+#else   //linux/macos
+        if (m_paramIndex == 0) { //rcx
+            mov_rdi_rbp_offset32(offset); //emit(0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
+        }
+        else if (m_paramIndex == 1) { //rdx
+            mov_rsi_rbp_offset32(offset); //emit(0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rbp + offset32]
+        }
+        else if (m_paramIndex == 2) { //r8
+            mov_rcx_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rbp + offset32]
+        }
+        else if (m_paramIndex == 3) { //r9
+            mov_rdx_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
+        }
+#endif
         else {
+            printf("loadLocal: m_paramIndex=%d, idx=%d\n",m_paramIndex,idx);
             push_qword_ptr_rbp(offset);//emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
@@ -115,6 +131,7 @@ void FunctionX64::loadLocal(int idx) {
             push_r9(); // emit(0x41, 0x51); // push r9
         }
         else {
+            printf("m_paramIndex=%d\n", m_paramIndex);
             push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
@@ -302,12 +319,25 @@ int FunctionX64::localIdx2EbpOff(int idx) {
 }
 
 void FunctionX64::saveParameters() {
-    if (m_paramCount > 0) {
+#ifdef _WIN32
+    if (m_paramIndex > 0) {
         mov_qword_ptr_rbp_rcx(0x18); //emit(0x48, 0x89, 0x4d, 0x10);// mov    QWORD PTR[rbp + 0x18], rcx
     }
-    if (m_paramCount > 1) {
+    if (m_paramIndex > 1) {
         mov_qword_ptr_rbp_rdx(0x20); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
+#else   //linux/macos
+    if (m_paramIndex == 0) { //rcx
+        mov_qword_ptr_rbp_rdi(0x18);
+    }
+    else if (m_paramIndex == 1) { //rdx
+        mov_qword_ptr_rbp_rsi(0x20);
+    }
+    else if (m_paramIndex == 2) { //r8
+    }
+    else if (m_paramIndex == 3) { //r9
+    }
+#endif
 }
 
 #if 0

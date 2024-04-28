@@ -66,8 +66,14 @@ protected:
 #define mov_qword_ptr_rsp_rcx(offset8)      {emit(0x48, 0x89, 0x4c, 0x24, offset8);}               // mov    QWORD PTR[rsp + 0x08], rcx
 #define mov_qword_ptr_rsp_rdx(offset8)      {emit(0x48, 0x89, 0x54, 0x24, offset8);}               // mov    QWORD PTR[rsp + 0x10], rdx
 #define mov_qword_ptr_rbp_rax(offset32)     {emit(0x48, 0x89, 0x85); emitValue(offset32);}   // mov qword ptr [rbp + idxOff], rax
-#define mov_qword_ptr_rbp_rcx(offset8)      {emit(0x48, 0x89, 0x4d, offset8);}               // mov    QWORD PTR[rsp + 0x08], rcx
-#define mov_qword_ptr_rbp_rdx(offset8)      {emit(0x48, 0x89, 0x55, offset8);}               // mov    QWORD PTR[rsp + 0x10], rdx
+#define mov_qword_ptr_rbp_rcx(offset8)      {emit(0x48, 0x89, 0x4d, offset8);}               // mov    QWORD PTR[rbp + 0x08], rcx
+#define mov_qword_ptr_rbp_rdx(offset8)      {emit(0x48, 0x89, 0x55, offset8);}               // mov    QWORD PTR[rbp + 0x10], rdx
+#define mov_qword_ptr_rbp_rdi(offset8)      {emit(0x48, 0x89, 0x7d, offset8);}               // mov    QWORD PTR[rbp + 0x10], rdi
+#define mov_qword_ptr_rbp_rsi(offset8)      {emit(0x48, 0x89, 0x75, offset8);}               // mov    QWORD PTR[rbp + 0x10], rsi
+//{ 0x48, 0x89, 0xBD, 0x00, 0x01, 0x00, 0x00, 0x48, 0x89, 0xB5, 0x00, 0x01, 0x00, 0x00 }
+//0:  48 89 bd 00 01 00 00    mov    QWORD PTR [rbp+0x100],rdi
+//7:  48 89 b5 00 01 00 00    mov    QWORD PTR [rbp+0x100],rsi
+
 #define mov_r8_imm64(n)                     {emit(0x49, 0xb8); emitValue((int64)n);}         // mov r8, #imm64
 #define mov_r8_rbp_offset32(offset32)       {emit(0x4c, 0x8b, 0x85); emitValue(offset32);}   // mov r8, [rbp + offset32]
 #define mov_r9_imm64(n)                     {emit(0x49, 0xb9); emitValue((int64)n);}         // mov r9, #imm64
@@ -86,6 +92,9 @@ protected:
 #define mov_r8_rsp_offset32(offset32)       {emit(0x4C, 0x8B, 0x84, 0x24); emitValue(offset32);}        // mov r8, [rsp + offset32]
 #define mov_r9_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x4C, 0x24); emitValue((char)offset8);}   // mov r9, [rsp + offset8]
 #define mov_r9_rsp_offset32(offset32)       {emit(0x4C, 0x8B, 0x8C, 0x24); emitValue(offset32);}        // mov r9, [rsp + offset32]
+
+#define mov_rdi_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0xbd); emitValue(offset32);}   // mov rdi, [rbp + offset32]
+#define mov_rsi_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0xb5); emitValue(offset32);}   // mov rsi, [rbp + offset32]
 
 #define mov_rdx_imm64(n)                    {emit(0x48, 0xba); emitValue((int64)n);}         // mov rdx, #imm64
 #define mov_rdx_qword_ptr_rsp0()            {emit(0x48, 0x8b, 0x14, 0x24);}                  // mov rdx, qword ptr[rsp]
