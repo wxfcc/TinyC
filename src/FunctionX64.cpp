@@ -21,7 +21,7 @@ void FunctionX64::beginBuild() {
     sub_rsp((MAX_LOCAL_COUNT - 1) * 8); // emit(0x48, 0x81, 0xec); emitValue((MAX_LOCAL_COUNT -1)* 8); 
                                         // sub rsp, MAX_LOCAL_COUNT * 8, there should keep rsp align 16 bytes for some instructions, 
                                         // like: movaps XMMWORD PTR [rsp+0x10], xmm1
-    lea_rbp_rsp8(0x40);
+    lea_rbp_rsp_8(0x40);
 }
 //call from JITEngine
 //generate epilogue code
@@ -168,7 +168,7 @@ void FunctionX64::dup() {
 }
 
 void FunctionX64::doArithmeticOp(TokenID opType) {
-    mov_rax_qword_ptr_rsp8(8);  //emit(0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8]
+    mov_rax_qword_ptr_rsp_8(8);  //emit(0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8]
     switch (opType) {
     case TID_OP_ADD:
         add_rax_qword_ptr_rsp0();   //emit(0x48, 0x03, 0x04, 0x24); // add rax, qword ptr [rsp]
@@ -189,12 +189,12 @@ void FunctionX64::doArithmeticOp(TokenID opType) {
         break;
     default: ASSERT(0); break;
     }
-    mov_qword_ptr_rsp_rax(8);   //emit(0x48, 0x89, 0x44, 0x24, 0x08); // mov qword ptr [rsp+8], rax
+    mov_qword_ptr_rsp_rax_8(8);   //emit(0x48, 0x89, 0x44, 0x24, 0x08); // mov qword ptr [rsp+8], rax
     add_rsp(8);                 //emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
 }
 void FunctionX64::cmp(TokenID cmpType) {
     Label label_1, label_0, label_end;
-    mov_rax_qword_ptr_rsp8(8);  //emit(0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8] 
+    mov_rax_qword_ptr_rsp_8(8);  //emit(0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8] 
     mov_rdx_qword_ptr_rsp0();   //emit(0x48, 0x8b, 0x14, 0x24); // mov rdx, qword ptr[rsp]
     add_rsp(8); //emit(0x48, 0x83, 0xc4, 0x08); //emitValue((char)8);// add rsp, 8
     cmp_rax_rdx();//emit(0x48, 0x39, 0xd0); // cmp rax, rdx
@@ -334,16 +334,16 @@ int FunctionX64::localIdx2EbpOff(int idx) {
 
 void FunctionX64::saveParameters() {
     if (m_myParamCount > 0) {
-        mov_qword_ptr_rbp_rcx(0x18); //emit(0x48, 0x89, 0x4d, 0x10);// mov    QWORD PTR[rbp + 0x18], rcx
+        mov_qword_ptr_rbp_rcx_8(0x18); //emit(0x48, 0x89, 0x4d, 0x10);// mov    QWORD PTR[rbp + 0x18], rcx
     }
     if (m_myParamCount > 1) {
-        mov_qword_ptr_rbp_rdx(0x20); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
+        mov_qword_ptr_rbp_rdx_8(0x20); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
     if (m_myParamCount > 2) {
-        mov_qword_ptr_rbp_r8(0x28); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
+        mov_qword_ptr_rbp_r8_8(0x28); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
     if (m_myParamCount > 3) {
-        mov_qword_ptr_rbp_r9(0x30); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
+        mov_qword_ptr_rbp_r9_8(0x30); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
 }
 
