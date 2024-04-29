@@ -13,10 +13,11 @@ public:
     //void loadImm(int imm);
     //void loadImm64(int64 imm);
     //void loadLiteralStr(const string& literalStr);
-    //void loadLocal(int idx);
+    void loadLocal(int idx);
     //void storeLocal(int idx);
     //void incLocal(int idx);
     //void decLocal(int idx);
+    void saveParameters();
 
 protected:
 

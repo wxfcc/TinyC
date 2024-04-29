@@ -1,3 +1,24 @@
+0x00000058B35EF590  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF5A0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF5B0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF5C0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF5D0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF5E0  00 00 00 00 00 00 00 00 02 fc de 6b f7 7f 00 00  .........??k?...
+0x00000058B35EF5F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF600  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF610  05 00 00 00 00 00 00 00 06 00 00 00 00 00 00 00  ................
+0x00000058B35EF620  07 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+0x00000058B35EF630  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF640  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF650  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF660  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF670  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF680  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF690  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
+0x00000058B35EF6A0  cc cc cc cc cc cc cc cc 9c 18 ec 63 fd 7f 00 00  ?????????.?c?...
+0x00000058B35EF6B0  70 50 68 7c 6c a1 00 00 47 c4 df 6b f7 7f 00 00  pPh|l?..G??k?...
+0x00000058B35EF6C0  00 00 00 00 f7 7f 00 00 00 00 00 00 00 00 00 00  ....?...........
+
 RAX = 00000000CCCCCCCC RBX = 0000000000000000 RCX = 0000000000000001 RDX = 0000000000000002 RSI = 0000000000000000 RDI = 00000058B35EF6A8 
 R8  = 0000000000000003 R9  = 0000000000000004 
 R10 = 0000000000000012 R11 = 00000058B35EF720 R12 = 0000000000000000 R13 = 0000000000000000 R14 = 0000000000000000 R15 = 0000000000000000 
@@ -40,23 +61,46 @@ int __fastcall t(int a, int b, int c, int d, int e, int f, int g) {
 00007FF76BDEFB3D C3                   ret  
 
 
-0x00000058B35EF590  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF5A0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF5B0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF5C0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF5D0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF5E0  00 00 00 00 00 00 00 00 02 fc de 6b f7 7f 00 00  .........??k?...
-0x00000058B35EF5F0  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF600  00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF610  05 00 00 00 00 00 00 00 06 00 00 00 00 00 00 00  ................
-0x00000058B35EF620  07 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-0x00000058B35EF630  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF640  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF650  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF660  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF670  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF680  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF690  cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc  ????????????????
-0x00000058B35EF6A0  cc cc cc cc cc cc cc cc 9c 18 ec 63 fd 7f 00 00  ?????????.?c?...
-0x00000058B35EF6B0  70 50 68 7c 6c a1 00 00 47 c4 df 6b f7 7f 00 00  pPh|l?..G??k?...
-0x00000058B35EF6C0  00 00 00 00 f7 7f 00 00 00 00 00 00 00 00 00 00  ....?...........
+void test_parameters() {
+00007FF75C9D1B20 40 55                push        rbp  
+00007FF75C9D1B22 57                   push        rdi  
+00007FF75C9D1B23 48 81 EC 08 01 00 00 sub         rsp,108h  
+00007FF75C9D1B2A 48 8D 6C 24 40       lea         rbp,[rsp+40h]  
+    t(1,2,3,4,5,6,7);
+00007FF75C9D1B2F C7 44 24 30 07 00 00 00 mov         dword ptr [rsp+30h],7  
+00007FF75C9D1B37 C7 44 24 28 06 00 00 00 mov         dword ptr [rsp+28h],6  
+00007FF75C9D1B3F C7 44 24 20 05 00 00 00 mov         dword ptr [rsp+20h],5  
+00007FF75C9D1B47 41 B9 04 00 00 00    mov         r9d,4  
+00007FF75C9D1B4D 41 B8 03 00 00 00    mov         r8d,3  
+00007FF75C9D1B53 BA 02 00 00 00       mov         edx,2  
+00007FF75C9D1B58 B9 01 00 00 00       mov         ecx,1  
+00007FF75C9D1B5D E8 DE F0 FF FF       call        t (07FF75C9D0C40h)  
+    t(1,2,3,4,5,6,7);
+00007FF75C9D1B62 C7 44 24 30 07 00 00 00 mov         dword ptr [rsp+30h],7  
+00007FF75C9D1B6A C7 44 24 28 06 00 00 00 mov         dword ptr [rsp+28h],6  
+00007FF75C9D1B72 C7 44 24 20 05 00 00 00 mov         dword ptr [rsp+20h],5  
+00007FF75C9D1B7A 41 B9 04 00 00 00    mov         r9d,4  
+00007FF75C9D1B80 41 B8 03 00 00 00    mov         r8d,3  
+00007FF75C9D1B86 BA 02 00 00 00       mov         edx,2  
+00007FF75C9D1B8B B9 01 00 00 00       mov         ecx,1  
+00007FF75C9D1B90 E8 AB F0 FF FF       call        t (07FF75C9D0C40h)  
+    myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
+00007FF75C9D1B95 48 B8 9A 78 56 34 12 00 00 00 mov         rax,123456789Ah  
+00007FF75C9D1B9F 48 89 44 24 30       mov         qword ptr [rsp+30h],rax  
+00007FF75C9D1BA4 48 B8 89 67 45 23 01 00 00 00 mov         rax,123456789h  
+00007FF75C9D1BAE 48 89 44 24 28       mov         qword ptr [rsp+28h],rax  
+00007FF75C9D1BB3 C7 44 24 20 04 00 00 00 mov         dword ptr [rsp+20h],4  
+00007FF75C9D1BBB 41 B9 03 00 00 00    mov         r9d,3  
+00007FF75C9D1BC1 41 B8 02 00 00 00    mov         r8d,2  
+00007FF75C9D1BC7 BA 01 00 00 00       mov         edx,1  
+00007FF75C9D1BCC 48 8D 0D 35 57 01 00 lea         rcx,[string "helo" (07FF75C9E7308h)]  
+00007FF75C9D1BD3 E8 5D 7B FD FF       call        myprintf (07FF75C9A9735h)  
+    exit(0);
+00007FF75C9D1BD8 33 C9                xor         ecx,ecx  
+00007FF75C9D1BDA FF 15 70 78 02 00    call        qword ptr [__imp_exit (07FF75C9F9450h)]  
+}
+00007FF75C9D1BE0 48 8D A5 C8 00 00 00 lea         rsp,[rbp+0C8h]  
+00007FF75C9D1BE7 5F                   pop         rdi  
+00007FF75C9D1BE8 5D                   pop         rbp  
+00007FF75C9D1BE9 C3                   ret  
+

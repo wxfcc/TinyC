@@ -9,59 +9,57 @@
 FunctionX64::FunctionX64(JITEngine* parent, char* codeBuf) : Function(parent, codeBuf) {
 }
 FunctionX64::~FunctionX64() {
-    printf("FunctionX64: %s, param count=%d\n", m_funcName.c_str(), m_paramCount);
+    printf("FunctionX64: %s, param count=%d\n", m_funcName.c_str(), m_myParamCount);
     //printf("FunctionX64: %s, local variable count=%d\n", m_funcName.c_str(), m_localVarCount);
 }
 //call from JITEngine
 //generate prologue code
 void FunctionX64::beginBuild() {
-    push_rdx();// emit(0x52); // push rdx
+    //push_rdx();// emit(0x52); // push rdx
     push_rbp();// emit(0x55); // push rbp
     mov_rbp_rsp(); // emit(0x48, 0x89, 0xe5); // mov rbp, rsp
     sub_rsp((MAX_LOCAL_COUNT - 1) * 8); // emit(0x48, 0x81, 0xec); emitValue((MAX_LOCAL_COUNT -1)* 8); 
                                         // sub rsp, MAX_LOCAL_COUNT * 8, there should keep rsp align 16 bytes for some instructions, 
                                         // like: movaps XMMWORD PTR [rsp+0x10], xmm1
+    lea_rbp_rsp8(0x40);
 }
 //call from JITEngine
 //generate epilogue code
 void FunctionX64::endBuild() {
     markLabel(&m_retLabel);
-    mov_rsp_rbp();  // emit(0x48, 0x89, 0xec);  // mov rsp,rbp 
+    //mov_rsp_rbp();  // emit(0x48, 0x89, 0xec);  // mov rsp,rbp 
+    add_rsp((MAX_LOCAL_COUNT - 1) * 8);
     pop_rbp();  // emit(0x5d); // pop rbp  
-    pop_rdx();  // emit(0x5a); // pop rdx  
+    //pop_rdx();  // emit(0x5a); // pop rdx  
     retn(); // emit(0xc3); // ret
 }
 /*
  in windows x64 mode, the order of parameter: rcx rdx r8 r9 [rsp] ...
 */
 void FunctionX64::prepareParam(int64 paraVal, int size) {
-    printf("FunctionX64Linux::prepareParam\n");
+    //printf("FunctionX64::prepareParam\n");
 
-    if (m_paramIndex == 0) { //rcx
+    if (m_callParamIndex == 0) { //rcx
         mov_rcx_imm64(paraVal); //emit(0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
     }
-    else if (m_paramIndex == 1) { //rdx
+    else if (m_callParamIndex == 1) { //rdx
         mov_rdx_imm64(paraVal); //emit(0x48, 0xba); emitValue((int64)paraVal); // mov rdx, #imm64
     }
-    else if (m_paramIndex == 2) { //r8
+    else if (m_callParamIndex == 2) { //r8
         mov_r8_imm64(paraVal); //emit(0x49, 0xb8); emitValue((int64)paraVal); // mov r8, #imm64
     }
-    else if (m_paramIndex == 3) { //r9
+    else if (m_callParamIndex == 3) { //r9
         mov_r9_imm64(paraVal); //emit(0x49, 0xb9); emitValue((int64)paraVal); // mov r9, #imm64
     }
     else {
         if (size <= 4) {
-            push_32(paraVal);//emit(0x68); emitValue((int)paraVal); // push #imm32, in fact it'll push #imm64 with the hi 32 bits as 0 
+            push_32(paraVal);//emit(0x68); emitValue((int)paraVal); // push #imm32
         }
         else {
             mov_rax_imm64(paraVal);//emit(0x48, 0xb8); emitValue((int64)paraVal); // mov rax, #imm64
             push_rax(); // emit(0x50); // push rax
-            // 48 C7 44 24 20 04 00 00 00             mov    qword ptr [rsp+20h], 4 
-            // 48 c7 84 24 20 01 00 00 00 00 00 00    mov    QWORD PTR [rsp + 0x120], 0x0
-
         }
     }
-    //m_paramIndex++;
 }
 
 void FunctionX64::loadImm(int imm) {
@@ -81,68 +79,80 @@ void FunctionX64::loadLiteralStr(const string& literalStr) {
 
 void FunctionX64::loadLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
-    //push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
-    //return;
+    //push_qword_ptr_rbp(offset);
+    if (idx < 0 || offset < 0) {
+        printf("loadLocal idx=%d, offset=%d, m_callParamIndex=%d\n", idx, offset, m_callParamIndex);
+    }
+#if 0
+    if (m_callParamIndex == 0) { //rcx
+        mov_rcx_rbp_offset32(offset); //emit(0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
+        //push_rcx();
+    }
+    else if (m_callParamIndex == 1) { //rdx
+        mov_rdx_rbp_offset32(offset); //emit(0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rbp + offset32]
+        //push_rdx();
+    }
+    else if (m_callParamIndex == 2) { //r8
+        mov_r8_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rbp + offset32]
+    }
+    else if (m_callParamIndex == 3) { //r9
+        mov_r9_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
+    }
+    else {
+        push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+    }
+#endif
+#if 1
     if (m_beginCall) {
-#ifdef _WIN32
         //for windows
-        if (m_paramIndex == 0) { //rcx
+        if (m_callParamIndex == 0) { //rcx
             mov_rcx_rbp_offset32(offset); //emit(0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
         }
-        else if (m_paramIndex == 1) { //rdx
+        else if (m_callParamIndex == 1) { //rdx
             mov_rdx_rbp_offset32(offset); //emit(0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rbp + offset32]
         }
-        else if (m_paramIndex == 2) { //r8
+        else if (m_callParamIndex == 2) { //r8
             mov_r8_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rbp + offset32]
         }
-        else if (m_paramIndex == 3) { //r9
+        else if (m_callParamIndex == 3) { //r9
             mov_r9_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
         }
-#else   //linux/macos
-        if (m_paramIndex == 0) { //rcx
-            mov_rdi_rbp_offset32(offset); //emit(0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
-        }
-        else if (m_paramIndex == 1) { //rdx
-            mov_rsi_rbp_offset32(offset); //emit(0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rbp + offset32]
-        }
-        else if (m_paramIndex == 2) { //r8
-            mov_rcx_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rbp + offset32]
-        }
-        else if (m_paramIndex == 3) { //r9
-            mov_rdx_rbp_offset32(offset); //emit(0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
-        }
-#endif
         else {
-            printf("loadLocal: m_paramIndex=%d, idx=%d\n",m_paramIndex,idx);
+            printf("loadLocal: m_callParamIndex=%d, idx=%d\n", m_callParamIndex,idx);
             push_qword_ptr_rbp(offset);//emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
     else {
-        if (m_paramIndex == 0) { //rcx
+        if (m_callParamIndex == 0) { //rcx
             push_rcx(); // emit(0x51); // push rcx
         }
-        else if (m_paramIndex == 1) { //rdx
+        else if (m_callParamIndex == 1) { //rdx
             push_rdx(); // emit(0x52); // push rdx
         }
-        else if (m_paramIndex == 2) { //r8
+        else if (m_callParamIndex == 2) { //r8
             push_r8(); // emit(0x41, 0x50); // push r8
         }
-        else if (m_paramIndex == 3) { //r9
+        else if (m_callParamIndex == 3) { //r9
             push_r9(); // emit(0x41, 0x51); // push r9
         }
         else {
-            printf("m_paramIndex=%d\n", m_paramIndex);
+            printf("m_callParamIndex=%d\n", m_callParamIndex);
             push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
         }
     }
-    //m_paramIndex++; //??
+#endif
 }
 
 void FunctionX64::storeLocal(int idx) {
+    int offset = localIdx2EbpOff(idx);
+#if 1
+    pop_rax();  //test
+    mov_qword_ptr_rbp_rax(offset); //emit(0x48, 0x89, 0x85); emitValue(offset); // mov qword ptr [rbp + idxOff], rax
+#else
     mov_rax_qword_ptr_rsp0(); //emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
-    mov_qword_ptr_rbp_rax(localIdx2EbpOff(idx)); //emit(0x48, 0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov qword ptr [rbp + idxOff], rax
-    //mov_qword_ptr_rsp_rax(localIdx2EbpOff(idx));
+    mov_qword_ptr_rbp_rax(offset); //emit(0x48, 0x89, 0x85); emitValue(offset); // mov qword ptr [rbp + idxOff], rax
     add_rsp(8); // emit(0x48, 0x83, 0xc4); emitValue((char)8); // add rsp, 8
+#endif
 }
 void FunctionX64::incLocal(int idx) {
     inc_qword_ptr_rbp(localIdx2EbpOff(idx));//emit(0x48, 0xff, 0x85); emitValue(localIdx2EbpOff(idx)); // inc qword ptr [rbp + idxOff]
@@ -228,12 +238,14 @@ void FunctionX64::retExpr() {
     add_rsp(8); // emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
     jmp(&m_retLabel);
 }
+//begin call a function in current function
 //call from FunctionParser, begin prepare parametes for call
 int FunctionX64::beginCall() {
     m_beginCall = 1;
     return 0;
 }
 /*
+* after call compelet, we need to do something, such as process return value ...
 //call from FunctionParser
  1. call rip+offset32
  2. call [rip+offset32]
@@ -276,12 +288,14 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
 
     call_qword_ptr_rip(offset); //emit(0xff, 0x15); emitValue((int)offset); // call qword ptr[rip+offset]
 #endif
-    pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
+    //pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
+    if (paramCount > 4) {   // for fastcall
+        pop(paramCount - 4);
+    }
     push_rax();//emit(0x50); // push rax
 
-    m_paramIndex = 0;
+    m_callParamIndex = -1;
     m_beginCall = 0;
-    //m_paramCount = paramCount;
 }
 
 // relative rip
@@ -319,25 +333,18 @@ int FunctionX64::localIdx2EbpOff(int idx) {
 }
 
 void FunctionX64::saveParameters() {
-#ifdef _WIN32
-    if (m_paramIndex > 0) {
+    if (m_myParamCount > 0) {
         mov_qword_ptr_rbp_rcx(0x18); //emit(0x48, 0x89, 0x4d, 0x10);// mov    QWORD PTR[rbp + 0x18], rcx
     }
-    if (m_paramIndex > 1) {
+    if (m_myParamCount > 1) {
         mov_qword_ptr_rbp_rdx(0x20); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
-#else   //linux/macos
-    if (m_paramIndex == 0) { //rcx
-        mov_qword_ptr_rbp_rdi(0x18);
+    if (m_myParamCount > 2) {
+        mov_qword_ptr_rbp_r8(0x28); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
-    else if (m_paramIndex == 1) { //rdx
-        mov_qword_ptr_rbp_rsi(0x20);
+    if (m_myParamCount > 3) {
+        mov_qword_ptr_rbp_r9(0x30); //emit(0x48, 0x89, 0x55, 0x18);// mov    QWORD PTR[rbp + 0x20], rdx
     }
-    else if (m_paramIndex == 2) { //r8
-    }
-    else if (m_paramIndex == 3) { //r9
-    }
-#endif
 }
 
 #if 0

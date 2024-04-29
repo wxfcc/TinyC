@@ -19,7 +19,9 @@ static string unescape(const string &s) {
     return r;
 }
 
-FunctionParser::FunctionParser(Function *builder, Scanner *scanner): m_builder(builder), m_scanner(scanner) {
+FunctionParser::FunctionParser(Function *function, Scanner *scanner): 
+    m_function(function), 
+    m_scanner(scanner) {
 }
 
 void FunctionParser::parse() { 
@@ -35,8 +37,8 @@ void FunctionParser::_function_define() {
         declareArg(m_scanner->next(1).lexeme, type);
         if (m_scanner->LA(1).tid == TID_COMMA) m_scanner->next(1);
     }
-    m_builder->setFuncName(funcName, (int)m_args.size());
-    //m_builder->setArgsCount(m_args.size());
+    m_function->setFuncName(funcName, (int)m_args.size());
+    //m_function->setArgsCount(m_args.size());
     ASSERT(m_scanner->next(1).tid == TID_RP);
     _block();
 }
@@ -50,14 +52,14 @@ void FunctionParser::_block() {
 void FunctionParser::_statement() {
     switch (m_scanner->LA(1).tid) {
         case TID_SEMICELON: m_scanner->next(1); break;
-        case TID_CONTINUE: m_scanner->next(2); m_builder->jmp(getLastContinueLabel()); break;
-        case TID_BREAK: m_scanner->next(2); m_builder->jmp(getLastBreakLabel()); break;
+        case TID_CONTINUE: m_scanner->next(2); m_function->jmp(getLastContinueLabel()); break;
+        case TID_BREAK: m_scanner->next(2); m_function->jmp(getLastBreakLabel()); break;
         case TID_RETURN: 
             m_scanner->next(1);
             if (m_scanner->LA(1).tid != TID_SEMICELON) {
                 _expr(0);
-                m_builder->retExpr();
-            } else m_builder->ret();
+                m_function->retExpr();
+            } else m_function->ret();
             ASSERT(m_scanner->next(1).tid == TID_SEMICELON);
             break;
         case TID_LBRACE: _block(); break;
@@ -67,7 +69,7 @@ void FunctionParser::_statement() {
         case TID_TYPE_STRING: 
         case TID_TYPE_INT: _local_define_list(); break;
         case TID_TYPE_VOID: ASSERT(0); break;
-        default: _expr(0); m_builder->pop(1); ASSERT(m_scanner->next(1).tid == TID_SEMICELON); break;
+        default: _expr(0); m_function->pop(1); ASSERT(m_scanner->next(1).tid == TID_SEMICELON); break;
     }
 }
 void FunctionParser::_if() {
@@ -76,33 +78,33 @@ void FunctionParser::_if() {
     m_scanner->next(2);
     _expr(0);
     ASSERT(m_scanner->next(1).tid == TID_RP);
-    m_builder->trueJmp(&label_true);
-    m_builder->jmp(&label_false);
+    m_function->trueJmp(&label_true);
+    m_function->jmp(&label_false);
 
-    m_builder->markLabel(&label_true);
+    m_function->markLabel(&label_true);
     _statement();
-    m_builder->jmp(&label_end);
+    m_function->jmp(&label_end);
 
-    m_builder->markLabel(&label_false);
+    m_function->markLabel(&label_false);
     if (m_scanner->LA(1).tid == TID_ELSE) {
         m_scanner->next(1);
         _statement();
     }
 
-    m_builder->markLabel(&label_end);
+    m_function->markLabel(&label_end);
 }
 void FunctionParser::_while() {
     Label *label_break = pushBreakLabel(), *label_continue = pushContinueLabel();
 
-    m_builder->markLabel(label_continue);
+    m_function->markLabel(label_continue);
     m_scanner->next(2);
     _expr(0);
     ASSERT(m_scanner->next(1).tid == TID_RP);
-    m_builder->falseJmp(label_break);
+    m_function->falseJmp(label_break);
 
     _statement();
-    m_builder->jmp(label_continue);
-    m_builder->markLabel(label_break);
+    m_function->jmp(label_continue);
+    m_function->markLabel(label_break);
 
     popBreakLabel(); 
     popContinueLabel();
@@ -117,29 +119,29 @@ void FunctionParser::_for() {
         case TID_SEMICELON: break;
         case TID_TYPE_INT: 
         case TID_TYPE_STRING: _local_define_list(); break;
-        default: _expr(0); m_builder->pop(1); ASSERT(m_scanner->next(1).tid == TID_SEMICELON); break;
+        default: _expr(0); m_function->pop(1); ASSERT(m_scanner->next(1).tid == TID_SEMICELON); break;
     }
 
-    m_builder->markLabel(&label_loop);
+    m_function->markLabel(&label_loop);
     if (m_scanner->LA(1).tid != TID_SEMICELON) _expr(0);
-    else m_builder->loadImm(1);
+    else m_function->loadImm(1);
     ASSERT(m_scanner->next(1).tid == TID_SEMICELON);
-    m_builder->falseJmp(label_break);
-    m_builder->jmp(&label_body);
+    m_function->falseJmp(label_break);
+    m_function->jmp(&label_body);
 
-    m_builder->markLabel(label_continue);
+    m_function->markLabel(label_continue);
     if (m_scanner->LA(1).tid != TID_RP) {
         _expr(0); 
-        m_builder->pop(1);
+        m_function->pop(1);
     }
     ASSERT(m_scanner->next(1).tid == TID_RP);
-    m_builder->jmp(&label_loop);
+    m_function->jmp(&label_loop);
 
-    m_builder->markLabel(&label_body);
+    m_function->markLabel(&label_body);
     _statement();
-    m_builder->jmp(label_continue);
+    m_function->jmp(label_continue);
 
-    m_builder->markLabel(label_break);
+    m_function->markLabel(label_break);
     popContinueLabel(); popBreakLabel();
     popScope();
 }
@@ -158,15 +160,15 @@ void FunctionParser::_id_or_assignment(const string &type) {
     if (m_scanner->LA(1).tid == TID_OP_ASSIGN) {
         m_scanner->next(1);
         _expr(0);
-        m_builder->storeLocal(getLocal(idToken.lexeme));
+        m_function->storeLocal(getLocal(idToken.lexeme));
     }
 }
 void FunctionParser::_expr(int rbp) {
     if (m_scanner->LA(1).tid == TID_ID && m_scanner->LA(2).tid == TID_OP_ASSIGN) {
         Token idToken = m_scanner->next(2);
         _expr(0);
-        m_builder->dup();
-        m_builder->storeLocal(getLocal(idToken.lexeme));
+        m_function->dup();
+        m_function->storeLocal(getLocal(idToken.lexeme));
     } else {
         _expr_nud();
         while (rbp < getOperatorLBP(m_scanner->LA(1).tid))
@@ -177,33 +179,33 @@ void FunctionParser::_expr_nud() {
     Token token = m_scanner->next(1);
     switch (token.tid) {
         case TID_TRUE: 
-            m_builder->loadImm(1); break;
+            m_function->loadImm(1); break;
         case TID_FALSE: 
-            m_builder->loadImm(0); break;
+            m_function->loadImm(0); break;
         case TID_INT: 
-            m_builder->loadImm(atoi(token.lexeme.c_str())); break;
+            m_function->loadImm(atoi(token.lexeme.c_str())); break;
         case TID_STRING: 
-            m_builder->loadLiteralStr(unescape(token.lexeme.substr(1, token.lexeme.size() - 2))); break;
+            m_function->loadLiteralStr(unescape(token.lexeme.substr(1, token.lexeme.size() - 2))); break;
         case TID_ID: 
             if (m_scanner->LA(1).tid == TID_LP) 
                 _expr_call(token);
             else 
-                m_builder->loadLocal(getLocal(token.lexeme));
+                m_function->loadLocal(getLocal(token.lexeme));
             break;
         case TID_LP: _expr(0); 
             ASSERT(m_scanner->next(1).tid == TID_RP); break;
         case TID_OP_NOT: 
             _expr(getOperatorRBP(token.tid)); 
-            m_builder->loadImm(0);
-            m_builder->cmp(TID_OP_EQUAL);
+            m_function->loadImm(0);
+            m_function->cmp(TID_OP_EQUAL);
             break;
         case TID_OP_INC: 
         case TID_OP_DEC: {
             int localIdx = getLocal(m_scanner->next(1).lexeme);
             if (token.tid == TID_OP_INC)
-                m_builder->incLocal(localIdx);
-            else m_builder->decLocal(localIdx);
-            m_builder->loadLocal(localIdx);
+                m_function->incLocal(localIdx);
+            else m_function->decLocal(localIdx);
+            m_function->loadLocal(localIdx);
             break;
         } 
         default: 
@@ -217,12 +219,12 @@ void FunctionParser::_expr_led() {
         case TID_OP_AND: 
         case TID_OP_OR: {
             Label label_end;
-            m_builder->dup();
-            if (opToken.tid == TID_OP_AND) m_builder->falseJmp(&label_end);
-            else m_builder->trueJmp(&label_end);
-            m_builder->pop(1);
+            m_function->dup();
+            if (opToken.tid == TID_OP_AND) m_function->falseJmp(&label_end);
+            else m_function->trueJmp(&label_end);
+            m_function->pop(1);
             _expr(getOperatorRBP(opToken.tid));
-            m_builder->markLabel(&label_end);
+            m_function->markLabel(&label_end);
         } break;
         case TID_OP_LESS: 
         case TID_OP_LESSEQ: 
@@ -231,7 +233,7 @@ void FunctionParser::_expr_led() {
         case TID_OP_EQUAL: 
         case TID_OP_NEQUAL:
             _expr(getOperatorRBP(opToken.tid));
-            m_builder->cmp(opToken.tid);
+            m_function->cmp(opToken.tid);
             break;
         case TID_OP_ADD: 
         case TID_OP_SUB: 
@@ -239,7 +241,7 @@ void FunctionParser::_expr_led() {
         case TID_OP_DIV: 
         case TID_OP_MOD:
             _expr(getOperatorRBP(opToken.tid));
-            m_builder->doArithmeticOp(opToken.tid);
+            m_function->doArithmeticOp(opToken.tid);
             break;
         default: ASSERT(0); break;
     }
@@ -247,18 +249,17 @@ void FunctionParser::_expr_led() {
 // parse funcation parameters and generate call code
 void FunctionParser::_expr_call(const Token &funcToken) {
     ASSERT(m_scanner->next(1).tid == TID_LP);
-    int callID = m_builder->beginCall();
+    int callID = m_function->beginCall();
     int paramCount = 0;
     while (m_scanner->LA(1).tid != TID_RP) {
-        m_builder->setParamIndex(paramCount);
+        m_function->setCallParamIndex(paramCount);
         _expr(0);
         if (m_scanner->LA(1).tid == TID_COMMA) 
             m_scanner->next(1);
         ++paramCount;
     }
-    m_builder->setParamIndex(-1);
     ASSERT(m_scanner->next(1).tid == TID_RP);
-    m_builder->endCall(funcToken.lexeme, callID, paramCount);
+    m_function->endCall(funcToken.lexeme, callID, paramCount);
 }
 
 int FunctionParser::getOperatorLBP(TokenID tid) {
@@ -299,20 +300,27 @@ int FunctionParser::getOperatorRBP(TokenID tid) {
     }
 }
 
-void FunctionParser::pushScope() { m_nestedLocals.resize(m_nestedLocals.size() + 1); }
-void FunctionParser::popScope() { m_nestedLocals.pop_back(); }
+void FunctionParser::pushScope() { 
+    m_nestedLocals.resize(m_nestedLocals.size() + 1); 
+}
+void FunctionParser::popScope() { 
+    m_nestedLocals.pop_back(); 
+}
 int FunctionParser::declareArg(const string &name, const string &type) {
     ASSERT(m_args.count(name) == 0);
     int idx = -((int)m_args.size() + 1);
     return m_args[name] = idx;
 }
+
 int FunctionParser::declareLocal(const string &name, const string &type) {
     ASSERT(m_nestedLocals.back().count(name) == 0);
     int idx = 0;
-    for (int i = 0; i < (int)m_nestedLocals.size(); ++i) idx += (int)m_nestedLocals[i].size();
+    for (int i = 0; i < (int)m_nestedLocals.size(); ++i)
+        idx += (int)m_nestedLocals[i].size();
     ASSERT(idx + 1 <= MAX_LOCAL_COUNT);
     return m_nestedLocals.back()[name] = idx;
 }
+
 int FunctionParser::getLocal(const string &name) {
     map<string, int>::iterator iter;
     for (int i = 0; i < (int)m_nestedLocals.size(); ++i) {

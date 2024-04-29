@@ -107,6 +107,12 @@
     <Text Include="..\docs\gcc_linux_macro.txt">
       <Filter>Docs</Filter>
     </Text>
+    <Text Include="..\test\hello3.c">
+      <Filter>test</Filter>
+    </Text>
+    <Text Include="..\test\hello2.c">
+      <Filter>test</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\inc\common.h">

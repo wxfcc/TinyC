@@ -3,7 +3,7 @@
 #include "Label.h"
 #include "Function.h"
 #include "JITEngine.h"
-
+// in x64 mode, just only support __fastcall calling convention 
 class FunctionX64 :public Function {
 public:
     FunctionX64(JITEngine* parent, char* codeBuf);
@@ -13,8 +13,6 @@ public:
     void endBuild();
 
     void prepareParam(int64 paraVal, int size);
-    //void prepareParamForWindows(int64 paraVal, int size);
-    //void prepareParamForLinux(int64 paraVal, int size);
     void loadImm(int imm);
     void loadImm64(int64 imm);
     void loadLiteralStr(const string& literalStr);
@@ -47,7 +45,7 @@ protected:
 
 #define add_rax_qword_ptr_rsp0()            {emit(0x48, 0x03, 0x04, 0x24);}                  // add rax, qword ptr [rsp]
 #define add_rsp(n)                          {emit(0x48, 0x81, 0xc4); emitValue(n);}          // add rsp, n 
-#define add_rsp8(n)                         {emit(0x48, 0x83, 0xc4); emitValue((char)n);}    // add rsp, 8
+#define add_rsp8(n)                         {emit(0x48, 0x83, 0xc4, n);}                     // add rsp, n
 #define call_qword_ptr_rip(offset32)        {emit(0xff, 0x15); emitValue((int)offset32);}    // call qword ptr[rip+offset]
 #define call_rip_offset32(offset32)         {emit(0xe8); emitValue(offset32);}               // call rip+offset
 #define cmp_rax_rdx()                       {emit(0x48, 0x39, 0xd0);}                        // cmp rax, rdx
@@ -62,17 +60,22 @@ protected:
 #define jle(offset32)                       {emit(0x0f, 0x8e); emitValue(offset32);}         // jle
 #define jmp_rip_offset32(offset32)          {emit(0xe9); emitValue(offset32);}               // jmp rip+offset32
 #define jne(offset32)                       {emit(0x0f, 0x85); emitValue(offset32);}         // jne
+#define lea_rbp_rsp8(n)                     {emit(0x48, 0x8d, 0x6c, 0x24, n);}               // lea    rbp, [rsp + 0x40]
+#define lea_rbp_rsp32(n)                    {emit(0x48, 0x8d, 0xac, 0x24); emitValue(n);}    // lea    rbp, [rsp + 0x400]
+
 #define mov_qword_ptr_rsp_rax(offset8)      {emit(0x48, 0x89, 0x44, 0x24, offset8);}         // mov qword ptr [rsp+8], rax
-#define mov_qword_ptr_rsp_rcx(offset8)      {emit(0x48, 0x89, 0x4c, 0x24, offset8);}               // mov    QWORD PTR[rsp + 0x08], rcx
-#define mov_qword_ptr_rsp_rdx(offset8)      {emit(0x48, 0x89, 0x54, 0x24, offset8);}               // mov    QWORD PTR[rsp + 0x10], rdx
+#define mov_qword_ptr_rsp_rcx(offset8)      {emit(0x48, 0x89, 0x4c, 0x24, offset8);}         // mov qword ptr[rsp + 0x08], rcx
+#define mov_qword_ptr_rsp_rdx(offset8)      {emit(0x48, 0x89, 0x54, 0x24, offset8);}         // mov qword ptr[rsp + 0x10], rdx
 #define mov_qword_ptr_rbp_rax(offset32)     {emit(0x48, 0x89, 0x85); emitValue(offset32);}   // mov qword ptr [rbp + idxOff], rax
-#define mov_qword_ptr_rbp_rcx(offset8)      {emit(0x48, 0x89, 0x4d, offset8);}               // mov    QWORD PTR[rbp + 0x08], rcx
-#define mov_qword_ptr_rbp_rdx(offset8)      {emit(0x48, 0x89, 0x55, offset8);}               // mov    QWORD PTR[rbp + 0x10], rdx
-#define mov_qword_ptr_rbp_rdi(offset8)      {emit(0x48, 0x89, 0x7d, offset8);}               // mov    QWORD PTR[rbp + 0x10], rdi
-#define mov_qword_ptr_rbp_rsi(offset8)      {emit(0x48, 0x89, 0x75, offset8);}               // mov    QWORD PTR[rbp + 0x10], rsi
-//{ 0x48, 0x89, 0xBD, 0x00, 0x01, 0x00, 0x00, 0x48, 0x89, 0xB5, 0x00, 0x01, 0x00, 0x00 }
-//0:  48 89 bd 00 01 00 00    mov    QWORD PTR [rbp+0x100],rdi
-//7:  48 89 b5 00 01 00 00    mov    QWORD PTR [rbp+0x100],rsi
+#define mov_qword_ptr_rbp_rcx(offset8)      {emit(0x48, 0x89, 0x4d, offset8);}               // mov qword ptr[rbp + 0x08], rcx
+#define mov_qword_ptr_rbp_rdx(offset8)      {emit(0x48, 0x89, 0x55, offset8);}               // mov qword ptr[rbp + 0x10], rdx
+#define mov_qword_ptr_rbp_r8(offset8)       {emit(0x4c, 0x89, 0x45, offset8);}               // mov qword ptr[rbp + 0x08], r8
+#define mov_qword_ptr_rbp_r9(offset8)       {emit(0x4c, 0x89, 0x4d, offset8);}               // mov qword ptr[rbp + 0x10], r9
+#define mov_qword_ptr_rbp_rdi(offset8)      {emit(0x48, 0x89, 0x7d, offset8);}               // mov qword ptr[rbp + 0x10], rdi
+#define mov_qword_ptr_rbp_rsi(offset8)      {emit(0x48, 0x89, 0x75, offset8);}               // mov qword ptr[rbp + 0x10], rsi
+#define mov_qword_ptr_rbp_rdi32(offset32)   {emit(0x48, 0x89, 0xbd); emitValue(offset32);}   // mov qword ptr[rbp + 0x100], rdi
+#define mov_qword_ptr_rbp_rsi32(offset32)   {emit(0x48, 0x89, 0xb5); emitValue(offset32);}   // mov qword ptr[rbp + 0x100], rsi
+#define mov_qword_ptr_rbp_imm(offset32,n)   {emit(0x48, 0xc7, 0x85); emitValue(offset32);emitValue(n);}   // mov qword ptr[rbp + 0x100], #n
 
 #define mov_r8_imm64(n)                     {emit(0x49, 0xb8); emitValue((int64)n);}         // mov r8, #imm64
 #define mov_r8_rbp_offset32(offset32)       {emit(0x4c, 0x8b, 0x85); emitValue(offset32);}   // mov r8, [rbp + offset32]
@@ -86,11 +89,11 @@ protected:
 #define mov_rcx_imm64(n)                    {emit(0x48, 0xb9); emitValue((int64)n);}         // mov rcx, #imm64
 #define mov_rcx_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0x8d); emitValue(offset32);}   // mov rcx, [rbp + offset32]
 #define mov_rcx_rsp_offset32(offset32)      {emit(0x48, 0x8b, 0x8c, 0x24); emitValue(offset32);}        // mov rcx, [rsp + offset32]
-#define mov_rdx_rsp_offset8(offset8)        {emit(0x48, 0x8b, 0x54, 0x24); emitValue((char)offset8);}   // mov rdx, [rsp + offset8]
+#define mov_rdx_rsp_offset8(offset8)        {emit(0x48, 0x8b, 0x54, 0x24, offset8);}         // mov rdx, [rsp + offset8]
 #define mov_rdx_rsp_offset32(offset32)      {emit(0x48, 0x8b, 0x94, 0x24); emitValue(offset32);}        // mov rdx, [rsp + offset32]
-#define mov_r8_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x44, 0x24); emitValue((char)offset8);}   // mov r8, [rsp + offset8]
+#define mov_r8_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x44, 0x24, offset8);}         // mov r8, [rsp + offset8]
 #define mov_r8_rsp_offset32(offset32)       {emit(0x4C, 0x8B, 0x84, 0x24); emitValue(offset32);}        // mov r8, [rsp + offset32]
-#define mov_r9_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x4C, 0x24); emitValue((char)offset8);}   // mov r9, [rsp + offset8]
+#define mov_r9_rsp_offset8(offset8)         {emit(0x4C, 0x8B, 0x4C, 0x24, offset8);}         // mov r9, [rsp + offset8]
 #define mov_r9_rsp_offset32(offset32)       {emit(0x4C, 0x8B, 0x8C, 0x24); emitValue(offset32);}        // mov r9, [rsp + offset32]
 
 #define mov_rdi_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0xbd); emitValue(offset32);}   // mov rdi, [rbp + offset32]
@@ -100,6 +103,7 @@ protected:
 #define mov_rdx_qword_ptr_rsp0()            {emit(0x48, 0x8b, 0x14, 0x24);}                  // mov rdx, qword ptr[rsp]
 #define mov_rdx_rbp_offset32(offset32)      {emit(0x48, 0x8b, 0x95); emitValue(offset32);}   // mov rdx, [rbp + offset32]
 #define mov_rsp_rbp()                       {emit(0x48, 0x89, 0xec);}                        // mov rsp,rbp 
+#define pop_rax()                           {emit(0x58);}                                    // pop rax
 #define pop_rbp()                           {emit(0x5d);}                                    // pop rbp  
 #define pop_rdx()                           {emit(0x5a);}                                    // pop rdx  
 #define push_32(n)                          {emit(0x68); emitValue((int)n);}                 // push #imm32
@@ -110,9 +114,11 @@ protected:
 #define push_r8()                           {emit(0x41, 0x50);}                              // push r8
 #define push_r9()                           {emit(0x41, 0x51);}                              // push r9
 #define push_rax()                          {emit(0x50);}                                    // push rax
-#define push_rbp()                          {emit(0x55);}                                    // push rbp
 #define push_rcx()                          {emit(0x51);}                                    // push rcx
 #define push_rdx()                          {emit(0x52);}                                    // push rdx
+#define push_rbp()                          {emit(0x55);}                                    // push rbp
+#define push_rsi()                          {emit(0x56);}                                    // push rsi
+#define push_rdi()                          {emit(0x57);}                                    // push rdi
 #define retn()                              {emit(0xc3);}                                    // ret
 #define sub_rax_qword_ptr_rsp0()            {emit(0x48, 0x2b, 0x04, 0x24);}                  // sub rax, qword ptr [rsp]
 #define sub_rsp(n)                          {emit(0x48, 0x81, 0xec); emitValue(n);}          // sub rsp, n

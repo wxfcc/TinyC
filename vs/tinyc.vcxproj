@@ -62,6 +62,12 @@
     <ClCompile Include="..\src\Test.cpp" />
     <ClCompile Include="..\src\FunctionX64.cpp" />
     <ClCompile Include="..\src\FunctionX86.cpp" />
+    <Text Include="..\test\hello2.c">
+      <FileType>CppCode</FileType>
+    </Text>
+    <Text Include="..\test\hello3.c">
+      <FileType>CppCode</FileType>
+    </Text>
     <Text Include="..\docs\gcc_linux_macro.txt" />
     <Text Include="..\docs\helo1_x64_asm.txt" />
     <Text Include="..\docs\helo1_x86_asm.txt" />
@@ -78,6 +84,8 @@
     <Text Include="..\docs\windows_x64_spec.txt" />
     <Text Include="..\test\hello.c">
       <FileType>CppCode</FileType>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </ExcludedFromBuild>
     </Text>
     <Text Include="..\test\hello0.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</ExcludedFromBuild>
@@ -317,9 +325,12 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <SupportJustMyCode>false</SupportJustMyCode>
+      <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -396,7 +407,8 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <SupportJustMyCode>false</SupportJustMyCode>
+      <SupportJustMyCode>true</SupportJustMyCode>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

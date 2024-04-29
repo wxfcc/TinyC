@@ -48,7 +48,7 @@ public:
     virtual void condJmp(TokenID tid, Label *label) = 0;
     virtual int localIdx2EbpOff(int idx) = 0;
     virtual void saveParameters() = 0;
-    void setParamIndex(int paramIndex);
+    void setCallParamIndex(int paramIndex);
 
 protected:
     void emitCode(int n, ...);
@@ -71,8 +71,8 @@ protected:
     string m_funcName;
     Label m_retLabel;
     int m_beginCall;
-    int m_paramCount;
-    int m_paramIndex;
+    int m_myParamCount;
+    int m_callParamIndex;
     int m_localVarCount;
 };
 

@@ -9,7 +9,7 @@
 FunctionX64Linux::FunctionX64Linux(JITEngine* parent, char* codeBuf) : FunctionX64(parent, codeBuf) {
 }
 FunctionX64Linux::~FunctionX64Linux() {
-    printf("FunctionX64Linux: %s, param count=%d\n", m_funcName.c_str(), m_paramCount);
+    printf("FunctionX64Linux: %s, param count=%d\n", m_funcName.c_str(), m_myParamCount);
     //printf("FunctionX64Linux: %s, local variable count=%d\n", m_funcName.c_str(), m_localVarCount);
 }
 
@@ -17,23 +17,22 @@ FunctionX64Linux::~FunctionX64Linux() {
  in linux x64 mode, the order of parameter: rdi rsi rdx rcx r8 r9 [rsp] ...
 */
 void FunctionX64Linux::prepareParam(int64 paraVal, int size) {
-    printf("FunctionX64Linux::prepareParam\n");
-    if (m_paramIndex == 0) {
+    if (m_callParamIndex == 0) {
         emit(0x48, 0xbf); emitValue((int64)paraVal); // mov rdi, #imm64
     }
-    else if (m_paramIndex == 1) { 
+    else if (m_callParamIndex == 1) {
         emit(0x48, 0xbe); emitValue((int64)paraVal); // mov rsi, #imm64
     }
-    else if (m_paramIndex == 2) { 
+    else if (m_callParamIndex == 2) {
         emit(0x48, 0xba); emitValue((int64)paraVal); // mov rdx, #imm64
     }
-    else if (m_paramIndex == 3) { 
+    else if (m_callParamIndex == 3) {
         emit(0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
     }
-    else if (m_paramIndex == 4) { 
+    else if (m_callParamIndex == 4) {
         emit(0x49, 0xb8); emitValue((int64)paraVal); // mov r8, #imm64
     }
-    else if (m_paramIndex == 5) { 
+    else if (m_callParamIndex == 5) {
         emit(0x49, 0xb9); emitValue((int64)paraVal); // mov r9, #imm64
     }
     else {
@@ -48,9 +47,74 @@ void FunctionX64Linux::prepareParam(int64 paraVal, int size) {
 
         }
     }
-    m_paramIndex++;
+}
+void FunctionX64Linux::loadLocal(int idx) {
+    int offset = localIdx2EbpOff(idx);
+    //push_qword_ptr_rbp(offset);
+    if (idx < 0 || offset < 0) {
+        printf("loadLocal idx=%d, offset=%d, m_callParamIndex=%d\n", idx, offset, m_callParamIndex);
+    }
+
+    if (m_beginCall) {
+        if (m_callParamIndex == 0) { //rdi
+            mov_rdi_rbp_offset32(offset);
+        }
+        else if (m_callParamIndex == 1) { //rsi
+            mov_rsi_rbp_offset32(offset);
+        }
+        else if (m_callParamIndex == 2) { //rcx
+            mov_rcx_rbp_offset32(offset);
+        }
+        else if (m_callParamIndex == 3) { //rdx
+            mov_rdx_rbp_offset32(offset);
+        }
+        else {
+            printf("loadLocal: m_callParamIndex=%d, idx=%d\n", m_callParamIndex, idx);
+            push_qword_ptr_rbp(offset);//emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+        }
+    }
+    else {
+        if (m_callParamIndex == 0) { //rdi
+            push_rdi();
+        }
+        else if (m_callParamIndex == 1) { //rsi
+            push_rsi();
+        }
+        else if (m_callParamIndex == 2) { //rcx
+            push_rcx(); // emit(0x51); // push rcx
+        }
+        else if (m_callParamIndex == 3) { //rdx
+            push_rdx(); // emit(0x52); // push rdx
+        }
+        else if (m_callParamIndex == 4) { //r9
+            push_r8(); // emit(0x41, 0x50); // push r8
+        }
+        else if (m_callParamIndex == 5) { //r9
+            push_r9(); // emit(0x41, 0x51); // push r9
+        }
+        else {
+            printf("m_callParamIndex=%d\n", m_callParamIndex);
+            push_qword_ptr_rbp(offset); //emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
+        }
+    }
 }
 
+void FunctionX64Linux::saveParameters() {
+    if (m_myParamCount > 0) { //rdi
+        mov_qword_ptr_rbp_rdi(0x18);
+    }
+    else if (m_myParamCount > 1) { //rsi
+        mov_qword_ptr_rbp_rsi(0x20);
+    }
+    else if (m_myParamCount > 2) { //rcx
+    }
+    else if (m_myParamCount > 3) { //rdx
+    }
+    else if (m_myParamCount > 2) { //r8
+    }
+    else if (m_myParamCount > 3) { //r9
+    }
+}
 #if 0
 void FunctionX64Linux::loadImm(int imm) {
     if(m_beginCall)
@@ -70,46 +134,7 @@ void FunctionX64Linux::loadLiteralStr(const string& literalStr) {
     prepareParam((int64)loc, sizeof(loc));
 }
 
-void FunctionX64Linux::loadLocal(int idx) {
-    int offset = localIdx2EbpOff(idx);
-    if (m_beginCall) {
-        //for windows
-        if (m_paramIndex == 0) { //rcx
-            emit(0x48, 0x8b, 0x8d); emitValue(offset); // mov rcx, [rbp + offset32]
-        }
-        else if (m_paramIndex == 1) { //rdx
-            emit(0x48, 0x8b, 0x95); emitValue(offset); // mov rdx, [rbp + offset32]
-        }
-        else if (m_paramIndex == 2) { //r8
-            emit(0x4c, 0x8b, 0x85); emitValue(offset); // mov r8, [rbp + offset32]
-        }
-        else if (m_paramIndex == 3) { //r9
-            emit(0x4c, 0x8b, 0x8d); emitValue(offset); // mov r9, [rbp + offset32]
-        }
-        else {
-            emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
-        }
-    }
-    else {
-        if (m_paramIndex == 0) { //rcx
-            emit(0x51); // push rcx
-        }
-        else if (m_paramIndex == 1) { //rdx
-            emit(0x52); // push rdx
-        }
-        else if (m_paramIndex == 2) { //r8
-            emit(0x41, 0x50); // push r8
-        }
-        else if (m_paramIndex == 3) { //r9
-            emit(0x41, 0x51); // push r9
-        }
-        else {
-            emit(0xff, 0xb5); emitValue(offset); // push qword ptr [rbp + idxOff]
-        }
-    }
-    m_paramIndex++;
 
-}
 void FunctionX64Linux::storeLocal(int idx) {
     emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     emit(0x48, 0x89, 0x85); emitValue(localIdx2EbpOff(idx)); // mov qword ptr [rbp + idxOff], rax

@@ -1,11 +1,15 @@
-int add(int a,int b) {
-    return a+b;
-}
 int main()  {
-    int start = 100;
-    int a = add(9,2);
-    printf("9+2=%d\n", a);
-    //printf("hello world, %d, %d, %d\n", start, 123, a);
-    //printf("hello world, %d\n", 123);
+    int s = 1;
+    int t = 2;
+    int a = add2(9,2);
+    printf("9+2=%d,s=%d,t=%d\n", a,s,t);
+    int b = add3(9, 2, 1);
+    printf("9+2+1=%d,s=%d,t=%d\n", b,s,t);
     return 12;
+}
+int add2(int a, int b) {
+    return a + b;
+}
+int add3(int a, int b, int c) {
+    return a + b + c;
 }

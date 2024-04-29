@@ -9,8 +9,8 @@ Function::Function(JITEngine*parent, char *codeBuf){
     m_parent = parent;
     m_codeBuf = codeBuf;
     m_codeSize = 0;
-    m_paramCount = 0;
-    m_paramIndex = -1;
+    m_myParamCount = 0;
+    m_callParamIndex = -1;
     m_beginCall = 0;
     m_localVarCount = 0;
 }
@@ -20,7 +20,7 @@ Function::~Function(){
 
 void Function::setFuncName(string& name, int argsCount) {
     m_funcName = name;
-    m_paramCount = argsCount;
+    m_myParamCount = argsCount;
     saveParameters();
 }
 
@@ -42,6 +42,6 @@ void Function::emitCode(int n, ...) {
         m_codeBuf[m_codeSize++] = (char)va_arg(args, int);
     va_end(args);
 }
-void Function::setParamIndex(int paramIndex) {
-    m_paramIndex = paramIndex;
+void Function::setCallParamIndex(int paramIndex) {
+    m_callParamIndex = paramIndex;
 }
