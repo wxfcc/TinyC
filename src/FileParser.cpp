@@ -9,9 +9,9 @@ void FileParser::parse() {
 
 bool FileParser::parseFunction() {
     if (m_scanner->LA(1).tid != TID_EOF) {
-        Function *builder = m_engine->beginBuildFunction();
-        FunctionParser(builder, m_scanner).parse();
-        m_engine->endBuildFunction(builder);
+        Function *function = m_engine->beginBuildFunction();
+        FunctionParser(function, m_scanner).parse();
+        m_engine->endBuildFunction(function);
         return true;
     }
     return false;

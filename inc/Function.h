@@ -1,7 +1,8 @@
-#ifndef __FUNCTION_BUILDER__H__
-#define __FUNCTION_BUILDER__H__
+#ifndef __FUNCTION__H__
+#define __FUNCTION__H__
 #include "Label.h"
-#include "JITEngine.h"
+//#include "JITEngine.h"
+#include "Scanner.h"
 #include "common.h"
 
 #define ARG_T(t)  t  
@@ -13,6 +14,7 @@
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
 #define MAX_LOCAL_COUNT 64
 class JITEngine;
+class Function ;
 class Function {
 public:
     Function(JITEngine*parent, char *codeBuf);

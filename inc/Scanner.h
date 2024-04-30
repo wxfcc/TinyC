@@ -1,7 +1,6 @@
 #ifndef __SCANNER__H__
 #define __SCANNER__H__
 
-#include "JITEngine.h"
 using namespace std;
 enum TokenID {
     TID_LP, TID_RP, TID_LBRACE, TID_RBRACE, TID_LBRACKET, TID_RBRACKET, TID_COMMA, TID_SEMICELON,

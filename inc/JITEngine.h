@@ -3,12 +3,7 @@
 #include <string>
 #include <set>
 #include <map>
-#include "Label.h"
-#include "common.h"
-#include "Scanner.h"
-#include "FunctionX86.h"
-#include "FunctionX64.h"
-#include "FunctionX64Linux.h"
+#include "Function.h"
 
 //============================== code generator
 #define MAX_TEXT_SECTION_SIZE (4096 * 8)
@@ -40,7 +35,7 @@ public:
     char** _getFunctionEntry(const string &name);
     const char* _getLiteralStringLoc(const string &literalStr);
     Function* beginBuildFunction();
-    void endBuildFunction(Function *builder);
+    void endBuildFunction(Function *function);
     void endBuild();
     void addFunctionEntry(const char* funcName, char* entry);
     void dumpCode();

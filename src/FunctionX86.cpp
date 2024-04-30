@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdarg.h>
+#include "FunctionX86.h"
 #include "JITEngine.h"
 
 FunctionX86::FunctionX86(JITEngine* parent, char* codeBuf) : Function(parent, codeBuf) {
@@ -132,7 +133,7 @@ void FunctionX86::endCall(const string& funcName, int callID, int paramCount) {
     for (int i = 0; i < paramCount - 1; ++i) {
         push_dword_ptr_esp(((i + 1) * 2 - 1) * 4);//emit(0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 4); // push dword ptr [esp+4*i]
     }
-    call_qword_ptr_rip((long long)entry);//emit(0xff, 0x15); emitValue(entry); // call [entry]
+    call_dword_ptr_eip((long long)entry);//emit(0xff, 0x15); emitValue(entry); // call [entry]
     pop(paramCount + (paramCount > 0 ? paramCount - 1 : 0));
     push_eax();//emit(0x50); // push eax
 }

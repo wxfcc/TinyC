@@ -11,6 +11,10 @@
 #include <unistd.h>
 #endif
 #include "JITEngine.h"
+#include "FunctionX86.h"
+#include "FunctionX64.h"
+#include "FunctionX64Windows.h"
+#include "FunctionX64Linux.h"
 
 JITEngine::JITEngine(int arch, int os){
     m_arch = arch;
@@ -95,26 +99,26 @@ int JITEngine::setExecutable(){
 }
 
 Function* JITEngine::beginBuildFunction() {
-    Function* builder = NULL;
+    Function* function = NULL;
     if (m_arch == JIT_X86)
-        builder = new FunctionX86(this, m_code + m_codeSize);
+        function = new FunctionX86(this, m_code + m_codeSize);
     else if (m_arch == JIT_X64) {
         if(m_os == JIT_OS_WINDOWS)
-            builder = new FunctionX64(this, m_code + m_codeSize);
+            function = new FunctionX64Windows(this, m_code + m_codeSize);
         else if(m_os == JIT_OS_LINUX || m_os == JIT_OS_MACOS)
-            builder = new FunctionX64Linux(this, m_code + m_codeSize);
+            function = new FunctionX64Linux(this, m_code + m_codeSize);
     }
 
-    builder->beginBuild();
+    function->beginBuild();
 
-    return builder;
+    return function;
 }
-void JITEngine::endBuildFunction(Function* builder) {
-    builder->endBuild();
-    *_getFunctionEntry(builder->getFuncName()) = m_code + m_codeSize;
-    m_codeSize += builder->getCodeSize();
+void JITEngine::endBuildFunction(Function* function) {
+    function->endBuild();
+    *_getFunctionEntry(function->getFuncName()) = m_code + m_codeSize;
+    m_codeSize += function->getCodeSize();
     ASSERT(m_codeSize <= m_codeMax);
-    delete builder;
+    delete function;
 }
 
 

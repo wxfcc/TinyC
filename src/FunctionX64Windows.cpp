@@ -3,29 +3,29 @@
 #include <stddef.h>
 #include <stdarg.h>
 #include <limits.h>
-#include "FunctionX64.h"
+#include "FunctionX64Windows.h"
 #include "JITEngine.h"
 
-FunctionX64::FunctionX64(JITEngine* parent, char* codeBuf) : Function(parent, codeBuf) {
+FunctionX64Windows::FunctionX64Windows(JITEngine* parent, char* codeBuf) : Function(parent, codeBuf) {
 }
-FunctionX64::~FunctionX64() {
-    printf("FunctionX64: %s, param count=%d\n", m_funcName.c_str(), m_myParamCount);
-    //printf("FunctionX64: %s, local variable count=%d\n", m_funcName.c_str(), m_localVarCount);
+FunctionX64Windows::~FunctionX64Windows() {
+    printf("FunctionX64Windows: %s, param count=%d\n", m_funcName.c_str(), m_myParamCount);
+    //printf("FunctionX64Windows: %s, local variable count=%d\n", m_funcName.c_str(), m_localVarCount);
 }
 //call from JITEngine
 //generate prologue code
-void FunctionX64::beginBuild() {
+void FunctionX64Windows::beginBuild() {
     //push_rdx();// emit(0x52); // push rdx
     push_rbp();// emit(0x55); // push rbp
     mov_rbp_rsp(); // emit(0x48, 0x89, 0xe5); // mov rbp, rsp
-    sub_rsp((MAX_LOCAL_COUNT - 0) * 8); // emit(0x48, 0x81, 0xec); emitValue((MAX_LOCAL_COUNT -1)* 8);
-                                        // sub rsp, MAX_LOCAL_COUNT * 8, there should keep rsp align 16 bytes for some instructions,
+    sub_rsp((MAX_LOCAL_COUNT - 0) * 8); // emit(0x48, 0x81, 0xec); emitValue((MAX_LOCAL_COUNT -1)* 8); 
+                                        // sub rsp, MAX_LOCAL_COUNT * 8, there should keep rsp align 16 bytes for some instructions, 
                                         // like: movaps XMMWORD PTR [rsp+0x10], xmm1
     lea_rbp_rsp_8(0x40);
 }
 //call from JITEngine
 //generate epilogue code
-void FunctionX64::endBuild() {
+void FunctionX64Windows::endBuild() {
     markLabel(&m_retLabel);
     //mov_rsp_rbp();  // emit(0x48, 0x89, 0xec);  // mov rsp,rbp 
     add_rsp((MAX_LOCAL_COUNT - 1) * 8);
@@ -36,8 +36,8 @@ void FunctionX64::endBuild() {
 /*
  in windows x64 mode, the order of parameter: rcx rdx r8 r9 [rsp] ...
 */
-void FunctionX64::prepareParam(int64 paraVal, int size) {
-    //printf("FunctionX64::prepareParam\n");
+void FunctionX64Windows::prepareParam(int64 paraVal, int size) {
+    //printf("FunctionX64Windows::prepareParam\n");
 
     if (m_callParamIndex == 0) { //rcx
         mov_rcx_imm64(paraVal); //emit(0x48, 0xb9); emitValue((int64)paraVal); // mov rcx, #imm64
@@ -62,22 +62,22 @@ void FunctionX64::prepareParam(int64 paraVal, int size) {
     }
 }
 
-void FunctionX64::loadImm(int imm) {
+void FunctionX64Windows::loadImm(int imm) {
     if(m_beginCall)
         prepareParam(imm, sizeof(imm));
     else {
         push_32(imm);   // emit(0x68); emitValue(imm); // push imm
     }
 }
-void FunctionX64::loadImm64(int64 imm) {
+void FunctionX64Windows::loadImm64(int64 imm) {
     prepareParam(imm, sizeof(imm));
 }
-void FunctionX64::loadLiteralStr(const string& literalStr) {
+void FunctionX64Windows::loadLiteralStr(const string& literalStr) {
     const char* loc = m_parent->_getLiteralStringLoc(literalStr);
     prepareParam((int64)loc, sizeof(loc));
 }
 
-void FunctionX64::loadLocal(int idx) {
+void FunctionX64Windows::loadLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
     //push_qword_ptr_rbp(offset);
     if (idx < 0 || offset < 0) {
@@ -143,7 +143,7 @@ void FunctionX64::loadLocal(int idx) {
 #endif
 }
 
-void FunctionX64::storeLocal(int idx) {
+void FunctionX64Windows::storeLocal(int idx) {
     int offset = localIdx2EbpOff(idx);
 #if 1
     pop_rax();  //test
@@ -154,20 +154,20 @@ void FunctionX64::storeLocal(int idx) {
     add_rsp(8); // emit(0x48, 0x83, 0xc4); emitValue((char)8); // add rsp, 8
 #endif
 }
-void FunctionX64::incLocal(int idx) {
+void FunctionX64Windows::incLocal(int idx) {
     inc_qword_ptr_rbp(localIdx2EbpOff(idx));//emit(0x48, 0xff, 0x85); emitValue(localIdx2EbpOff(idx)); // inc qword ptr [rbp + idxOff]
 }
-void FunctionX64::decLocal(int idx) {
+void FunctionX64Windows::decLocal(int idx) {
     dec_qword_ptr_rbp(localIdx2EbpOff(idx));//emit(0x48, 0xff, 0x8d); emitValue(localIdx2EbpOff(idx)); // dec qword ptr [rbp + idxOff]
 }
-void FunctionX64::pop(int n) {
+void FunctionX64Windows::pop(int n) {
     add_rsp(n*8);//emit(0x48, 0x81, 0xc4); emitValue(n * 8); // add rsp, n * 8
 }
-void FunctionX64::dup() {
+void FunctionX64Windows::dup() {
     push_qword_ptr_rsp0();//emit(0xff, 0x34, 0x24); // push qword ptr [rsp]
 }
 
-void FunctionX64::doArithmeticOp(TokenID opType) {
+void FunctionX64Windows::doArithmeticOp(TokenID opType) {
     mov_rax_qword_ptr_rsp_8(8);  //emit(0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8]
     switch (opType) {
     case TID_OP_ADD:
@@ -192,7 +192,7 @@ void FunctionX64::doArithmeticOp(TokenID opType) {
     mov_qword_ptr_rsp_rax_8(8);   //emit(0x48, 0x89, 0x44, 0x24, 0x08); // mov qword ptr [rsp+8], rax
     add_rsp(8);                 //emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
 }
-void FunctionX64::cmp(TokenID cmpType) {
+void FunctionX64Windows::cmp(TokenID cmpType) {
     Label label_1, label_0, label_end;
     mov_rax_qword_ptr_rsp_8(8);  //emit(0x48, 0x8b, 0x44, 0x24, 0x08); // mov rax, qword ptr [rsp+8] 
     mov_rdx_qword_ptr_rsp0();   //emit(0x48, 0x8b, 0x14, 0x24); // mov rdx, qword ptr[rsp]
@@ -208,39 +208,39 @@ void FunctionX64::cmp(TokenID cmpType) {
     markLabel(&label_end);
 }
 
-void FunctionX64::markLabel(Label* label) {
+void FunctionX64Windows::markLabel(Label* label) {
     label->mark(m_codeBuf + m_codeSize); 
 }
-void FunctionX64::jmp(Label* label) {
+void FunctionX64Windows::jmp(Label* label) {
     jmp_rip_offset32(0);
     //emit(0xe9);                      // jmp rip+offset32
     //emitValue((int)NULL);
     char* ref = m_codeBuf + m_codeSize - sizeof(int);
     label->addRef(ref);
 }
-void FunctionX64::trueJmp(Label* label) {
+void FunctionX64Windows::trueJmp(Label* label) {
     mov_rax_qword_ptr_rsp0();   //emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     add_rsp(8);                 // emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
     test_rax_rax();             //emit(0x48, 0x85, 0xc0); // test rax, rax
     condJmp(TID_OP_NEQUAL, label);
 }
-void FunctionX64::falseJmp(Label* label) {
+void FunctionX64Windows::falseJmp(Label* label) {
     mov_rax_qword_ptr_rsp0();   //emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     add_rsp(8);                 // emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
     test_rax_rax();             //emit(0x48, 0x85, 0xc0); // test rax, rax
     condJmp(TID_OP_EQUAL, label);
 }
-void FunctionX64::ret() {
+void FunctionX64Windows::ret() {
     jmp(&m_retLabel); 
 }
-void FunctionX64::retExpr() {
+void FunctionX64Windows::retExpr() {
     mov_rax_qword_ptr_rsp0();   //emit(0x48, 0x8b, 0x04, 0x24); // mov rax, qword ptr [rsp]
     add_rsp(8); // emit(0x48, 0x83, 0xc4, 0x08); // add rsp, 8
     jmp(&m_retLabel);
 }
 //begin call a function in current function
 //call from FunctionParser, begin prepare parametes for call
-int FunctionX64::beginCall() {
+int FunctionX64Windows::beginCall() {
     m_beginCall = 1;
     return 0;
 }
@@ -254,7 +254,7 @@ int FunctionX64::beginCall() {
     call [rsp+0x8]
     call [rbp+0x8]
  */
-void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
+void FunctionX64Windows::endCall(const string& funcName, int callID, int paramCount) {
     char** entry = m_parent->_getFunctionEntry(funcName);
     //for (int i = 0; i < paramCount - 1; ++i) {
         //push_qword_ptr_rsp(((i + 1) * 2 - 1) * 8); // emit(0xff, 0xb4, 0x24); emitValue(((i + 1) * 2 - 1) * 8); // push qword ptr [rsp+8*i]
@@ -299,7 +299,7 @@ void FunctionX64::endCall(const string& funcName, int callID, int paramCount) {
 }
 
 // relative rip
-void FunctionX64::emitRelativeAddr32(char* absPos, int prefixLen) {
+void FunctionX64Windows::emitRelativeAddr32(char* absPos, int prefixLen) {
     char* rip = m_codeBuf + m_codeSize - prefixLen;
     int64 offset = (int64)(absPos - rip) - prefixLen - 4;  // prefixLen+4  = sizeof(call rip+offset)
     if (offset > INT_MAX) {
@@ -311,7 +311,7 @@ void FunctionX64::emitRelativeAddr32(char* absPos, int prefixLen) {
 }
 
 
-void FunctionX64::condJmp(TokenID tid, Label* label) {
+void FunctionX64Windows::condJmp(TokenID tid, Label* label) {
     if (tid == TID_OP_LESS) { jl(0); }
     else if (tid == TID_OP_LESSEQ) { jle(0); }
     else if (tid == TID_OP_GREATER) { jg(0); }
@@ -323,7 +323,7 @@ void FunctionX64::condJmp(TokenID tid, Label* label) {
     label->addRef(ref); 
 }
 
-int FunctionX64::localIdx2EbpOff(int idx) {
+int FunctionX64Windows::localIdx2EbpOff(int idx) {
     int offset = 0;
     if (idx < 0)
         offset = 16 - idx * 8;
@@ -332,7 +332,7 @@ int FunctionX64::localIdx2EbpOff(int idx) {
     return offset;
 }
 
-void FunctionX64::saveParameters() {
+void FunctionX64Windows::saveParameters() {
     if (m_myParamCount > 0) {
         mov_qword_ptr_rbp_rcx_8(0x18); //emit(0x48, 0x89, 0x4d, 0x10);// mov    QWORD PTR[rbp + 0x18], rcx
     }

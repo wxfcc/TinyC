@@ -4,6 +4,7 @@
 #include <stdarg.h>
 #include <limits.h>
 
+#include "FunctionX64Linux.h"
 #include "JITEngine.h"
 
 FunctionX64Linux::FunctionX64Linux(JITEngine* parent, char* codeBuf) : FunctionX64(parent, codeBuf) {
