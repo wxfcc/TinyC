@@ -106,7 +106,8 @@ Function* JITEngine::beginBuildFunction() {
         if(m_os == JIT_OS_WINDOWS)
             function = new FunctionX64Windows(this, m_code + m_codeSize);
         else if(m_os == JIT_OS_LINUX || m_os == JIT_OS_MACOS)
-            function = new FunctionX64Linux(this, m_code + m_codeSize);
+//            function = new FunctionX64Linux(this, m_code + m_codeSize);
+            function = new FunctionX64(this, m_code + m_codeSize);
     }
 
     function->beginBuild();

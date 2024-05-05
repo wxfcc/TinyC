@@ -9,6 +9,7 @@ public:
     ~Label();
     void mark(char *address);
     void addRef(char *ref);
+    int removeRef(char *ref);
 private:
     void bindRefs();
 private:

@@ -40,9 +40,11 @@ void myprintf(const char* s, ...) {
     //printf("myprintf:%s\n", s);
     //printf(s);
 }
-
-void func1(int a) {
-    printf("func1, a=%d\n", a);
+extern "C"
+void func1(long long a) {
+    printf("func1, a=%llx\n", a);
+//    if(a > 0x10000000)
+//        printf("%s\n",(char*)a);
 }
 
 void test2(const char* f, int n) {
@@ -161,8 +163,21 @@ int test2(JITEngine* jit) {
 static int t(int a, int b, int c, int d, int e, int f, int g) {
     return a;
 }
+//int     printf(const char * __restrict, ...) __printflike(1, 2);
+void func4(float a, ...){
+    long long k=0xff,s=0xfe;
+    //asm{push rbx}   // cause EXC_BAD_ACCESS (code=EXC_I386_GPFLT)
+    printf("hello %f\n", a);
+//    asm{pop rbx}
+}
+void func3(){
+    func4(0);
+    printf("hello\n",1);
+}
 
 void test_parameters() {
+    func4(1.0, 9);
+    func3();
     t(1,2,3,4,5,6,7);
     t(1,2,3,4,5,6,7);
     myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);

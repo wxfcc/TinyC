@@ -47,6 +47,15 @@ protected:
 #define add_rsp(n)                          {emit(0x48, 0x81, 0xc4); emitValue((int)n);}        // add rsp, n 
 #define add_rsp_8(n)                        {emit(0x48, 0x83, 0xc4, n);}                        // add rsp, n
 #define call_qword_ptr_rip(offset32)        {emit(0xff, 0x15); emitValue((int)offset32);}       // call qword ptr[rip + offset]
+#define call_rax()                          {emit(0xff, 0xd0);}
+#define call_rcx()                          {emit(0xff, 0xd1);}
+#define call_rdx()                          {emit(0xff, 0xd2);}
+#define call_rbx()                          {emit(0xff, 0xd3);}
+#define call_qdowrd_ptr_rax()               {emit(0xff, 0x10);}
+#define call_qdowrd_ptr_rcx()               {emit(0xff, 0x11);}
+#define call_qdowrd_ptr_rdx()               {emit(0xff, 0x12);}
+#define call_qdowrd_ptr_rbx()               {emit(0xff, 0x13);}
+
 #define call_rip_offset32(offset32)         {emit(0xe8); emitValue(offset32);}                  // call rip+offset
 #define cmp_rax_rdx()                       {emit(0x48, 0x39, 0xd0);}                           // cmp rax, rdx
 #define dec_qword_ptr_rbp(offset32)         {emit(0x48, 0xff, 0x8d); emitValue(offset32);}      // dec qword ptr [rbp + offset32]

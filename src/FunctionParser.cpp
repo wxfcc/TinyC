@@ -38,38 +38,56 @@ void FunctionParser::_function_define() {
         if (m_scanner->LA(1).tid == TID_COMMA) m_scanner->next(1);
     }
     m_function->setFuncName(funcName, (int)m_args.size());
-    //m_function->setArgsCount(m_args.size());
     ASSERT(m_scanner->next(1).tid == TID_RP);
     _block();
 }
 void FunctionParser::_block() {
     pushScope();
     ASSERT(m_scanner->next(1).tid == TID_LBRACE);
-    while (m_scanner->LA(1).tid != TID_RBRACE) _statement();
+    while (m_scanner->LA(1).tid != TID_RBRACE) 
+        _statement();
     ASSERT(m_scanner->next(1).tid == TID_RBRACE);
     popScope();
 }
 void FunctionParser::_statement() {
     switch (m_scanner->LA(1).tid) {
-        case TID_SEMICELON: m_scanner->next(1); break;
-        case TID_CONTINUE: m_scanner->next(2); m_function->jmp(getLastContinueLabel()); break;
-        case TID_BREAK: m_scanner->next(2); m_function->jmp(getLastBreakLabel()); break;
-        case TID_RETURN: 
+        case TID_SEMICELON: 
+            m_scanner->next(1);
+            break;
+        case TID_CONTINUE: 
+            m_scanner->next(2);
+            m_function->jmp(getLastContinueLabel());
+            break;
+        case TID_BREAK: 
+            m_scanner->next(2);
+            m_function->jmp(getLastBreakLabel());
+            break;
+        case TID_RETURN:
             m_scanner->next(1);
             if (m_scanner->LA(1).tid != TID_SEMICELON) {
                 _expr(0);
                 m_function->retExpr();
-            } else m_function->ret();
+            } else 
+                m_function->ret();
             ASSERT(m_scanner->next(1).tid == TID_SEMICELON);
             break;
-        case TID_LBRACE: _block(); break;
-        case TID_IF: _if(); break;
-        case TID_WHILE: _while(); break;
-        case TID_FOR: _for(); break;
-        case TID_TYPE_STRING: 
-        case TID_TYPE_INT: _local_define_list(); break;
-        case TID_TYPE_VOID: ASSERT(0); break;
-        default: _expr(0); m_function->pop(1); ASSERT(m_scanner->next(1).tid == TID_SEMICELON); break;
+        case TID_LBRACE: 
+            _block(); break;
+        case TID_IF: 
+            _if(); break;
+        case TID_WHILE: 
+            _while(); break;
+        case TID_FOR: 
+            _for(); break;
+        case TID_TYPE_STRING:
+        case TID_TYPE_INT: 
+            _local_define_list(); break;
+        case TID_TYPE_VOID: 
+            ASSERT(0); break;
+        default: 
+            _expr(0);
+            m_function->pop(1);
+            ASSERT(m_scanner->next(1).tid == TID_SEMICELON); break;
     }
 }
 void FunctionParser::_if() {

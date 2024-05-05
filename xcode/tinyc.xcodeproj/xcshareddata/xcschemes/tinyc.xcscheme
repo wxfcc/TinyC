@@ -54,7 +54,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "../test/hello.c"
+            argument = "../test/x64_rsp.c"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

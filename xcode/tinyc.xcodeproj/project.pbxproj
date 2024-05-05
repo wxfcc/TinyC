@@ -19,6 +19,7 @@
 		72921B512BD3D35D00624690 /* Test.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B502BD3D35D00624690 /* Test.cpp */; };
 		72921B532BD6C95500624690 /* FunctionX64Linux.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B522BD6C95500624690 /* FunctionX64Linux.cpp */; };
 		72921B742BE1493F00624690 /* FunctionX64Windows.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 72921B732BE1493F00624690 /* FunctionX64Windows.cpp */; };
+		72921B762BE1FE5F00624690 /* Func.s in Sources */ = {isa = PBXBuildFile; fileRef = 72921B752BE1FE5F00624690 /* Func.s */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -67,6 +68,24 @@
 		72921B712BE1488D00624690 /* Label.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Label.h; sourceTree = "<group>"; };
 		72921B722BE1488D00624690 /* FunctionParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionParser.h; sourceTree = "<group>"; };
 		72921B732BE1493F00624690 /* FunctionX64Windows.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionX64Windows.cpp; sourceTree = "<group>"; };
+		72921B752BE1FE5F00624690 /* Func.s */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.asm; path = Func.s; sourceTree = "<group>"; };
+		72921B782BE3E87900624690 /* helo0_x64_asm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = helo0_x64_asm.txt; sourceTree = "<group>"; };
+		72921B792BE3E87900624690 /* mac_x64.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = mac_x64.txt; sourceTree = "<group>"; };
+		72921B7A2BE3E87900624690 /* gcc_macos_macro */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gcc_macos_macro; sourceTree = "<group>"; };
+		72921B7B2BE3E87900624690 /* issues.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = issues.txt; sourceTree = "<group>"; };
+		72921B7C2BE3E87900624690 /* asm_x64.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = asm_x64.txt; sourceTree = "<group>"; };
+		72921B7D2BE3E87900624690 /* helo1_x86_asm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = helo1_x86_asm.txt; sourceTree = "<group>"; };
+		72921B7E2BE3E87900624690 /* gcc_linux_macro.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = gcc_linux_macro.txt; sourceTree = "<group>"; };
+		72921B7F2BE3E87900624690 /* vc_x64.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vc_x64.txt; sourceTree = "<group>"; };
+		72921B802BE3E87900624690 /* grammar.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = grammar.txt; sourceTree = "<group>"; };
+		72921B812BE3E87900624690 /* helo1_x64_asm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = helo1_x64_asm.txt; sourceTree = "<group>"; };
+		72921B822BE3E87900624690 /* windows_x64_spec.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = windows_x64_spec.txt; sourceTree = "<group>"; };
+		72921B832BE3E87900624690 /* vc_macro.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = vc_macro.txt; sourceTree = "<group>"; };
+		72921B842BE3E87900624690 /* helo0_x86_asm.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = helo0_x86_asm.txt; sourceTree = "<group>"; };
+		72921B852BE6B66B00624690 /* test1.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test1.c; sourceTree = "<group>"; };
+		72921B862BE6B66B00624690 /* hello3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = hello3.c; sourceTree = "<group>"; };
+		72921B872BE6B66B00624690 /* x64_rsp.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = x64_rsp.c; sourceTree = "<group>"; };
+		72921B882BE6B66B00624690 /* test0.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = test0.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -83,6 +102,7 @@
 		7277C4492BBC64A00054171F = {
 			isa = PBXGroup;
 			children = (
+				72921B772BE3E82C00624690 /* ../docs */,
 				72921B672BE1478900624690 /* ../inc */,
 				72921B662BDD5EE700624690 /* tinyc.entitlements */,
 				72921B542BDCAB5100624690 /* ../test */,
@@ -102,6 +122,7 @@
 		727800942BBF2297000B5A2A /* ../src */ = {
 			isa = PBXGroup;
 			children = (
+				72921B752BE1FE5F00624690 /* Func.s */,
 				72921B732BE1493F00624690 /* FunctionX64Windows.cpp */,
 				72921B522BD6C95500624690 /* FunctionX64Linux.cpp */,
 				72921B502BD3D35D00624690 /* Test.cpp */,
@@ -121,6 +142,10 @@
 		72921B542BDCAB5100624690 /* ../test */ = {
 			isa = PBXGroup;
 			children = (
+				72921B862BE6B66B00624690 /* hello3.c */,
+				72921B882BE6B66B00624690 /* test0.c */,
+				72921B852BE6B66B00624690 /* test1.c */,
+				72921B872BE6B66B00624690 /* x64_rsp.c */,
 				72921B632BDCABB000624690 /* performance.c */,
 				72921B552BDCABA300624690 /* hello_mod.c */,
 				72921B592BDCABA300624690 /* hello_win.c */,
@@ -149,6 +174,26 @@
 				72921B6C2BE1488D00624690 /* Scanner.h */,
 			);
 			path = ../inc;
+			sourceTree = "<group>";
+		};
+		72921B772BE3E82C00624690 /* ../docs */ = {
+			isa = PBXGroup;
+			children = (
+				72921B7C2BE3E87900624690 /* asm_x64.txt */,
+				72921B7E2BE3E87900624690 /* gcc_linux_macro.txt */,
+				72921B7A2BE3E87900624690 /* gcc_macos_macro */,
+				72921B802BE3E87900624690 /* grammar.txt */,
+				72921B782BE3E87900624690 /* helo0_x64_asm.txt */,
+				72921B842BE3E87900624690 /* helo0_x86_asm.txt */,
+				72921B812BE3E87900624690 /* helo1_x64_asm.txt */,
+				72921B7D2BE3E87900624690 /* helo1_x86_asm.txt */,
+				72921B7B2BE3E87900624690 /* issues.txt */,
+				72921B792BE3E87900624690 /* mac_x64.txt */,
+				72921B832BE3E87900624690 /* vc_macro.txt */,
+				72921B7F2BE3E87900624690 /* vc_x64.txt */,
+				72921B822BE3E87900624690 /* windows_x64_spec.txt */,
+			);
+			path = ../docs;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -208,6 +253,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				72921B762BE1FE5F00624690 /* Func.s in Sources */,
 				727800A12BBF2757000B5A2A /* FileParser.cpp in Sources */,
 				727800A32BBF2757000B5A2A /* FunctionParser.cpp in Sources */,
 				72921B742BE1493F00624690 /* FunctionX64Windows.cpp in Sources */,

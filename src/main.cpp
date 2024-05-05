@@ -12,8 +12,12 @@ void block();
 void myprintf(const char* s, ...);
 int test(JITEngine* g_jitEngine);
 int test2(JITEngine* g_jitEngine);
-void func1(int a);
 void test_parameters();
+extern "C"{
+void func1(int a);
+void func2(int a);
+void printf2(char*fmt);
+}
 
 static JITEngine* g_jitEngine;
 static string format(const char *fmt, ...) {
@@ -114,17 +118,23 @@ JITEngine* createJitEngine(int arch, int os){
 
     engine->addFunctionEntry("loadFile", (char*)loadFile);
     engine->addFunctionEntry("runFile", (char*)handleFile);
-    engine->addFunctionEntry("printf", (char*)printf);
+    engine->addFunctionEntry("printf", (char*)printf2);
     engine->addFunctionEntry("myprintf", (char*)myprintf);
     engine->addFunctionEntry("func1", (char*)func1);
+    engine->addFunctionEntry("func2", (char*)func2);
 	return engine;
 }
-
+/*
+ -a   arch: x86/x64/arm/arm64
+ -os  windows/linux/macos
+ */
+// _start() 0x7ff8155adbd0
 int main(int argc, char *argv[]) {
 #if 0
     test_parameters();
-#else
-	int ret = 0;
+#endif
+
+    int ret = 0;
     int arch = JIT_X86, os = JIT_OS_WINDOWS;
 #if defined _WIN64 || defined __x86_64__
     arch = JIT_X64;
@@ -134,6 +144,7 @@ int main(int argc, char *argv[]) {
 #elif defined __APPLE__
     os = JIT_OS_MACOS;
 #endif
+//    printf("helo %d %d\n", 1,2 ); exit(0);
     g_jitEngine = createJitEngine(arch, os);
 
     //test(g_jitEngine);
@@ -146,6 +157,5 @@ int main(int argc, char *argv[]) {
     	ret = handleInput();    	
     }    
     return ret;
-#endif
 }
 
