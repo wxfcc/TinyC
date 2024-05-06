@@ -54,6 +54,9 @@
     <ClCompile Include="..\src\FunctionX64Linux.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\FunctionX64Windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\test\hello_mod.c">
@@ -145,5 +148,15 @@
     <ClInclude Include="..\inc\FunctionX64Linux.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\src\Func.asm">
+      <Filter>Source Files</Filter>
+    </MASM>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\Func.s">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

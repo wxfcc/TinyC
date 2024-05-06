@@ -1,5 +1,6 @@
 #ifndef __SCANNER__H__
 #define __SCANNER__H__
+#include <string>
 
 using namespace std;
 enum TokenID {

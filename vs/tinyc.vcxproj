@@ -55,6 +55,7 @@
     <ClCompile Include="..\src\Function.cpp" />
     <ClCompile Include="..\src\FunctionParser.cpp" />
     <ClCompile Include="..\src\FunctionX64Linux.cpp" />
+    <ClCompile Include="..\src\FunctionX64Windows.cpp" />
     <ClCompile Include="..\src\JITEngine.cpp" />
     <ClCompile Include="..\src\Label.cpp" />
     <ClCompile Include="..\src\main.cpp" />
@@ -131,6 +132,12 @@
     <ClInclude Include="..\inc\Scanner.h" />
     <ClInclude Include="..\inc\FunctionX64.h" />
     <ClInclude Include="..\inc\FunctionX86.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <MASM Include="..\src\Func.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\src\Func.s" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
@@ -216,6 +223,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -486,5 +494,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(VCTargetsPath)\BuildCustomizations\masm.targets" />
   </ImportGroup>
 </Project>

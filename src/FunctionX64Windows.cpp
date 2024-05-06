@@ -28,7 +28,7 @@ void FunctionX64Windows::beginBuild() {
 void FunctionX64Windows::endBuild() {
     markLabel(&m_retLabel);
     //mov_rsp_rbp();  // emit(0x48, 0x89, 0xec);  // mov rsp,rbp 
-    add_rsp((MAX_LOCAL_COUNT - 1) * 8);
+    add_rsp((MAX_LOCAL_COUNT - 0) * 8);
     pop_rbp();  // emit(0x5d); // pop rbp  
     //pop_rdx();  // emit(0x5a); // pop rdx  
     retn(); // emit(0xc3); // ret

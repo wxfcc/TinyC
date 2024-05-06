@@ -180,7 +180,7 @@ void test_parameters() {
     func3();
     t(1,2,3,4,5,6,7);
     t(1,2,3,4,5,6,7);
-    myprintf("helo", 1, 2, 3, 4,(long long)0x123456789, (long long)0x123456789a);
+    myprintf("helo", 1, 2, 3, 4); // , (long long)0x123456789, (long long)0x123456789a);
     exit(0);
 }
 

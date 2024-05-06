@@ -118,7 +118,8 @@ JITEngine* createJitEngine(int arch, int os){
 
     engine->addFunctionEntry("loadFile", (char*)loadFile);
     engine->addFunctionEntry("runFile", (char*)handleFile);
-    engine->addFunctionEntry("printf", (char*)printf2);
+    engine->addFunctionEntry("printf", (char*)printf);
+    engine->addFunctionEntry("printf2", (char*)printf2);
     engine->addFunctionEntry("myprintf", (char*)myprintf);
     engine->addFunctionEntry("func1", (char*)func1);
     engine->addFunctionEntry("func2", (char*)func2);
