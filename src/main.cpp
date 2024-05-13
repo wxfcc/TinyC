@@ -8,12 +8,12 @@
 #include "FileParser.h"
 
 using namespace std;
-void block();
 void myprintf(const char* s, ...);
 int test(JITEngine* g_jitEngine);
 int test2(JITEngine* g_jitEngine);
 void test_parameters();
 extern "C"{
+void dbg_break();
 void func1(int a);
 void func2(int a);
 void printf2(char*fmt);
@@ -123,6 +123,7 @@ JITEngine* createJitEngine(int arch, int os){
     engine->addFunctionEntry("myprintf", (char*)myprintf);
     engine->addFunctionEntry("func1", (char*)func1);
     engine->addFunctionEntry("func2", (char*)func2);
+    engine->addFunctionEntry("dbg_break", (char*)dbg_break);
 	return engine;
 }
 /*
