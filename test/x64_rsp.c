@@ -21,7 +21,7 @@ int main()  {
 //}
 int add3(int a, int b, int c) {
     int s = a + b + c;
-    func2(a);
+    func2(a,8,9,7);
     func2(b);
     func2(c);
     func2(s);

@@ -3,6 +3,7 @@
     .intel_syntax noprefix
     
     .globl      _func1
+    .globl      _dbg_break
     .globl      _printf
     .globl      _printf2
     .globl      _func2
@@ -10,18 +11,29 @@
     
 _func2:
 #    push    rdx     # for align rsp with 16 bytes
+    call    _dbg_break
+#    push    rax
     push    rbp
-    mov     rdi, [rsp + 0x18)
+    mov     rbp, rsp
+#    mov     rax, rsp
+#    and     rax, 0xf
+#    test    rax,rax
+#    jz      .nn
+    and     rsp, 0xfffffffffffffff0
+.nn:
+    mov     rdi, [rsp + 0x10]
     call    _func1
+    mov     rsp, rbp
     pop     rbp
+#    pop     rax
 #    pop     rdx
     ret
 
 _printf2:
-    mov     rdi, [rsp + 0x8)
-    mov     rsi, [rsp + 0x10)
-    mov     rcx, [rsp + 0x18)
-    mov     rdx, [rsp + 0x20)
+    mov     rdi, [rsp + 0x8]
+    mov     rsi, [rsp + 0x10]
+    mov     rcx, [rsp + 0x18]
+    mov     rdx, [rsp + 0x20]
     lea     rax, [rip + .return]
     push    rax
     xor     rax, rax

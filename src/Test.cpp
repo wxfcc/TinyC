@@ -15,7 +15,9 @@ using namespace std;
 typedef int(*FP_Main)();
 
 // just for set debug breakpoint
-void block() {
+extern "C"
+void dbg_break() {
+    puts("dbg_break");
 }
 
 // direct call printf will cause segmentation fault  ??
